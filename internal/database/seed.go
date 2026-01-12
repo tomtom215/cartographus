@@ -8,7 +8,7 @@ package database
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,8 +21,7 @@ import (
 func (db *DB) SeedMockData(ctx context.Context) error {
 	logging.Info().Msg("Seeding database with mock data for screenshots...")
 
-	// Seed random number generator for consistent but varied data
-	rand.Seed(time.Now().UnixNano())
+	// rand/v2 auto-seeds from system entropy, no explicit seeding needed
 
 	// Define mock data parameters
 	const (

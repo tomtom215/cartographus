@@ -1,0 +1,86 @@
+# golangci-lint configuration for Cartographus
+# https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  build-tags:
+    - wal
+    - nats
+  skip-dirs:
+    - vendor
+    - docs
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+  disable:
+    - deadcode      # deprecated
+    - structcheck   # deprecated
+    - varcheck      # deprecated
+
+linters-settings:
+  errcheck:
+    # Don't check for errors in test files for common test patterns
+    exclude-functions:
+      - (io.Writer).Write
+      - (*os.File).Write
+      - (*os.File).Seek
+      - os.WriteFile
+      - os.MkdirAll
+      - os.Chdir
+      - (net/http.ResponseWriter).Write
+      - (*github.com/gorilla/websocket.Conn).WriteMessage
+
+  staticcheck:
+    checks:
+      - all
+      - -SA1019  # Ignore deprecation warnings (we handle these separately)
+      - -SA5011  # Ignore nil pointer checks after nil check (common test pattern)
+      - -SA4017  # Ignore "doesn't have side effects" for time comparisons
+      - -SA9003  # Ignore empty branches (used in fuzz tests)
+      - -SA4000  # Ignore identical expressions (NaN checks)
+      - -SA1012  # Ignore nil context in tests
+
+  gosimple:
+    checks:
+      - all
+      - -S1009  # Ignore "should omit nil check" (explicit is clearer)
+
+issues:
+  # Exclude test files from certain checks
+  exclude-rules:
+    # Ignore unchecked errors in tests - common pattern for setup/teardown
+    - path: _test\.go
+      linters:
+        - errcheck
+
+    # Ignore unused code warnings in test files
+    - path: _test\.go
+      linters:
+        - unused
+
+    # Database package has prepared infrastructure for future features
+    - path: internal/database/
+      linters:
+        - unused
+
+    # Allow dot imports in tests for testing frameworks
+    - path: _test\.go
+      text: "dot-imports"
+
+  # Maximum issues count per one linter
+  max-issues-per-linter: 50
+
+  # Maximum count of issues with the same text
+  max-same-issues: 10
+
+  # Don't hide issues in vendor, generated files, etc.
+  exclude-use-default: false
+
+  # New issues introduced in the last N commits
+  new: false
