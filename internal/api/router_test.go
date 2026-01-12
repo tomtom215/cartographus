@@ -59,7 +59,7 @@ func setupRouterTestHandler(t *testing.T) (*Handler, *database.DB) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	mockClient := &MockTautulliClient{}
 
@@ -858,7 +858,7 @@ func BenchmarkRouterSetup(b *testing.B) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		db:        db,
@@ -904,7 +904,7 @@ func BenchmarkRouterHandleRequest(b *testing.B) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		db:        db,

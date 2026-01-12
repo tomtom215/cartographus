@@ -141,7 +141,7 @@ func TestService_LookupIP(t *testing.T) {
 	t.Run("returns VPN details when found", func(t *testing.T) {
 		service, _ := NewService(nil, &Config{Enabled: true})
 
-		service.lookup.AddServer(&Server{
+		_ = service.lookup.AddServer(&Server{
 			Provider: "expressvpn",
 			Country:  "Germany",
 			City:     "Frankfurt",
@@ -367,11 +367,11 @@ func TestService_GetStats(t *testing.T) {
 	}
 
 	// Add some data
-	service.lookup.AddServer(&Server{
+	_ = service.lookup.AddServer(&Server{
 		Provider: "test",
 		IPs:      []string{"192.0.2.1", "192.0.2.2"},
 	})
-	service.lookup.AddServer(&Server{
+	_ = service.lookup.AddServer(&Server{
 		Provider: "test",
 		IPs:      []string{"2001:db8::1"},
 	})
@@ -473,7 +473,7 @@ func TestService_Reload(t *testing.T) {
 	}
 
 	// Add data directly to lookup
-	service.lookup.AddServer(&Server{
+	_ = service.lookup.AddServer(&Server{
 		Provider: "test",
 		IPs:      []string{"192.0.2.1"},
 	})
@@ -497,7 +497,7 @@ func TestService_EnrichWithVPNInfo(t *testing.T) {
 	service, _ := NewService(nil, &Config{Enabled: true})
 
 	// Add VPN data
-	service.lookup.AddServer(&Server{
+	_ = service.lookup.AddServer(&Server{
 		Provider: "mullvad",
 		Country:  "Netherlands",
 		City:     "Amsterdam",
@@ -634,7 +634,7 @@ func TestService_ConcurrentAccess(t *testing.T) {
 	service, _ := NewService(nil, nil)
 
 	// Add some data
-	service.lookup.AddServer(&Server{
+	_ = service.lookup.AddServer(&Server{
 		Provider: "test",
 		IPs:      []string{"192.0.2.1"},
 	})

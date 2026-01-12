@@ -20,7 +20,7 @@ func TestFileExists(t *testing.T) {
 	defer env.Close()
 
 	existingFile := filepath.Join(env.tempDir, "exists.txt")
-	os.WriteFile(existingFile, []byte("test"), 0644)
+	_ = os.WriteFile(existingFile, []byte("test"), 0644)
 
 	if !fileExists(existingFile) {
 		t.Error("expected file to exist")
@@ -40,7 +40,7 @@ func TestGetFileSize(t *testing.T) {
 
 	content := []byte("test content here")
 	filePath := filepath.Join(env.tempDir, "test.txt")
-	os.WriteFile(filePath, content, 0644)
+	_ = os.WriteFile(filePath, content, 0644)
 
 	size := getFileSize(filePath)
 	if size != int64(len(content)) {
@@ -146,7 +146,7 @@ func TestOpenArchiveReader(t *testing.T) {
 
 	t.Run("uncompressed tar", func(t *testing.T) {
 		filePath := filepath.Join(env.tempDir, "test.tar")
-		os.WriteFile(filePath, []byte("fake tar content"), 0644)
+		_ = os.WriteFile(filePath, []byte("fake tar content"), 0644)
 
 		reader, closers, err := openArchiveReader(filePath)
 		if err != nil {

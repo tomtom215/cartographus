@@ -371,7 +371,7 @@ func TestGetPlaybackTrends_NilContext(t *testing.T) {
 
 	// nil context should be handled by ensureContext
 	// Note: This tests the internal ensureContext fallback behavior
-	trends, interval, err := db.GetPlaybackTrends(nil, filter)
+	trends, interval, err := db.GetPlaybackTrends(nil, filter) //nolint:staticcheck // SA1012: intentionally testing nil context handling
 	if err != nil {
 		t.Logf("GetPlaybackTrends with nil context returned error (may be expected): %v", err)
 	}

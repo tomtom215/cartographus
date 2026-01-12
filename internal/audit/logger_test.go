@@ -352,7 +352,7 @@ func TestMemoryStore_Delete(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		_ = store.Save(ctx, &e)
 	}
 
 	// Delete events older than 36 hours
@@ -380,7 +380,7 @@ func TestMemoryStore_Count(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		_ = store.Save(ctx, &e)
 	}
 
 	// Count all
@@ -408,7 +408,7 @@ func TestMemoryStore_GetStats(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		_ = store.Save(ctx, &e)
 	}
 
 	stats, err := store.GetStats(ctx)

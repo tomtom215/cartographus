@@ -230,7 +230,7 @@ func setupTestManager(t *testing.T) (*Manager, *database.DB) {
 
 	// Create WebSocket hub
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	// Create mock client
 	mockClient := &MockTautulliClient{}
@@ -448,7 +448,7 @@ func TestManagerInterval(t *testing.T) {
 	defer db.Close()
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	mockClient := &MockTautulliClient{}
 

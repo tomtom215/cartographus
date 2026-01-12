@@ -582,7 +582,7 @@ func TestEnsureContext(t *testing.T) {
 	defer db.Close()
 
 	t.Run("nil context gets timeout", func(t *testing.T) {
-		ctx, cancel := db.ensureContext(nil)
+		ctx, cancel := db.ensureContext(nil) //nolint:staticcheck // SA1012: intentionally testing nil context handling
 		defer cancel()
 
 		deadline, hasDeadline := ctx.Deadline()

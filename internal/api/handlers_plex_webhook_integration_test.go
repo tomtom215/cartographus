@@ -69,7 +69,7 @@ func TestPlexWebhook_Integration_EventPublishing(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	publisher := &mockEventPublisher{}
 
@@ -186,7 +186,7 @@ func TestPlexWebhook_Integration_MultipleEventTypes(t *testing.T) {
 			}
 
 			wsHub := ws.NewHub()
-			go wsHub.Run()
+			go wsHub.RunWithContext(context.Background())
 
 			publisher := &mockEventPublisher{}
 
@@ -257,7 +257,7 @@ func TestPlexWebhook_Integration_WebSocketBroadcast(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	// Give hub time to start
 	time.Sleep(50 * time.Millisecond)
@@ -324,7 +324,7 @@ func TestPlexWebhook_Integration_TVShowMetadata(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	publisher := &mockEventPublisher{}
 
@@ -410,7 +410,7 @@ func TestPlexWebhook_Integration_ConcurrentRequests(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		cache:     cache.New(5 * time.Minute),

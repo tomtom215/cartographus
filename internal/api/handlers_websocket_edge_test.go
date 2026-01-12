@@ -6,6 +6,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +23,7 @@ func TestWebSocket_MethodNotAllowed(t *testing.T) {
 	t.Parallel()
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		wsHub: wsHub,
@@ -60,7 +61,7 @@ func TestWebSocket_MissingUpgradeHeaders(t *testing.T) {
 	t.Parallel()
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		wsHub: wsHub,
