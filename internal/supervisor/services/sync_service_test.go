@@ -185,7 +185,11 @@ func TestSyncServiceWithSupervisor(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
 		defer cancel()
 
-		go sup.Serve(ctx)
+		go func() {
+			if err := sup.Serve(ctx); err != nil && err != context.DeadlineExceeded && err != context.Canceled {
+				t.Logf("Supervisor serve error (expected during test): %v", err)
+			}
+		}()
 		time.Sleep(200 * time.Millisecond)
 
 		// Should have been started at least 3 times (2 failures + 1 success)

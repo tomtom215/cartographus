@@ -154,28 +154,6 @@ func (db *DB) clearStatementCache() {
 	db.stmtCacheMu.Unlock()
 }
 
-// withConnectionRecovery wraps a database operation with automatic connection recovery
-func (db *DB) withConnectionRecovery(operation func() error) error {
-	err := operation()
-	if err == nil {
-		return nil
-	}
-
-	if !isConnectionError(err) {
-		return err
-	}
-
-	if reconnectErr := db.reconnect(); reconnectErr != nil {
-		return fmt.Errorf("connection recovery failed: %w (original error: %w)", reconnectErr, err)
-	}
-
-	if retryErr := operation(); retryErr != nil {
-		return fmt.Errorf("operation failed after reconnection: %w", retryErr)
-	}
-
-	return nil
-}
-
 // isConnectionError checks if an error indicates database connection loss
 func isConnectionError(err error) bool {
 	if err == nil {

@@ -378,7 +378,7 @@ func TestPlexWebhook_WithEventPublisher(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background()) //nolint:errcheck // Test only
 
 	pub := &mockWebhookEventPublisher{}
 

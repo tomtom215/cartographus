@@ -805,7 +805,9 @@ func TestCalculateNextBackupTime(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	mockDB := &MockDatabase{path: filepath.Join(tempDir, "test.duckdb")}
-	os.WriteFile(mockDB.path, []byte("test"), 0644)
+	if err := os.WriteFile(mockDB.path, []byte("test"), 0644); err != nil {
+		t.Fatalf("failed to write mock db: %v", err)
+	}
 
 	cfg := &Config{
 		Enabled:   true,

@@ -346,7 +346,9 @@ func TestOpenVerificationDB(t *testing.T) {
 		}
 		defer os.Remove(tmpFile.Name())
 
-		tmpFile.WriteString("not a valid duckdb file")
+		if _, err := tmpFile.WriteString("not a valid duckdb file"); err != nil {
+			t.Fatalf("failed to write temp file: %v", err)
+		}
 		tmpFile.Close()
 
 		_, err = openVerificationDB(ctx, tmpFile.Name())
@@ -385,7 +387,9 @@ func TestVerifyRestoredDatabase(t *testing.T) {
 
 		// Create empty file
 		emptyDB := filepath.Join(env.tempDir, "empty.duckdb")
-		os.WriteFile(emptyDB, []byte{}, 0o644)
+		if err := os.WriteFile(emptyDB, []byte{}, 0o644); err != nil {
+			t.Fatalf("failed to write empty db: %v", err)
+		}
 
 		cfg := env.newTestConfig()
 		mockDB := &mockDatabaseInterface{
@@ -598,9 +602,13 @@ func TestRestoreConfigFiles(t *testing.T) {
 
 		// Create config directory and file
 		configDir := filepath.Join(tempDir, "config")
-		os.MkdirAll(configDir, 0o750)
+		if err := os.MkdirAll(configDir, 0o750); err != nil {
+			t.Fatalf("failed to create config dir: %v", err)
+		}
 		configFile := filepath.Join(configDir, "config.json")
-		os.WriteFile(configFile, []byte(`{"key": "value"}`), 0o644)
+		if err := os.WriteFile(configFile, []byte(`{"key": "value"}`), 0o644); err != nil {
+			t.Fatalf("failed to write config file: %v", err)
+		}
 
 		result := &RestoreResult{}
 		manager.restoreConfigFiles(tempDir, result)
@@ -624,9 +632,13 @@ func TestRestoreConfigFiles(t *testing.T) {
 
 		// Create config directory and file
 		configDir := filepath.Join(tempDir, "config")
-		os.MkdirAll(configDir, 0o750)
+		if err := os.MkdirAll(configDir, 0o750); err != nil {
+			t.Fatalf("failed to create config dir: %v", err)
+		}
 		configFile := filepath.Join(configDir, "config.json")
-		os.WriteFile(configFile, []byte(`{"key": "value"}`), 0o644)
+		if err := os.WriteFile(configFile, []byte(`{"key": "value"}`), 0o644); err != nil {
+			t.Fatalf("failed to write config file: %v", err)
+		}
 
 		result := &RestoreResult{}
 		manager.restoreConfigFiles(tempDir, result)

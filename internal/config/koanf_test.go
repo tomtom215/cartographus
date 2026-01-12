@@ -177,7 +177,11 @@ func TestFindConfigFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get working directory: %v", err)
 	}
-	defer os.Chdir(origDir)
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore working directory: %v", err)
+		}
+	}()
 
 	// Change to temp directory
 	if err := os.Chdir(tmpDir); err != nil {

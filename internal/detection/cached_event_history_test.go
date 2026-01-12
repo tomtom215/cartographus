@@ -267,7 +267,7 @@ func TestCachedEventHistory_GetActiveStreamsForUser(t *testing.T) {
 	}
 
 	// Second call should also call wrapped (no caching)
-	cached.GetActiveStreamsForUser(context.Background(), 42, "server1")
+	_, _ = cached.GetActiveStreamsForUser(context.Background(), 42, "server1")
 	if mock.activeStreamsCalls != 2 {
 		t.Errorf("expected 2 calls (no caching), got %d", mock.activeStreamsCalls)
 	}
@@ -378,7 +378,7 @@ func TestCachedEventHistory_GetSimultaneousLocations(t *testing.T) {
 	}
 
 	// Second call should also call wrapped (no caching)
-	cached.GetSimultaneousLocations(context.Background(), 42, "server1", 30*time.Minute)
+	_, _ = cached.GetSimultaneousLocations(context.Background(), 42, "server1", 30*time.Minute)
 	if mock.simultaneousCalls != 2 {
 		t.Errorf("expected 2 calls (no caching), got %d", mock.simultaneousCalls)
 	}
@@ -438,16 +438,16 @@ func TestCachedEventHistory_Stats(t *testing.T) {
 	cached := NewCachedEventHistory(mock, DefaultCachedEventHistoryConfig())
 
 	// Generate some stats
-	cached.GetLastEventForUser(context.Background(), 42, "server1") // miss
-	cached.GetLastEventForUser(context.Background(), 42, "server1") // hit
-	cached.GetLastEventForUser(context.Background(), 42, "server1") // hit
+	_, _ = cached.GetLastEventForUser(context.Background(), 42, "server1") // miss
+	_, _ = cached.GetLastEventForUser(context.Background(), 42, "server1") // hit
+	_, _ = cached.GetLastEventForUser(context.Background(), 42, "server1") // hit
 
 	cached.RecordEvent(&DetectionEvent{
 		MachineID: "m1",
 		ServerID:  "s1",
 		IPAddress: "1.1.1.1",
 	})
-	cached.GetRecentIPsForDevice(context.Background(), "m1", "s1", 5*time.Minute) // hit
+	_, _ = cached.GetRecentIPsForDevice(context.Background(), "m1", "s1", 5*time.Minute) // hit
 
 	stats := cached.Stats()
 

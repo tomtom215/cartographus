@@ -324,7 +324,9 @@ func TestEngine_Metrics(t *testing.T) {
 			Username:  "testuser",
 			Timestamp: time.Now(),
 		}
-		engine.Process(context.Background(), event)
+		if _, err := engine.Process(context.Background(), event); err != nil {
+			t.Fatalf("Process() error = %v", err)
+		}
 	}
 
 	metrics := engine.Metrics()
@@ -384,7 +386,9 @@ func TestEngine_SetDetectorEnabled(t *testing.T) {
 	}
 
 	// Re-enable
-	engine.SetDetectorEnabled(RuleTypeImpossibleTravel, true)
+	if err := engine.SetDetectorEnabled(RuleTypeImpossibleTravel, true); err != nil {
+		t.Fatalf("SetDetectorEnabled() error = %v", err)
+	}
 	if !d.Enabled() {
 		t.Error("detector should be enabled")
 	}
@@ -666,7 +670,9 @@ func TestEngine_Metrics_DetectorMetrics(t *testing.T) {
 		Longitude: -0.1278,
 		Timestamp: time.Now(),
 	}
-	engine.Process(context.Background(), event)
+	if _, err := engine.Process(context.Background(), event); err != nil {
+		t.Fatalf("Process() error = %v", err)
+	}
 
 	metrics := engine.Metrics()
 

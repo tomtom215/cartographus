@@ -384,7 +384,7 @@ func TestClient_ReadPump_UnexpectedCloseError(t *testing.T) {
 
 	server := setupWebSocketServer(t, func(t *testing.T, conn *websocket.Conn) {
 		time.Sleep(10 * time.Millisecond)
-		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseAbnormalClosure, "test close"))
+		_ = conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseAbnormalClosure, "test close"))
 		conn.Close()
 	})
 	defer server.Close()

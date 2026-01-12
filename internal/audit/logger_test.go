@@ -268,7 +268,9 @@ func TestMemoryStore_Query(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		if err := store.Save(ctx, &e); err != nil {
+			t.Fatalf("Save() error = %v", err)
+		}
 	}
 
 	// Query by type
@@ -317,7 +319,9 @@ func TestMemoryStore_TimeRangeQuery(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		if err := store.Save(ctx, &e); err != nil {
+			t.Fatalf("Save() error = %v", err)
+		}
 	}
 
 	// Query last 90 minutes

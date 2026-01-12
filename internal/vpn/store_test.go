@@ -220,9 +220,15 @@ func TestDuckDBStore_ListProviders(t *testing.T) {
 	}
 
 	// Add providers
-	store.SaveProvider(ctx, &Provider{Name: "a", DisplayName: "A", IPCount: 100})
-	store.SaveProvider(ctx, &Provider{Name: "b", DisplayName: "B", IPCount: 300})
-	store.SaveProvider(ctx, &Provider{Name: "c", DisplayName: "C", IPCount: 200})
+	if err := store.SaveProvider(ctx, &Provider{Name: "a", DisplayName: "A", IPCount: 100}); err != nil {
+		t.Fatalf("SaveProvider() error = %v", err)
+	}
+	if err := store.SaveProvider(ctx, &Provider{Name: "b", DisplayName: "B", IPCount: 300}); err != nil {
+		t.Fatalf("SaveProvider() error = %v", err)
+	}
+	if err := store.SaveProvider(ctx, &Provider{Name: "c", DisplayName: "C", IPCount: 200}); err != nil {
+		t.Fatalf("SaveProvider() error = %v", err)
+	}
 
 	providers, err = store.ListProviders(ctx)
 	if err != nil {
@@ -276,10 +282,14 @@ func TestDuckDBStore_SaveIP_Upsert(t *testing.T) {
 	}
 
 	// Save initial
-	store.SaveIP(ctx, "192.0.2.1", "provider1", "Country1", "City1", "host1")
+	if err := store.SaveIP(ctx, "192.0.2.1", "provider1", "Country1", "City1", "host1"); err != nil {
+		t.Fatalf("SaveIP() error = %v", err)
+	}
 
 	// Update same IP with different data
-	store.SaveIP(ctx, "192.0.2.1", "provider2", "Country2", "City2", "host2")
+	if err := store.SaveIP(ctx, "192.0.2.1", "provider2", "Country2", "City2", "host2"); err != nil {
+		t.Fatalf("SaveIP() error = %v", err)
+	}
 
 	// Verify updated
 	result, err := store.GetVPNInfo(ctx, "192.0.2.1")
@@ -341,27 +351,33 @@ func TestDuckDBStore_GetServers(t *testing.T) {
 	}
 
 	// Add servers
-	store.SaveServer(ctx, &Server{
+	if err := store.SaveServer(ctx, &Server{
 		Provider: "mullvad",
 		Country:  "Sweden",
 		City:     "Stockholm",
 		Hostname: "se-sto-001.mullvad.net",
 		IPs:      []string{"192.0.2.1", "192.0.2.2"},
-	})
-	store.SaveServer(ctx, &Server{
+	}); err != nil {
+		t.Fatalf("SaveServer() error = %v", err)
+	}
+	if err := store.SaveServer(ctx, &Server{
 		Provider: "mullvad",
 		Country:  "Germany",
 		City:     "Berlin",
 		Hostname: "de-ber-001.mullvad.net",
 		IPs:      []string{"192.0.2.3"},
-	})
-	store.SaveServer(ctx, &Server{
+	}); err != nil {
+		t.Fatalf("SaveServer() error = %v", err)
+	}
+	if err := store.SaveServer(ctx, &Server{
 		Provider: "nordvpn", // Different provider
 		Country:  "Norway",
 		City:     "Oslo",
 		Hostname: "no-osl-001.nordvpn.com",
 		IPs:      []string{"192.0.2.4"},
-	})
+	}); err != nil {
+		t.Fatalf("SaveServer() error = %v", err)
+	}
 
 	servers, err := store.GetServers(ctx, "mullvad")
 	if err != nil {
@@ -398,7 +414,9 @@ func TestDuckDBStore_IsVPNIP(t *testing.T) {
 		t.Fatalf("failed to init schema: %v", err)
 	}
 
-	store.SaveIP(ctx, "192.0.2.1", "test", "Test", "Test", "test.example.com")
+	if err := store.SaveIP(ctx, "192.0.2.1", "test", "Test", "Test", "test.example.com"); err != nil {
+		t.Fatalf("SaveIP() error = %v", err)
+	}
 
 	tests := []struct {
 		ip       string

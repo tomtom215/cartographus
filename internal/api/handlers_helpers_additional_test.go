@@ -93,7 +93,7 @@ func TestParseCommaSeparated_EmptyResults(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := parseCommaSeparated(tt.input)
-			if result != nil && len(result) > 0 {
+			if len(result) > 0 {
 				t.Errorf("Expected empty result for %q, got %v", tt.input, result)
 			}
 		})

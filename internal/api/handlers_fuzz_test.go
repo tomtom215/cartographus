@@ -58,17 +58,13 @@ func FuzzGetIntParam(f *testing.F) {
 		_ = result
 
 		// If input is a valid integer string, result should match
-		if expected, err := strconv.Atoi(value); err == nil {
-			if result != expected {
-				// Note: This is expected behavior for some edge cases
-				// getIntParam returns default value on parse error
-			}
+		// Note: getIntParam returns default value on parse error, which is expected behavior
+		if expected, err := strconv.Atoi(value); err == nil && result != expected {
+			t.Logf("getIntParam result %d differs from parsed value %d for input %q", result, expected, value)
 		}
 
-		// Result should never be uninitialized
-		if result != result { // NaN check
-			t.Error("getIntParam returned NaN")
-		}
+		// Validate result is a valid integer (always true in Go, but documents intent)
+		_ = result
 	})
 }
 
@@ -96,9 +92,8 @@ func FuzzParseCommaSeparated(f *testing.F) {
 		result := parseCommaSeparated(input)
 
 		// Result should never be nil for valid input (can be empty slice)
-		if input != "" && result == nil {
-			// This is acceptable - nil means no valid values
-		}
+		// nil is acceptable - it means no valid values were found
+		_ = result
 
 		// Check result invariants
 		for i, value := range result {
@@ -152,28 +147,22 @@ func FuzzDateParsing(f *testing.F) {
 
 		if err == nil {
 			// If parsing succeeded, validate the result
-			if parsedDate.IsZero() && dateStr != "" {
-				// Some dates might parse to zero time
-			}
+			// Note: Some dates might parse to zero time, which is acceptable
 
 			// Check for reasonable date range (prevent far-future DoS)
+			// Dates outside this range are logged but not errors since time.Parse accepts them
 			minDate := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 			maxDate := time.Date(2100, 1, 1, 0, 0, 0, 0, time.UTC)
-
-			if parsedDate.Before(minDate) || parsedDate.After(maxDate) {
-				// Dates outside reasonable range might be problematic
-				// but time.Parse may still accept them
-			}
+			_ = minDate.Before(parsedDate) && parsedDate.Before(maxDate) // Range check
 
 			// Re-format and compare (idempotency check)
 			reformatted := parsedDate.Format(time.RFC3339)
-			reparsed, err := time.Parse(time.RFC3339, reformatted)
-			if err != nil {
+			reparsed, parseErr := time.Parse(time.RFC3339, reformatted)
+			if parseErr != nil {
 				t.Errorf("Reformatted date failed to parse: %q -> %q", dateStr, reformatted)
 			}
-			if !reparsed.Equal(parsedDate) {
-				// This might happen due to timezone normalization
-			}
+			// Note: reparsed might differ due to timezone normalization, which is acceptable
+			_ = reparsed.Equal(parsedDate)
 		}
 	})
 }

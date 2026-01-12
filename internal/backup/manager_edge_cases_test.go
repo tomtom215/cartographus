@@ -64,9 +64,13 @@ func TestNewManager_EdgeCases(t *testing.T) {
 		env := newTestEnv(t)
 		defer env.Close()
 
-		os.MkdirAll(env.backupDir, 0750)
+		if err := os.MkdirAll(env.backupDir, 0750); err != nil {
+			t.Fatalf("failed to create backup dir: %v", err)
+		}
 		metadataContent := `{"backups":[],"retention":{"min_count":5}}`
-		os.WriteFile(filepath.Join(env.backupDir, "metadata.json"), []byte(metadataContent), 0600)
+		if err := os.WriteFile(filepath.Join(env.backupDir, "metadata.json"), []byte(metadataContent), 0600); err != nil {
+			t.Fatalf("failed to write metadata: %v", err)
+		}
 
 		cfg := &Config{
 			Enabled:   true,
@@ -375,9 +379,13 @@ func TestListBackups_EdgeCases(t *testing.T) {
 		manager := env.newTestManager(t)
 		ctx := context.Background()
 
-		manager.CreateBackup(ctx, TypeFull, "first")
+		if _, err := manager.CreateBackup(ctx, TypeFull, "first"); err != nil {
+			t.Fatalf("CreateBackup() error = %v", err)
+		}
 		time.Sleep(10 * time.Millisecond)
-		manager.CreateBackup(ctx, TypeFull, "second")
+		if _, err := manager.CreateBackup(ctx, TypeFull, "second"); err != nil {
+			t.Fatalf("CreateBackup() error = %v", err)
+		}
 
 		backups, _ := manager.ListBackups(BackupListOptions{SortDesc: false, Limit: 10})
 
@@ -391,7 +399,9 @@ func TestListBackups_EdgeCases(t *testing.T) {
 		defer env.Close()
 
 		manager := env.newTestManager(t)
-		manager.CreateBackup(context.Background(), TypeFull, "test")
+		if _, err := manager.CreateBackup(context.Background(), TypeFull, "test"); err != nil {
+			t.Fatalf("CreateBackup() error = %v", err)
+		}
 
 		status := StatusCompleted
 		backups, _ := manager.ListBackups(BackupListOptions{Status: &status, Limit: 10})
@@ -498,9 +508,13 @@ func TestValidateBackup_EdgeCases(t *testing.T) {
 		env := newTestEnv(t)
 		defer env.Close()
 
-		os.MkdirAll(env.backupDir, 0750)
+		if err := os.MkdirAll(env.backupDir, 0750); err != nil {
+			t.Fatalf("failed to create backup dir: %v", err)
+		}
 		backupFile := filepath.Join(env.backupDir, "test.tar.gz")
-		os.WriteFile(backupFile, []byte("test content"), 0644)
+		if err := os.WriteFile(backupFile, []byte("test content"), 0644); err != nil {
+			t.Fatalf("failed to write backup file: %v", err)
+		}
 
 		cfg := env.newTestConfig()
 		manager, _ := NewManager(cfg, nil)

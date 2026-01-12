@@ -52,7 +52,9 @@ func TestLookup_LookupIP_Found(t *testing.T) {
 		IPs:        []string{"203.0.113.50"},
 	}
 
-	lookup.AddServer(server)
+	if err := lookup.AddServer(server); err != nil {
+		t.Fatalf("AddServer() error = %v", err)
+	}
 
 	result := lookup.LookupIP("203.0.113.50")
 	if !result.IsVPN {

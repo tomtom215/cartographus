@@ -376,7 +376,7 @@ func TestUpdater_HashCalculation(t *testing.T) {
 
 	ctx := context.Background()
 	// This will fail to import (invalid format) but hash should still be calculated
-	updater.UpdateFromURL(ctx, server.URL)
+	_ = updater.UpdateFromURL(ctx, server.URL)
 
 	// The hash is only set on successful import, so let's use valid data
 	validServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

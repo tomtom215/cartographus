@@ -312,7 +312,7 @@ func TestZitadelClaimsMappingConfig(t *testing.T) {
 
 // TestNewZitadelRelyingParty_NilConfig tests nil config handling.
 func TestNewZitadelRelyingParty_NilConfig(t *testing.T) {
-	_, err := NewZitadelRelyingParty(nil, nil)
+	_, err := NewZitadelRelyingParty(context.Background(), nil)
 	if err == nil {
 		t.Error("expected error for nil config")
 	}
@@ -327,7 +327,7 @@ func TestNewZitadelRelyingParty_InvalidConfig(t *testing.T) {
 		// Missing required fields
 	}
 
-	_, err := NewZitadelRelyingParty(nil, config)
+	_, err := NewZitadelRelyingParty(context.Background(), config)
 	if err == nil {
 		t.Error("expected error for invalid config")
 	}

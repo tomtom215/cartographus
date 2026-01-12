@@ -19,7 +19,7 @@ func TestPrometheusMetrics(t *testing.T) {
 		t.Parallel()
 		handler := PrometheusMetrics(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
+			_, _ = w.Write([]byte("OK"))
 		})
 
 		req := httptest.NewRequest("GET", "/api/v1/test", nil)
@@ -36,7 +36,7 @@ func TestPrometheusMetrics(t *testing.T) {
 		t.Parallel()
 		handler := PrometheusMetrics(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Internal Server Error"))
+			_, _ = w.Write([]byte("Internal Server Error"))
 		})
 
 		req := httptest.NewRequest("POST", "/api/v1/test", nil)
@@ -107,7 +107,7 @@ func TestPrometheusMetrics(t *testing.T) {
 		t.Parallel()
 		handler := PrometheusMetrics(func(w http.ResponseWriter, r *http.Request) {
 			// Just write body without explicit WriteHeader
-			w.Write([]byte("Hello"))
+			_, _ = w.Write([]byte("Hello"))
 		})
 
 		req := httptest.NewRequest("GET", "/api/v1/test", nil)
@@ -269,7 +269,7 @@ func TestMetricsResponseWriter(t *testing.T) {
 		}
 
 		// Don't call WriteHeader, just write
-		wrapper.Write([]byte("test"))
+		_, _ = wrapper.Write([]byte("test"))
 
 		// Status code should still be the default
 		if wrapper.statusCode != http.StatusOK {
@@ -282,7 +282,7 @@ func TestMetricsResponseWriter(t *testing.T) {
 func BenchmarkPrometheusMetrics(b *testing.B) {
 	handler := PrometheusMetrics(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	req := httptest.NewRequest("GET", "/api/v1/test", nil)
@@ -315,6 +315,6 @@ func BenchmarkMetricsResponseWriter_Write(b *testing.B) {
 		wrapper := &metricsResponseWriter{
 			ResponseWriter: rec,
 		}
-		wrapper.Write(data)
+		_, _ = wrapper.Write(data)
 	}
 }
