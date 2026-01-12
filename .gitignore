@@ -1,0 +1,108 @@
+# Binaries
+cartographus
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Output of go coverage
+*.out
+coverage.html
+
+# Build artifacts
+/dist/
+/build/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.env
+.envrc
+*.pem
+*.key
+*.crt
+*.p12
+credentials.json
+secrets.yaml
+secrets.yml
+
+# Database files
+*.db
+*.duckdb
+*.duckdb.wal
+*.sqlite
+*.sqlite3
+data/
+/data
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node.js (web frontend)
+web/node_modules/
+web/dist/
+web/.cache/
+web/coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Playwright test artifacts
+web/test-results/
+web/playwright-report/
+web/playwright/.cache/
+
+# DuckDB extensions (downloaded at runtime)
+*.duckdb_extension
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# WAL files
+wal/
+badger/
+
+# NATS data
+nats-data/
+jetstream/
+
+# Docker
+docker-compose.override.yml
+
+# Profiling
+*.pprof
+*.prof
+
+# Vendor (if not committed)
+# vendor/
+
+# OS specific
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Go workspace
+go.work
+go.work.sum

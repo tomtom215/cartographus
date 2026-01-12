@@ -1,0 +1,151 @@
+# Dependabot configuration for Cartographus
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "go"
+    reviewers:
+      - "tomtom215"
+    groups:
+      # Group minor and patch updates for DuckDB
+      duckdb:
+        patterns:
+          - "github.com/duckdb/*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group NATS-related dependencies
+      nats:
+        patterns:
+          - "github.com/nats-io/*"
+          - "github.com/ThreeDotsLabs/watermill*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group OpenTelemetry dependencies
+      otel:
+        patterns:
+          - "go.opentelemetry.io/*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group all other minor/patch updates
+      all-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+        exclude-patterns:
+          - "github.com/duckdb/*"
+          - "github.com/nats-io/*"
+          - "github.com/ThreeDotsLabs/watermill*"
+          - "go.opentelemetry.io/*"
+
+  # npm (frontend)
+  - package-ecosystem: "npm"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "frontend"
+    reviewers:
+      - "tomtom215"
+    groups:
+      # Group MapLibre and mapping dependencies
+      mapping:
+        patterns:
+          - "maplibre-gl*"
+          - "@maplibre/*"
+          - "pmtiles"
+          - "@deck.gl/*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group ECharts dependencies
+      echarts:
+        patterns:
+          - "echarts*"
+          - "echarts-gl"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group development dependencies
+      dev-deps:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group all other production dependencies
+      prod-deps:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+        exclude-patterns:
+          - "maplibre-gl*"
+          - "@maplibre/*"
+          - "pmtiles"
+          - "@deck.gl/*"
+          - "echarts*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "ci"
+    reviewers:
+      - "tomtom215"
+    groups:
+      actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker (Dockerfile)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(docker)"
+    labels:
+      - "dependencies"
+      - "docker"
+    reviewers:
+      - "tomtom215"
