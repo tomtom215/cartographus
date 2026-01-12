@@ -448,10 +448,8 @@ func (f *OIDCFlow) ValidateState(ctx context.Context, state string) (*OIDCStateD
 	}
 
 	// Delete state to prevent replay attacks (single use)
-	if err := f.store.Delete(ctx, state); err != nil {
-		// Log but don't fail - state was already validated
-		// log.Printf("Failed to delete state: %v", err)
-	}
+	// Error is intentionally ignored - state was already validated and deletion is a cleanup step
+	_ = f.store.Delete(ctx, state)
 
 	return stateData, nil
 }

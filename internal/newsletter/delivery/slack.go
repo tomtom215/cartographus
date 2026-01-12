@@ -50,17 +50,17 @@ func (c *SlackChannel) MaxContentLength() int {
 // Validate checks if the Slack webhook configuration is valid.
 func (c *SlackChannel) Validate(config *models.ChannelConfig) error {
 	if config == nil {
-		return fmt.Errorf("Slack configuration is required")
+		return fmt.Errorf("slack configuration is required")
 	}
 	if config.SlackWebhookURL == "" {
-		return fmt.Errorf("Slack webhook URL is required")
+		return fmt.Errorf("slack webhook URL is required")
 	}
 	if err := ValidateWebhookURL(config.SlackWebhookURL); err != nil {
-		return fmt.Errorf("invalid Slack webhook URL: %w", err)
+		return fmt.Errorf("invalid slack webhook URL: %w", err)
 	}
 	// Validate it looks like a Slack webhook
 	if !strings.Contains(config.SlackWebhookURL, "hooks.slack.com/") {
-		return fmt.Errorf("URL does not appear to be a Slack webhook URL")
+		return fmt.Errorf("URL does not appear to be a slack webhook URL")
 	}
 	return nil
 }
@@ -153,7 +153,7 @@ func (c *SlackChannel) Send(ctx context.Context, params *SendParams) (*DeliveryR
 		result.IsTransient = isTransientHTTPError(result.ErrorCode)
 		return result, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	result.ResponseCode = resp.StatusCode
 

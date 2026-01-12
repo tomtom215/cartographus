@@ -153,7 +153,7 @@ func (s *DuckDBStore) LoadUpdateStatus(ctx context.Context) (*UpdateStatus, erro
 	if err != nil {
 		return nil, fmt.Errorf("failed to query metadata: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var key, value string
@@ -234,7 +234,7 @@ func (s *DuckDBStore) ListProviders(ctx context.Context) ([]Provider, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to list providers: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var providers []Provider
 	for rows.Next() {
@@ -271,7 +271,7 @@ func (s *DuckDBStore) GetServers(ctx context.Context, provider string) ([]Server
 	if err != nil {
 		return nil, fmt.Errorf("failed to get servers: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var servers []Server
 	for rows.Next() {
@@ -418,7 +418,7 @@ func (s *DuckDBStore) LoadIntoLookup(ctx context.Context, lookup *Lookup) error 
 	if err != nil {
 		return fmt.Errorf("failed to load VPN IPs: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	serverMap := make(map[string]*Server)
 	for rows.Next() {

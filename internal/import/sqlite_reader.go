@@ -310,7 +310,7 @@ func (r *SQLiteReader) ReadBatch(ctx context.Context, sinceID int64, limit int) 
 	if err != nil {
 		return nil, fmt.Errorf("query records: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var records []TautulliRecord
 	for rows.Next() {
@@ -450,7 +450,7 @@ func (r *SQLiteReader) GetMediaTypeStats(ctx context.Context) (map[string]int, e
 	if err != nil {
 		return nil, fmt.Errorf("get media type stats: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	stats := make(map[string]int)
 	for rows.Next() {

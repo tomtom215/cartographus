@@ -136,7 +136,7 @@ func (m *MiddlewareV2) buildAuthenticator(cfg *MiddlewareV2Config) (Authenticato
 
 	case AuthModePlex:
 		if cfg.PlexAuthenticator == nil {
-			return nil, errors.New("Plex authenticator required for plex auth mode")
+			return nil, errors.New("plex authenticator required for plex auth mode")
 		}
 		return cfg.PlexAuthenticator, nil
 

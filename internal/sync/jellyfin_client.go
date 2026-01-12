@@ -101,11 +101,7 @@ func (c *JellyfinClient) GetSessions(ctx context.Context) ([]models.JellyfinSess
 	if err != nil {
 		return nil, fmt.Errorf("jellyfin sessions request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail - main operation succeeded
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
@@ -152,11 +148,7 @@ func (c *JellyfinClient) GetSystemInfo(ctx context.Context) (*JellyfinSystemInfo
 	if err != nil {
 		return nil, fmt.Errorf("jellyfin system info request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
@@ -182,11 +174,7 @@ func (c *JellyfinClient) GetUsers(ctx context.Context) ([]JellyfinUser, error) {
 	if err != nil {
 		return nil, fmt.Errorf("jellyfin users request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
@@ -212,11 +200,7 @@ func (c *JellyfinClient) Ping(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("jellyfin ping failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("jellyfin ping returned status %d", resp.StatusCode)
@@ -239,11 +223,7 @@ func (c *JellyfinClient) StopSession(ctx context.Context, sessionID string) erro
 	if err != nil {
 		return fmt.Errorf("jellyfin stop session request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Jellyfin returns 204 No Content on success
 	if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {

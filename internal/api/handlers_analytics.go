@@ -318,7 +318,7 @@ func (h *Handler) AnalyticsGeographic(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) validateLimitParam(r *http.Request, defaultLimit, maxLimit int) (int, error) {
 	limit := getIntParam(r, "limit", defaultLimit)
 	if limit < 1 || limit > maxLimit {
-		return 0, fmt.Errorf("Limit must be between 1 and %d", maxLimit)
+		return 0, fmt.Errorf("limit must be between 1 and %d", maxLimit)
 	}
 	return limit, nil
 }
@@ -330,7 +330,7 @@ func validateStringParam(r *http.Request, paramName, defaultValue string, validV
 		return defaultValue, nil
 	}
 	if !validValues[value] {
-		return "", fmt.Errorf("Invalid %s parameter", paramName)
+		return "", fmt.Errorf("invalid %s parameter", paramName)
 	}
 	return value, nil
 }
