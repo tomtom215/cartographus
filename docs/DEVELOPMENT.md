@@ -36,7 +36,7 @@ This document covers development workflow, code conventions, testing strategy, a
 ```bash
 # 1. Clone repository
 git clone https://github.com/tomtom215/cartographus.git
-cd map
+cd cartographus
 
 # 2. Install dependencies
 make install-deps

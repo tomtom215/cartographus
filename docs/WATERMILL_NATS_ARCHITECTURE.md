@@ -178,7 +178,7 @@ The new event processor will:
 The event processor will be added to the existing project structure:
 
 ```
-map/
+cartographus/
 ├── internal/
 │   ├── eventprocessor/           # NEW: Event processing package
 │   │   ├── config.go             # Event processor configuration

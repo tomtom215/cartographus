@@ -285,7 +285,7 @@ For bare-metal installations without Docker.
 ```bash
 # Clone repository
 git clone https://github.com/tomtom215/cartographus.git
-cd map
+cd cartographus
 
 # Set required environment variables
 export GOTOOLCHAIN=local

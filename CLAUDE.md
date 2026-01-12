@@ -190,7 +190,7 @@ Cartographus is a self-hosted media server analytics platform that visualizes pl
 ## Directory Structure
 
 ```
-map/
+cartographus/
 ├── cmd/server/main.go           # Application entry point
 ├── internal/                    # Private application code (26 packages)
 │   ├── api/                     # HTTP handlers (~51 source files)

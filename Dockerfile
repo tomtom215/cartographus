@@ -151,12 +151,12 @@ RUN --mount=type=cache,id=gomod,target=/go/pkg/mod \
     -tags "wal,nats" \
     -ldflags="-w -s" \
     -p=$(nproc) \
-    -o map \
+    -o cartographus \
     ./cmd/server && \
     \
     # Verify binary architecture matches target
-    file map && \
-    echo "✅ Binary built: $(ls -lh map | awk '{print $5}') for ${TARGETARCH}"
+    file cartographus && \
+    echo "✅ Binary built: $(ls -lh cartographus | awk '{print $5}') for ${TARGETARCH}"
 
 # Stage 3: Final runtime image
 FROM debian:trixie-slim
@@ -170,17 +170,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
     curl \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd -g 1000 map \
-    && useradd -u 1000 -g map -s /bin/sh -m map
+    && groupadd -g 1000 cartographus \
+    && useradd -u 1000 -g cartographus -s /bin/sh -m cartographus
 
 # Pre-install DuckDB extensions to avoid runtime downloads
 # This ensures the app starts reliably without network dependencies
-# Extensions are installed to /home/map/.duckdb/extensions/ (user home)
+# Extensions are installed to /home/cartographus/.duckdb/extensions/ (user home)
 ARG TARGETARCH
 RUN set -ex; \
     PLATFORM="linux_amd64"; \
     if [ "$TARGETARCH" = "arm64" ]; then PLATFORM="linux_arm64"; fi; \
-    EXTENSIONS_DIR="/home/map/.duckdb/extensions/${DUCKDB_VERSION}/${PLATFORM}"; \
+    EXTENSIONS_DIR="/home/cartographus/.duckdb/extensions/${DUCKDB_VERSION}/${PLATFORM}"; \
     mkdir -p "$EXTENSIONS_DIR"; \
     MAIN_REPO="https://extensions.duckdb.org/${DUCKDB_VERSION}/${PLATFORM}"; \
     COMMUNITY_REPO="https://community-extensions.duckdb.org/${DUCKDB_VERSION}/${PLATFORM}"; \
@@ -203,20 +203,20 @@ RUN set -ex; \
         gunzip -f "${EXTENSIONS_DIR}/${ext}.duckdb_extension.gz" && \
         echo "  OK: ${ext} ($(du -h "${EXTENSIONS_DIR}/${ext}.duckdb_extension" | cut -f1))"; \
     done; \
-    # Fix ownership for map user
-    chown -R map:map /home/map/.duckdb; \
+    # Fix ownership for cartographus user
+    chown -R cartographus:cartographus /home/cartographus/.duckdb; \
     echo "=== Extensions installed: $(du -sh "$EXTENSIONS_DIR" | cut -f1) total ==="; \
     ls -la "$EXTENSIONS_DIR/"
 
 WORKDIR /app
 
-COPY --from=backend-builder /build/map /app/map
+COPY --from=backend-builder /build/cartographus /app/cartographus
 COPY --from=backend-builder /build/internal/templates /app/internal/templates
 COPY --from=frontend-builder /build/web/dist /app/web/dist
 
 # Verify all files were copied to runtime image
 RUN echo "=== Verifying runtime image files ===" && \
-    test -f /app/map || (echo "❌ ERROR: /app/map binary not found" && exit 1) && \
+    test -f /app/cartographus || (echo "❌ ERROR: /app/cartographus binary not found" && exit 1) && \
     test -d /app/web/dist || (echo "❌ ERROR: /app/web/dist directory not found" && exit 1) && \
     test -f /app/web/dist/styles.css || (echo "❌ ERROR: /app/web/dist/styles.css not found in runtime image" && exit 1) && \
     test -f /app/web/dist/index.html || (echo "❌ ERROR: /app/web/dist/index.html not found in runtime image" && exit 1) && \
@@ -234,9 +234,9 @@ RUN echo "=== Verifying runtime image files ===" && \
     echo ""
 
 RUN mkdir -p /data && \
-    chown -R map:map /app /data
+    chown -R cartographus:cartographus /app /data
 
-USER map
+USER cartographus
 
 EXPOSE 3857
 
@@ -250,4 +250,4 @@ ENV DUCKDB_PATH=/data/cartographus.duckdb \
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:3857/api/v1/health/ready || exit 1
 
-ENTRYPOINT ["/app/map"]
+ENTRYPOINT ["/app/cartographus"]
