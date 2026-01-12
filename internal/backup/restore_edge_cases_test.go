@@ -253,7 +253,7 @@ func TestCopyFile(t *testing.T) {
 		src := filepath.Join(env.tempDir, "source.txt")
 		dst := filepath.Join(env.tempDir, "dest.txt")
 
-		os.WriteFile(src, []byte("test content"), 0644)
+		_ = os.WriteFile(src, []byte("test content"), 0644)
 
 		err := copyFile(src, dst)
 		if err != nil {
@@ -277,7 +277,7 @@ func TestCopyFile(t *testing.T) {
 		src := filepath.Join(env.tempDir, "source2.txt")
 		dst := filepath.Join(env.tempDir, "newdir", "subdir", "dest2.txt")
 
-		os.WriteFile(src, []byte("test"), 0644)
+		_ = os.WriteFile(src, []byte("test"), 0644)
 
 		err := copyFile(src, dst)
 		if err != nil {

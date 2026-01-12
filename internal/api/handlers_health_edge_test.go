@@ -161,7 +161,7 @@ func TestHealth_WithWebSocket(t *testing.T) {
 	t.Parallel()
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		startTime: time.Now(),

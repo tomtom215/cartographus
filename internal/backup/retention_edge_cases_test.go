@@ -45,9 +45,9 @@ func TestApplyRetentionPolicy(t *testing.T) {
 		env := newTestEnv(t)
 		defer env.Close()
 
-		os.MkdirAll(env.backupDir, 0750)
+		_ = os.MkdirAll(env.backupDir, 0750)
 		oldBackupFile := filepath.Join(env.backupDir, "old-backup.tar.gz")
-		os.WriteFile(oldBackupFile, []byte("old"), 0644)
+		_ = os.WriteFile(oldBackupFile, []byte("old"), 0644)
 
 		cfg := &Config{
 			Enabled:   true,
@@ -177,9 +177,9 @@ func TestCleanupCorruptedBackups(t *testing.T) {
 	env := newTestEnv(t)
 	defer env.Close()
 
-	os.MkdirAll(env.backupDir, 0750)
+	_ = os.MkdirAll(env.backupDir, 0750)
 	validFile := filepath.Join(env.backupDir, "valid.tar.gz")
-	os.WriteFile(validFile, []byte("valid content"), 0644)
+	_ = os.WriteFile(validFile, []byte("valid content"), 0644)
 
 	cfg := env.newTestConfig()
 	manager, _ := NewManager(cfg, nil)

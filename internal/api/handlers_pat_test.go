@@ -62,7 +62,7 @@ func setupPATTestHandler(t *testing.T) (*Handler, *database.DB, func()) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		db:        db,
