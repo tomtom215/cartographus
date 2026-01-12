@@ -50,7 +50,7 @@ func BenchmarkCreateBackup(b *testing.B) {
 			b.Fatalf("backup failed: %v", err)
 		}
 		// Clean up
-		os.Remove(backup.FilePath)
+		_ = os.Remove(backup.FilePath)
 	}
 }
 

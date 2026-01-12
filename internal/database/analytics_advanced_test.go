@@ -111,7 +111,7 @@ func insertMoviePlaybacks(t *testing.T, db *DB, now time.Time, title string, cou
 // TestGetBingeAnalytics_WithBingeSessions tests binge watching detection
 func TestGetBingeAnalytics_WithBingeSessions(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -169,7 +169,7 @@ func TestGetBingeAnalytics_WithBingeSessions(t *testing.T) {
 // TestGetBingeAnalytics_NoBingeSessions tests when no binge sessions exist
 func TestGetBingeAnalytics_NoBingeSessions(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -188,7 +188,7 @@ func TestGetBingeAnalytics_NoBingeSessions(t *testing.T) {
 // TestGetBingeAnalytics_WithUserFilter tests filtering by user
 func TestGetBingeAnalytics_WithUserFilter(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -228,7 +228,7 @@ func TestGetBingeAnalytics_WithUserFilter(t *testing.T) {
 // TestGetBandwidthAnalytics_Success tests bandwidth analytics
 func TestGetBandwidthAnalytics_Success(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -284,7 +284,7 @@ func TestGetBandwidthAnalytics_Success(t *testing.T) {
 // TestGetPopularContent_Success tests popular content analytics
 func TestGetPopularContent_Success(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -324,7 +324,7 @@ func TestGetPopularContent_Success(t *testing.T) {
 // TestGetWatchParties_DetectsSimultaneousViewing tests watch party detection
 func TestGetWatchParties_DetectsSimultaneousViewing(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -358,7 +358,7 @@ func TestGetWatchParties_DetectsSimultaneousViewing(t *testing.T) {
 // TestGetUserEngagement_Success tests user engagement metrics
 func TestGetUserEngagement_Success(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -398,7 +398,7 @@ func TestGetUserEngagement_Success(t *testing.T) {
 // TestGetComparativeAnalytics_WeekOverWeek tests comparative analytics
 func TestGetComparativeAnalytics_WeekOverWeek(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -448,7 +448,7 @@ func TestGetComparativeAnalytics_WeekOverWeek(t *testing.T) {
 // TestGetComparativeAnalytics_MonthOverMonth tests month-over-month comparison
 func TestGetComparativeAnalytics_MonthOverMonth(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -472,7 +472,7 @@ func TestGetComparativeAnalytics_MonthOverMonth(t *testing.T) {
 // TestGetContentAbandonmentAnalytics_HighAbandonmentContent tests content with high abandonment rates
 func TestGetContentAbandonmentAnalytics_HighAbandonmentContent(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -520,7 +520,7 @@ func TestGetContentAbandonmentAnalytics_HighAbandonmentContent(t *testing.T) {
 // TestGetContentAbandonmentAnalytics_HighCompletionContent tests content with high completion rates
 func TestGetContentAbandonmentAnalytics_HighCompletionContent(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -560,7 +560,7 @@ func TestGetContentAbandonmentAnalytics_HighCompletionContent(t *testing.T) {
 // TestGetContentAbandonmentAnalytics_TVShowFirstEpisodeDropOff tests first episode abandonment
 func TestGetContentAbandonmentAnalytics_TVShowFirstEpisodeDropOff(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -632,7 +632,7 @@ func TestGetContentAbandonmentAnalytics_TVShowFirstEpisodeDropOff(t *testing.T) 
 // TestGetContentAbandonmentAnalytics_FilterByMediaType tests filtering by media type
 func TestGetContentAbandonmentAnalytics_FilterByMediaType(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	now := time.Now()
@@ -691,7 +691,7 @@ func TestGetContentAbandonmentAnalytics_FilterByMediaType(t *testing.T) {
 // TestGetContentAbandonmentAnalytics_EmptyDataset tests with no playback events
 func TestGetContentAbandonmentAnalytics_EmptyDataset(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	insertTestGeolocations(t, db)
 
 	analytics, err := db.GetContentAbandonmentAnalytics(context.Background(), LocationStatsFilter{})

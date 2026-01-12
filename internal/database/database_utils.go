@@ -35,7 +35,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/tomtom215/cartographus/internal/logging"

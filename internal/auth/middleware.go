@@ -152,14 +152,14 @@ func (m *Middleware) extractJWTToken(r *http.Request, authHeader string) (string
 	if authHeader == "" {
 		cookie, err := r.Cookie("token")
 		if err != nil {
-			return "", fmt.Errorf("Unauthorized: missing token")
+			return "", fmt.Errorf("unauthorized: missing token")
 		}
 		return cookie.Value, nil
 	}
 
 	parts := strings.SplitN(authHeader, " ", 2)
 	if len(parts) != 2 || parts[0] != "Bearer" {
-		return "", fmt.Errorf("Unauthorized: invalid authorization header")
+		return "", fmt.Errorf("unauthorized: invalid authorization header")
 	}
 
 	return parts[1], nil

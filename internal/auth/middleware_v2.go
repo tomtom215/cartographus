@@ -120,7 +120,7 @@ func (m *MiddlewareV2) buildAuthenticator(cfg *MiddlewareV2Config) (Authenticato
 
 	case AuthModeBasic:
 		if cfg.BasicAuthManager == nil {
-			return nil, errors.New("Basic auth manager required for basic auth mode")
+			return nil, errors.New("basic auth manager required for basic auth mode")
 		}
 		basicConfig := &BasicAuthenticatorConfig{
 			DefaultRole:   cfg.BasicAuthDefaultRole,

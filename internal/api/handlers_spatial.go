@@ -382,7 +382,7 @@ func (h *Handler) validateServerLocation() (*ServerLocation, error) {
 	serverLat := h.config.Server.Latitude
 	serverLon := h.config.Server.Longitude
 	if serverLat == 0.0 && serverLon == 0.0 {
-		return nil, fmt.Errorf("Server location not configured (set SERVER_LATITUDE and SERVER_LONGITUDE)")
+		return nil, fmt.Errorf("server location not configured (set SERVER_LATITUDE and SERVER_LONGITUDE)")
 	}
 	return &ServerLocation{Lat: serverLat, Lon: serverLon}, nil
 }

@@ -1,27 +1,21 @@
 # golangci-lint configuration for Cartographus
 # https://golangci-lint.run/usage/configuration/
+version: "2"
 
 run:
   timeout: 5m
   build-tags:
     - wal
     - nats
-  skip-dirs:
-    - vendor
-    - docs
 
 linters:
+  default: none
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - unused
-  disable:
-    - deadcode      # deprecated
-    - structcheck   # deprecated
-    - varcheck      # deprecated
 
 linters-settings:
   errcheck:
@@ -38,7 +32,9 @@ issues:
   max-same-issues: 10
 
   # Don't hide issues in vendor, generated files, etc.
-  exclude-use-default: false
+  exclude-generated: lax
 
-  # New issues introduced in the last N commits
-  new: false
+  # Exclude directories
+  exclude-dirs:
+    - vendor
+    - docs

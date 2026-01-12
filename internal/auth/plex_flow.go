@@ -30,7 +30,7 @@ var (
 	ErrPINNotAuthorized = errors.New("PIN not yet authorized")
 
 	// ErrPlexAPIFailed indicates a Plex API call failed.
-	ErrPlexAPIFailed = errors.New("Plex API request failed")
+	ErrPlexAPIFailed = errors.New("plex API request failed")
 )
 
 // Plex API endpoints

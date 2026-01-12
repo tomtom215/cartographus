@@ -53,7 +53,7 @@ func (db *DB) getBandwidthByTranscode(ctx context.Context, whereClause string, a
 	if err != nil {
 		return nil, 0, 0, 0, fmt.Errorf("failed to query bandwidth by transcode: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var byTranscode []models.BandwidthByTranscode
 	var totalBandwidthGB float64
@@ -121,7 +121,7 @@ func (db *DB) getBandwidthByResolution(ctx context.Context, whereClause string, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to query bandwidth by resolution: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	resolutionMap := make(map[string]*models.BandwidthByResolution)
 
@@ -197,7 +197,7 @@ func (db *DB) getBandwidthByCodec(ctx context.Context, whereClause string, args 
 	if err != nil {
 		return nil, fmt.Errorf("failed to query bandwidth by codec: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var byCodec []models.BandwidthByCodec
 
@@ -248,7 +248,7 @@ func (db *DB) getBandwidthTrends(ctx context.Context, whereClause string, args [
 	if err != nil {
 		return nil, fmt.Errorf("failed to query bandwidth trends: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var trends []models.BandwidthTrend
 
@@ -300,7 +300,7 @@ func (db *DB) getTopUsersBandwidth(ctx context.Context, whereClause string, args
 	if err != nil {
 		return nil, fmt.Errorf("failed to query top users: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var topUsers []models.BandwidthByUser
 
@@ -573,7 +573,7 @@ func (db *DB) getBitrateByResolution(ctx context.Context, whereClause string, ar
 	if err != nil {
 		return nil, fmt.Errorf("failed to query bitrate by resolution: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []models.BitrateByResolutionItem
 	for rows.Next() {
@@ -610,7 +610,7 @@ func (db *DB) getBitrateTimeSeries(ctx context.Context, whereClause string, args
 	if err != nil {
 		return nil, fmt.Errorf("failed to query bitrate time series: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []models.BitrateTimeSeriesItem
 	for rows.Next() {
