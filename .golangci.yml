@@ -1,6 +1,5 @@
 # golangci-lint configuration for Cartographus
 # https://golangci-lint.run/usage/configuration/
-version: "2"
 
 run:
   timeout: 5m
@@ -9,7 +8,7 @@ run:
     - nats
 
 linters:
-  default: none
+  disable-all: true
   enable:
     - errcheck
     - govet
@@ -30,9 +29,6 @@ issues:
 
   # Maximum count of issues with the same text
   max-same-issues: 10
-
-  # Don't hide issues in vendor, generated files, etc.
-  exclude-generated: lax
 
   # Exclude directories
   exclude-dirs:
