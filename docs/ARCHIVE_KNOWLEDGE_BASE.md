@@ -144,7 +144,7 @@ Cartographus aggregates playback data from media servers and displays it on inte
 ### Directory Structure
 
 ```
-map/
+cartographus/
 ├── cmd/server/main.go           # Entry point
 ├── internal/                    # Private packages (26)
 │   ├── api/                     # HTTP handlers, 302 endpoints

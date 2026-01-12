@@ -184,7 +184,7 @@ Run the automated setup script (recommended):
 ```bash
 # Clone the repository
 git clone https://github.com/tomtom215/cartographus.git
-cd map
+cd cartographus
 
 # Run the setup script (requires sudo)
 sudo bash scripts/setup-runner-host.sh install

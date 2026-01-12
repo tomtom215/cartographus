@@ -403,7 +403,7 @@ Experimental Kubernetes support available. See [deploy/kubernetes/README.md](dep
 ### Building from Source
 
 ```bash
-git clone https://github.com/tomtom215/cartographus.git && cd map
+git clone https://github.com/tomtom215/cartographus.git && cd cartographus
 export GOTOOLCHAIN=local
 make build
 ./cartographus

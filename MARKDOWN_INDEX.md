@@ -57,7 +57,7 @@ This index catalogs all markdown files with creation dates, modification dates, 
 ### Current Structure (129 files)
 
 ```
-map/
+cartographus/
 ├── Root (10 files) ............... 6 PUBLIC_READY, 4 NEEDS_REVIEW
 ├── .github/ (2 files) ............ 2 PUBLIC_READY
 ├── deploy/ (4 files) ............. 4 PUBLIC_READY
@@ -75,7 +75,7 @@ map/
 ### Recommended Structure for Public Release
 
 ```
-map/
+cartographus/
 ├── Root (6 files)
 │   ├── README.md ................. User-facing intro
 │   ├── CHANGELOG.md .............. Version history

@@ -45,8 +45,8 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 # Fork the repository on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/map.git
-cd map
+git clone https://github.com/YOUR_USERNAME/cartographus.git
+cd cartographus
 
 # Add upstream remote
 git remote add upstream https://github.com/tomtom215/cartographus.git
@@ -382,7 +382,7 @@ When suggesting features, include:
 ### Project Structure
 
 ```
-map/
+cartographus/
 ├── cmd/server/          # Application entry point
 ├── internal/            # Private application code (26 packages)
 │   ├── api/            # HTTP handlers and Chi routing (302 endpoints)
