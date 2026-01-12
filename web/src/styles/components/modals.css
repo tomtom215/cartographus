@@ -1,0 +1,460 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Modal Components
+ *
+ * Modal overlays, dialogs, and keyboard shortcuts modal.
+ * WCAG 2.1 AA compliant with focus trapping.
+ * Reference: UI/UX Audit
+ */
+
+/* =================================================================
+   Keyboard Shortcuts Modal
+   Accessible modal for displaying application keyboard shortcuts
+   ================================================================= */
+
+/* Specific styles for keyboard shortcuts modal */
+#keyboard-shortcuts-modal {
+    display: none;
+}
+
+#keyboard-shortcuts-modal.visible {
+    display: flex;
+}
+
+#keyboard-shortcuts-modal .modal-content {
+    max-width: 600px;
+    width: 100%;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: var(--z-modal, 10000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 550px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--secondary-bg);
+    z-index: 1;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44px touch target size */
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+.modal-close:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.modal-body {
+    padding: 16px 20px;
+}
+
+.shortcut-section {
+    margin-bottom: 20px;
+}
+
+.shortcut-section:last-child {
+    margin-bottom: 0;
+}
+
+.shortcut-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--highlight);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.shortcut-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex-wrap: wrap;
+}
+
+.shortcut-item span {
+    flex: 1;
+    min-width: 150px;
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 8px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+/* Responsive modal for mobile */
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .shortcut-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .shortcut-item span {
+        min-width: auto;
+    }
+}
+
+/* =================================================================
+   Confirmation Dialog
+   Modal dialog for confirming destructive actions
+   WCAG 2.1 AA compliant with focus trapping
+   ================================================================= */
+.confirmation-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal, 10000);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.confirmation-dialog-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.confirmation-dialog-content {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+
+.confirmation-dialog-overlay.visible .confirmation-dialog-content {
+    transform: scale(1);
+}
+
+.confirmation-dialog-title {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+}
+
+.confirmation-dialog-message {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0 0 24px;
+}
+
+.confirmation-dialog-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.confirmation-dialog-actions .btn-confirm {
+    background: var(--color-error);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44px touch target size */
+    min-height: 44px;
+}
+
+.confirmation-dialog-actions .btn-confirm:hover {
+    background: var(--color-error-light);
+}
+
+.confirmation-dialog-actions .btn-confirm:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.confirmation-dialog-actions .btn-cancel {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44px touch target size */
+    min-height: 44px;
+}
+
+.confirmation-dialog-actions .btn-cancel:hover {
+    background: var(--accent);
+    border-color: var(--text-secondary);
+}
+
+.confirmation-dialog-actions .btn-cancel:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+/* High contrast mode */
+[data-theme="high-contrast"] .confirmation-dialog-content {
+    border-width: 2px;
+    border-color: var(--text-primary);
+}
+
+[data-theme="high-contrast"] .confirmation-dialog-actions .btn-confirm {
+    border: 2px solid transparent;
+}
+
+/* Light mode */
+[data-theme="light"] .confirmation-dialog-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .confirmation-dialog-content {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+    .confirmation-dialog-content {
+        padding: 20px;
+        border-radius: 12px 12px 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: none;
+    }
+
+    .confirmation-dialog-overlay {
+        align-items: flex-end;
+    }
+
+    .confirmation-dialog-actions {
+        flex-direction: column;
+    }
+
+    .confirmation-dialog-actions .btn-confirm,
+    .confirmation-dialog-actions .btn-cancel {
+        width: 100%;
+    }
+}
+
+/* =================================================================
+   Touch Gestures Grid
+   Documentation for mobile touch interactions
+   ================================================================= */
+.touch-gestures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.gesture-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--accent);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: background-color 0.2s ease;
+}
+
+.gesture-item:hover {
+    background: var(--secondary-bg);
+}
+
+.gesture-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary-bg);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.gesture-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.gesture-info strong {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.gesture-info span {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Mobile: single column */
+@media (max-width: 480px) {
+    .touch-gestures-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* High contrast mode */
+[data-theme="high-contrast"] .gesture-item {
+    border-width: 2px;
+}
+
+[data-theme="high-contrast"] .gesture-icon {
+    border: 1px solid var(--text-primary);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .gesture-item {
+        transition: none;
+    }
+
+    .modal-overlay {
+        transition: none !important;
+    }
+
+    .modal-content {
+        transition: none !important;
+        transform: none !important;
+    }
+
+    .confirmation-dialog-overlay {
+        transition: none !important;
+    }
+
+    .confirmation-dialog-content {
+        transition: none !important;
+        transform: none !important;
+    }
+
+    .modal-close {
+        transition: none !important;
+    }
+
+    .confirmation-dialog-actions .btn-confirm,
+    .confirmation-dialog-actions .btn-cancel {
+        transition: none !important;
+    }
+}

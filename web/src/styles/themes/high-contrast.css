@@ -1,0 +1,103 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * High Contrast Theme
+ *
+ * WCAG 2.1 Level AAA (7:1 contrast ratio) for maximum accessibility.
+ * Reference: UI/UX Audit accessibility requirements
+ */
+
+[data-theme="high-contrast"] {
+    --primary-bg: #000000;      /* Pure black for maximum contrast */
+    --secondary-bg: #0a0a0a;    /* Near black for subtle depth */
+    --accent: #1a1a1a;          /* Dark grey for UI elements */
+    --highlight: #ffff00;       /* Yellow - high visibility, 19.6:1 contrast */
+    --highlight-hover: #ffee00;
+    --highlight-alt: #00ffff;   /* Cyan - secondary high-visibility */
+    --text-primary: #ffffff;    /* Pure white - 21:1 contrast on black */
+    --text-secondary: #e0e0e0;  /* Light grey - 17.8:1 contrast */
+    --border: #ffffff;          /* White borders for strong separation */
+
+    /* Surface and panel colors for high contrast */
+    --surface-color: #0a0a0a;   /* Near black for maximum contrast */
+    --border-color: #ffffff;    /* White borders for strong separation */
+    --panel-bg: #000000;        /* Pure black background */
+
+    /* Semantic colors - High visibility versions */
+    --color-success: #00ff00;   /* Bright green */
+    --color-success-light: #88ff88;
+    --color-warning: #ffff00;   /* Yellow */
+    --color-warning-light: #ffffaa;
+    --color-error: #ff0000;     /* Bright red */
+    --color-error-light: #ff8888;
+    --color-info: #00ffff;      /* Cyan */
+    --color-info-light: #88ffff;
+
+    /* High contrast chart palette */
+    --chart-primary: #ffff00;
+    --chart-color-1: #ffff00;   /* Yellow */
+    --chart-color-2: #00ffff;   /* Cyan */
+    --chart-color-3: #00ff00;   /* Green */
+    --chart-color-4: #ff00ff;   /* Magenta */
+    --chart-color-5: #ff8800;   /* Orange */
+    --chart-color-6: #ffffff;   /* White */
+    --chart-color-7: #88ff88;   /* Light green */
+    --chart-color-8: #ff88ff;   /* Light magenta */
+    --chart-color-9: #8888ff;   /* Light blue */
+    --chart-color-10: #ffff88;  /* Light yellow */
+
+    /* High contrast heatmap */
+    --heatmap-1: #000088;
+    --heatmap-2: #0000ff;
+    --heatmap-3: #00ffff;
+    --heatmap-4: #00ff00;
+    --heatmap-5: #ffff00;
+    --heatmap-6: #ff8800;
+    --heatmap-7: #ff0000;
+
+    /* Globe visualization colors for high contrast mode */
+    --globe-marker-high: #ff00ff;         /* Magenta - high visibility */
+    --globe-marker-medium-high: #ff8800;  /* Orange - high visibility */
+    --globe-marker-medium: #ffff00;       /* Yellow - high visibility */
+    --globe-marker-low: #00ffff;          /* Cyan - high visibility */
+    --globe-tooltip-bg: rgba(0, 0, 0, 0.98);
+    --globe-tooltip-border: #ffffff;
+    --globe-tooltip-text: #ffffff;
+
+    /* Focus indicator - Maximum visibility */
+    --focus-indicator: #00ff00; /* Bright green - 15.3:1 contrast */
+
+    /* Icon colors for high contrast mode */
+    --icon-color: var(--text-primary);          /* White for visibility */
+    --icon-color-active: var(--highlight);       /* Yellow for active state */
+    --icon-color-hover: var(--highlight-alt);    /* Cyan for hover */
+}
+
+/* High contrast mode specific overrides for enhanced visibility */
+[data-theme="high-contrast"] button {
+    border: 2px solid var(--text-primary);
+    font-weight: 600;
+}
+
+[data-theme="high-contrast"] input,
+[data-theme="high-contrast"] select {
+    border: 2px solid var(--text-primary);
+    font-weight: 500;
+}
+
+[data-theme="high-contrast"] .nav-tab,
+[data-theme="high-contrast"] .analytics-tab {
+    border: 2px solid var(--text-primary);
+}
+
+[data-theme="high-contrast"] .nav-tab.active,
+[data-theme="high-contrast"] .analytics-tab.active {
+    background: var(--highlight);
+    color: #000000;
+    border-color: var(--highlight);
+    font-weight: 700;
+}

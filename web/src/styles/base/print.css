@@ -1,0 +1,369 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Print Stylesheet
+ *
+ * Optimizes the page for printing by:
+ * - Hiding interactive UI elements (navigation, controls, buttons)
+ * - Adjusting colors for print (light background, dark text)
+ * - Ensuring charts render properly
+ * - Setting appropriate page breaks
+ * - Formatting tables and cards for paper output
+ */
+
+@media print {
+    /* =================================================================
+       Page Setup
+       ================================================================= */
+    @page {
+        size: A4;
+        margin: 1.5cm;
+    }
+
+    * {
+        /* Reset transitions for instant rendering */
+        transition: none !important;
+        animation: none !important;
+        /* Use print-friendly colors */
+        color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    html, body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+        line-height: 1.4;
+    }
+
+    /* =================================================================
+       Hide Interactive Elements
+       ================================================================= */
+    /* Navigation and header controls */
+    header,
+    #sidebar,
+    .sidebar-overlay,
+    .menu-toggle,
+    #nav-tabs,
+    #analytics-nav-wrapper,
+    .nav-tab,
+    .analytics-tab,
+    .header-controls,
+    #theme-toggle,
+    #colorblind-toggle,
+    #ws-status-indicator,
+    #notification-toggle,
+    #help-docs-toggle,
+    .breadcrumb-nav {
+        display: none !important;
+    }
+
+    /* Map controls and interactive elements */
+    .maplibregl-ctrl,
+    .maplibregl-ctrl-group,
+    .maplibregl-ctrl-zoom,
+    .maplibregl-ctrl-compass,
+    .maplibregl-ctrl-fullscreen,
+    .maplibregl-ctrl-scale,
+    .geocoder-control,
+    #map-controls,
+    #viz-mode-buttons,
+    #globe-controls,
+    #arc-toggle,
+    #hexagon-toggle,
+    #hexagon-resolution,
+    #timeline-controls,
+    .map-keyboard-hint {
+        display: none !important;
+    }
+
+    /* Chart interactive elements */
+    .chart-export,
+    .chart-maximize-btn,
+    .chart-drill-down-indicator,
+    .chart-tooltip-info,
+    .chart-zoom-controls {
+        display: none !important;
+    }
+
+    /* Filter panels */
+    #filters,
+    .filter-group,
+    .filter-presets,
+    .quick-filters {
+        display: none !important;
+    }
+
+    /* Other interactive elements */
+    .toast,
+    .toast-container,
+    .notification-panel,
+    .modal,
+    .onboarding-overlay,
+    .onboarding-modal,
+    .onboarding-tooltip,
+    .help-modal,
+    .settings-modal,
+    .confirmation-dialog,
+    .keyboard-shortcuts-modal,
+    #loading-overlay,
+    .analytics-loading-overlay,
+    .loading-spinner,
+    .progress-bar,
+    button:not(.no-print-hide),
+    footer {
+        display: none !important;
+    }
+
+    /* =================================================================
+       Layout Adjustments
+       ================================================================= */
+    /* Expand main content to full width */
+    #app {
+        display: block !important;
+    }
+
+    #main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Container adjustments */
+    #map-container,
+    #analytics-container,
+    #activity-container,
+    #server-container,
+    #recently-added-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    /* =================================================================
+       Map Printing
+       ================================================================= */
+    #map,
+    #globe {
+        height: 400px !important;
+        width: 100% !important;
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    .maplibregl-map {
+        background: white !important;
+    }
+
+    /* =================================================================
+       Chart Printing
+       ================================================================= */
+    .chart-grid {
+        display: block !important;
+    }
+
+    .chart-card {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px !important;
+        margin-bottom: 15px !important;
+        padding: 15px !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .chart-card.full-width {
+        width: 100% !important;
+    }
+
+    .chart-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+    }
+
+    .chart-title {
+        color: black !important;
+        font-size: 14pt !important;
+        font-weight: bold !important;
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+
+    .chart-content {
+        min-height: 200px !important;
+        height: auto !important;
+    }
+
+    /* Ensure ECharts canvas renders */
+    .chart-content canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Empty states in charts */
+    .chart-empty,
+    .empty-state {
+        background: #f5f5f5 !important;
+        color: #666 !important;
+        border: 1px dashed #ccc !important;
+    }
+
+    /* =================================================================
+       Stats Cards
+       ================================================================= */
+    #stats {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        padding: 10px !important;
+        flex: 1 1 calc(25% - 10px) !important;
+        min-width: 150px !important;
+    }
+
+    .stat-value {
+        color: black !important;
+        font-size: 18pt !important;
+        font-weight: bold !important;
+    }
+
+    .stat-label {
+        color: #666 !important;
+        font-size: 10pt !important;
+    }
+
+    .stat-trend {
+        display: none !important; /* Hide trend indicators */
+    }
+
+    /* =================================================================
+       Tables
+       ================================================================= */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        page-break-inside: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    th, td {
+        border: 1px solid #ccc !important;
+        padding: 8px !important;
+        text-align: left !important;
+        color: black !important;
+        background: white !important;
+    }
+
+    th {
+        background: #f0f0f0 !important;
+        font-weight: bold !important;
+    }
+
+    /* =================================================================
+       Activity and Server Dashboards
+       ================================================================= */
+    .activity-card,
+    .server-card,
+    .media-card {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+        margin-bottom: 10px;
+    }
+
+    /* =================================================================
+       Recently Added Grid
+       ================================================================= */
+    .recently-added-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    .media-card img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    /* =================================================================
+       Quick Insights
+       ================================================================= */
+    .quick-insights-row,
+    .quick-insight-card,
+    .anomaly-detection-section,
+    .comparative-insights-section {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        color: black !important;
+        page-break-inside: avoid;
+    }
+
+    .quick-insight-header,
+    .quick-insight-value,
+    .quick-insight-label {
+        color: black !important;
+    }
+
+    /* =================================================================
+       Links
+       ================================================================= */
+    a {
+        color: black !important;
+        text-decoration: underline !important;
+    }
+
+    /* Show URLs after links */
+    a[href^="http"]:after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #666;
+    }
+
+    /* =================================================================
+       Page Breaks
+       ================================================================= */
+    h1, h2, h3 {
+        page-break-after: avoid;
+        color: black !important;
+    }
+
+    .analytics-page {
+        page-break-before: always;
+    }
+
+    .analytics-page:first-of-type {
+        page-break-before: avoid;
+    }
+
+    /* =================================================================
+       Print Header/Footer
+       ================================================================= */
+    /* Add a print title/timestamp */
+    body::before {
+        content: "Cartographus Report - Printed: " attr(data-print-date);
+        display: block;
+        font-size: 10pt;
+        color: #666;
+        margin-bottom: 20px;
+        text-align: right;
+    }
+}

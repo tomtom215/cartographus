@@ -1,0 +1,875 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Newsletter Management Styles
+ *
+ * Styles for the Newsletter Generator UI pages.
+ */
+
+/* =========================================================================
+   Newsletter Container
+   ========================================================================= */
+
+#newsletter-container {
+    padding: var(--spacing-lg);
+}
+
+/* =========================================================================
+   Newsletter Navigation
+   ========================================================================= */
+
+.newsletter-nav {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-sm);
+}
+
+.newsletter-nav-tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.newsletter-nav-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.newsletter-nav-tab.active {
+    color: var(--color-primary);
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--color-primary);
+    font-weight: 500;
+}
+
+/* =========================================================================
+   Newsletter Page Layout
+   ========================================================================= */
+
+.newsletter-page {
+    animation: fadeIn 0.2s ease;
+}
+
+.newsletter-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.newsletter-section-header h2 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.newsletter-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.newsletter-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.newsletter-section h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* =========================================================================
+   Newsletter Stats Grid
+   ========================================================================= */
+
+.newsletter-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.newsletter-stat-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+.newsletter-stat-card .stat-value {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.newsletter-stat-card .stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.newsletter-stat-card .stat-sub {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+}
+
+.newsletter-stat-card.success {
+    border-left: 3px solid var(--color-success);
+}
+
+.newsletter-stat-card.success .stat-value {
+    color: var(--color-success);
+}
+
+.newsletter-stat-card.error {
+    border-left: 3px solid var(--color-error);
+}
+
+.newsletter-stat-card.error .stat-value {
+    color: var(--color-error);
+}
+
+/* =========================================================================
+   Newsletter Filters
+   ========================================================================= */
+
+.newsletter-filters {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.newsletter-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    min-width: 150px;
+}
+
+.newsletter-search {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    min-width: 200px;
+}
+
+.newsletter-search::placeholder {
+    color: var(--text-muted);
+}
+
+/* =========================================================================
+   Newsletter Tables
+   ========================================================================= */
+
+.newsletter-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.newsletter-table th,
+.newsletter-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.newsletter-table th {
+    background: var(--bg-tertiary);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.newsletter-table td {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+.newsletter-table tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+.newsletter-table .table-empty,
+.newsletter-table .table-loading {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-muted);
+}
+
+/* =========================================================================
+   Newsletter Badges
+   ========================================================================= */
+
+.newsletter-type-badge,
+.newsletter-channel-badge,
+.newsletter-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: white;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.status-indicator.active {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.status-indicator.inactive {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+}
+
+.built-in-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin-left: var(--spacing-xs);
+}
+
+/* =========================================================================
+   Newsletter Actions
+   ========================================================================= */
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover:not(:disabled) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.btn-action:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-action.btn-delete:hover:not(:disabled) {
+    color: var(--color-error);
+}
+
+.btn-action.btn-trigger:hover:not(:disabled) {
+    color: var(--color-success);
+}
+
+/* =========================================================================
+   Toggle Switch
+   ========================================================================= */
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-tertiary);
+    transition: 0.3s;
+    border-radius: 22px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(18px);
+}
+
+/* =========================================================================
+   Channel Distribution
+   ========================================================================= */
+
+.channel-distribution {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.channel-stat-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+}
+
+.channel-stat-row:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.channel-label {
+    min-width: 100px;
+}
+
+.channel-bar-container {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.channel-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.channel-count {
+    min-width: 100px;
+    text-align: right;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* =========================================================================
+   Template & Schedule Cells
+   ========================================================================= */
+
+.template-name-cell,
+.schedule-name-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.template-title,
+.schedule-title {
+    font-weight: 500;
+}
+
+.template-description,
+.schedule-description {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.cron-display {
+    display: block;
+}
+
+.timezone-display {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.never-run {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* =========================================================================
+   Recipients Stats
+   ========================================================================= */
+
+.recipients-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.recipients-failed {
+    color: var(--color-error);
+    font-size: var(--font-size-xs);
+}
+
+.recipients-bar {
+    display: flex;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    margin-top: var(--spacing-xs);
+    overflow: hidden;
+}
+
+.recipients-bar-success {
+    background: var(--color-success);
+    height: 100%;
+}
+
+.recipients-bar-failed {
+    background: var(--color-error);
+    height: 100%;
+}
+
+/* =========================================================================
+   Pagination
+   ========================================================================= */
+
+.newsletter-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+/* =========================================================================
+   Newsletter Modals
+   ========================================================================= */
+
+.newsletter-modal {
+    max-width: 700px;
+    width: 90%;
+}
+
+/* =========================================================================
+   Newsletter Forms
+   ========================================================================= */
+
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.form-group label {
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="search"],
+.form-group select,
+.form-group textarea {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: var(--font-mono);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.form-hint {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.form-section {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.form-section h4 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+/* =========================================================================
+   Preview Container
+   ========================================================================= */
+
+.newsletter-preview-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    min-height: 400px;
+}
+
+.preview-header {
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+}
+
+.preview-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.preview-tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.preview-tab.active {
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.preview-content {
+    flex: 1;
+    min-height: 300px;
+}
+
+.preview-iframe {
+    width: 100%;
+    height: 400px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: white;
+}
+
+.preview-text-content {
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    white-space: pre-wrap;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+}
+
+/* =========================================================================
+   Delivery Details
+   ========================================================================= */
+
+.delivery-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.detail-row {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.detail-row label {
+    min-width: 100px;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.details-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--spacing-md);
+}
+
+.details-section h4 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.recipients-summary {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.summary-stat {
+    text-align: center;
+}
+
+.summary-stat .stat-value {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.summary-stat .stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.summary-stat.success .stat-value {
+    color: var(--color-success);
+}
+
+.summary-stat.error .stat-value {
+    color: var(--color-error);
+}
+
+.recipient-details-table {
+    width: 100%;
+    font-size: var(--font-size-sm);
+    border-collapse: collapse;
+}
+
+.recipient-details-table th,
+.recipient-details-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.error-cell {
+    color: var(--color-error);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.error-section {
+    background: var(--color-error-bg);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+}
+
+.error-message {
+    color: var(--color-error);
+    font-weight: 500;
+}
+
+.error-details {
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    background: var(--bg-primary);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+}
+
+.content-stats {
+    display: flex;
+    gap: var(--spacing-lg);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item .stat-value {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.stat-item .stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.more-recipients {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.monospace {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+}
+
+/* =========================================================================
+   Notifications
+   ========================================================================= */
+
+.notification {
+    position: fixed;
+    bottom: var(--spacing-lg);
+    right: var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+}
+
+.notification-success {
+    border-left: 3px solid var(--color-success);
+}
+
+.notification-error {
+    border-left: 3px solid var(--color-error);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* =========================================================================
+   Empty States
+   ========================================================================= */
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-muted);
+}
+
+/* =========================================================================
+   Warning Text
+   ========================================================================= */
+
+.warning-text {
+    color: var(--color-warning);
+    font-size: var(--font-size-sm);
+}
+
+/* =========================================================================
+   Responsive Adjustments
+   ========================================================================= */
+
+@media (max-width: 768px) {
+    .newsletter-nav {
+        flex-wrap: wrap;
+    }
+
+    .newsletter-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .newsletter-filters {
+        flex-direction: column;
+    }
+
+    .newsletter-select,
+    .newsletter-search {
+        width: 100%;
+    }
+
+    .newsletter-table {
+        font-size: var(--font-size-xs);
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}

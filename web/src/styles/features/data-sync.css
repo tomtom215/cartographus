@@ -1,0 +1,569 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Data Sync Components
+ *
+ * Styles for the Data Sync UI feature including:
+ * - Sync progress display
+ * - Tautulli import controls
+ * - Plex historical sync controls
+ * - Server sync status
+ *
+ * Reference: Data Sync UI Implementation
+ */
+
+/* =================================================================
+   Data Sync Settings Section
+   ================================================================= */
+
+.data-sync-section {
+    margin-bottom: var(--spacing-lg, 1.5rem);
+}
+
+.data-sync-subsection {
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-md, 8px);
+    padding: var(--spacing-md, 1rem);
+    margin-bottom: var(--spacing-md, 1rem);
+}
+
+.data-sync-subsection-title {
+    font-size: var(--font-size-md, 1rem);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-sm, 0.5rem) 0;
+    color: var(--text-primary, #fff);
+}
+
+.data-sync-description {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    margin: 0 0 var(--spacing-md, 1rem) 0;
+}
+
+/* =================================================================
+   Sync Progress Component
+   ================================================================= */
+
+.sync-progress-container {
+    margin: var(--spacing-md, 1rem) 0;
+}
+
+.sync-progress-panel {
+    background: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-md, 8px);
+    padding: var(--spacing-md, 1rem);
+}
+
+/* Status Colors */
+.sync-status-idle {
+    border-color: var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.sync-status-running {
+    border-color: var(--highlight, #007bff);
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.sync-status-completed {
+    border-color: var(--success, #28a745);
+    background: rgba(40, 167, 69, 0.05);
+}
+
+.sync-status-error {
+    border-color: var(--danger, #dc3545);
+    background: rgba(220, 53, 69, 0.05);
+}
+
+.sync-status-cancelled {
+    border-color: var(--warning, #ffc107);
+    background: rgba(255, 193, 7, 0.05);
+}
+
+/* Status Header */
+.sync-status-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 0.5rem);
+    margin-bottom: var(--spacing-sm, 0.5rem);
+}
+
+.sync-status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.sync-status-running .sync-status-icon {
+    color: var(--highlight, #007bff);
+}
+
+.sync-status-completed .sync-status-icon {
+    color: var(--success, #28a745);
+}
+
+.sync-status-error .sync-status-icon {
+    color: var(--danger, #dc3545);
+}
+
+.sync-status-cancelled .sync-status-icon {
+    color: var(--warning, #ffc107);
+}
+
+.sync-status-text {
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+}
+
+.sync-dry-run-badge {
+    font-size: var(--font-size-xs, 0.75rem);
+    background: var(--warning, #ffc107);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm, 4px);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Spinning icon animation */
+.sync-icon-spinning {
+    animation: sync-icon-spin 1s linear infinite;
+}
+
+@keyframes sync-icon-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =================================================================
+   Progress Bar
+   ================================================================= */
+
+.sync-progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 0.5rem);
+    margin-bottom: var(--spacing-md, 1rem);
+}
+
+.sync-progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-sm, 4px);
+    overflow: hidden;
+}
+
+.sync-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--highlight, #007bff), var(--highlight-alt, #00b4d8));
+    border-radius: var(--radius-sm, 4px);
+    transition: width 0.3s ease;
+}
+
+.sync-progress-percent {
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    min-width: 50px;
+    text-align: right;
+}
+
+/* =================================================================
+   Stats Grid
+   ================================================================= */
+
+.sync-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-sm, 0.5rem);
+    margin-bottom: var(--spacing-md, 1rem);
+}
+
+.sync-stat {
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
+    border-radius: var(--radius-sm, 4px);
+    padding: var(--spacing-sm, 0.5rem);
+    text-align: center;
+}
+
+.sync-stat-label {
+    display: block;
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    margin-bottom: 2px;
+}
+
+.sync-stat-value {
+    display: block;
+    font-size: var(--font-size-md, 1rem);
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+}
+
+.sync-stat-success {
+    color: var(--success, #28a745);
+}
+
+.sync-stat-warning {
+    color: var(--warning, #ffc107);
+}
+
+.sync-stat-error {
+    color: var(--danger, #dc3545);
+}
+
+/* =================================================================
+   ETA Display
+   ================================================================= */
+
+.sync-eta {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xs, 0.25rem);
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    margin-bottom: var(--spacing-md, 1rem);
+}
+
+.sync-eta-value {
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+}
+
+/* =================================================================
+   Error Log
+   ================================================================= */
+
+.sync-error-section {
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    padding-top: var(--spacing-sm, 0.5rem);
+}
+
+.sync-error-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 0.25rem);
+    background: none;
+    border: none;
+    color: var(--danger, #dc3545);
+    font-size: var(--font-size-sm, 0.875rem);
+    cursor: pointer;
+    padding: var(--spacing-xs, 0.25rem) 0;
+    width: 100%;
+    text-align: left;
+}
+
+.sync-error-toggle:hover {
+    color: var(--danger-light, #e85d6a);
+}
+
+.sync-error-log {
+    margin-top: var(--spacing-sm, 0.5rem);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.sync-error-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sync-error-item {
+    display: flex;
+    gap: var(--spacing-sm, 0.5rem);
+    font-size: var(--font-size-xs, 0.75rem);
+    padding: var(--spacing-xs, 0.25rem) 0;
+    border-bottom: 1px solid var(--border-light, rgba(255, 255, 255, 0.05));
+}
+
+.sync-error-item:last-child {
+    border-bottom: none;
+}
+
+.sync-error-time {
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+    flex-shrink: 0;
+}
+
+.sync-error-message {
+    color: var(--text-primary, #fff);
+    word-break: break-word;
+}
+
+.sync-error-recoverable {
+    opacity: 0.7;
+}
+
+.sync-error-fatal .sync-error-message {
+    color: var(--danger, #dc3545);
+}
+
+.sync-error-more {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+    font-style: italic;
+    margin: var(--spacing-xs, 0.25rem) 0 0 0;
+}
+
+/* =================================================================
+   Data Sync Form
+   ================================================================= */
+
+.data-sync-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md, 1rem);
+}
+
+.data-sync-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs, 0.25rem);
+}
+
+.data-sync-form .form-group label {
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+}
+
+.data-sync-form .form-input,
+.data-sync-form .form-select {
+    width: 100%;
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+    font-size: var(--font-size-sm, 0.875rem);
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-sm, 4px);
+    color: var(--text-primary, #fff);
+}
+
+.data-sync-form .form-input:focus,
+.data-sync-form .form-select:focus {
+    outline: none;
+    border-color: var(--highlight, #007bff);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.data-sync-form .form-hint {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+}
+
+.data-sync-form .form-group-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md, 1rem);
+}
+
+.data-sync-form .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 0.25rem);
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-primary, #fff);
+    cursor: pointer;
+}
+
+.data-sync-form .checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--highlight, #007bff);
+}
+
+.data-sync-form .form-actions {
+    display: flex;
+    gap: var(--spacing-sm, 0.5rem);
+    flex-wrap: wrap;
+}
+
+.data-sync-form .form-warning {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--warning, #ffc107);
+    margin: 0;
+    padding: var(--spacing-sm, 0.5rem);
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: var(--radius-sm, 4px);
+}
+
+/* =================================================================
+   Validation Result
+   ================================================================= */
+
+.validation-result {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm, 0.5rem);
+    margin-top: var(--spacing-md, 1rem);
+    padding: var(--spacing-md, 1rem);
+    border-radius: var(--radius-sm, 4px);
+}
+
+.validation-success {
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid var(--success, #28a745);
+}
+
+.validation-error {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid var(--danger, #dc3545);
+}
+
+.validation-icon {
+    flex-shrink: 0;
+}
+
+.validation-success .validation-icon {
+    color: var(--success, #28a745);
+}
+
+.validation-error .validation-icon {
+    color: var(--danger, #dc3545);
+}
+
+.validation-details {
+    flex: 1;
+}
+
+.validation-details p {
+    margin: 0 0 var(--spacing-xs, 0.25rem) 0;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-primary, #fff);
+}
+
+.validation-details p:last-child {
+    margin-bottom: 0;
+}
+
+.validation-message {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-primary, #fff);
+}
+
+/* =================================================================
+   Settings Section Toggle
+   ================================================================= */
+
+.settings-section-header {
+    margin-bottom: var(--spacing-sm, 0.5rem);
+}
+
+.settings-section-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 0.5rem);
+    width: 100%;
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-md, 8px);
+    color: var(--text-primary, #fff);
+    font-size: var(--font-size-md, 1rem);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s ease;
+}
+
+.settings-section-toggle:hover {
+    background: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+}
+
+.settings-section-icon {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.settings-section-title {
+    flex: 1;
+    margin: 0;
+    font-size: var(--font-size-md, 1rem);
+    font-weight: 600;
+}
+
+.settings-section-summary {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.settings-section-content {
+    padding: var(--spacing-md, 1rem);
+}
+
+/* =================================================================
+   Access Denied State
+   ================================================================= */
+
+.access-denied-message {
+    padding: var(--spacing-lg, 1.5rem);
+    text-align: center;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+/* =================================================================
+   Screen Reader Only
+   ================================================================= */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =================================================================
+   Responsive Adjustments
+   ================================================================= */
+
+@media (max-width: 768px) {
+    .sync-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .data-sync-form .form-group-row {
+        flex-direction: column;
+    }
+
+    .data-sync-form .form-actions {
+        flex-direction: column;
+    }
+
+    .data-sync-form .form-actions button {
+        width: 100%;
+    }
+}
+
+/* =================================================================
+   Reduced Motion Support
+   ================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .sync-icon-spinning {
+        animation: none;
+    }
+
+    .sync-progress-bar-fill {
+        transition: none;
+    }
+
+    .settings-section-toggle {
+        transition: none;
+    }
+}

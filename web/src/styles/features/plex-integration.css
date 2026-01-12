@@ -1,0 +1,237 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Plex Integration Panel Styles (ADR-0009)
+ * Styles for the Plex integration status and sessions display
+ */
+
+/* Panel Container */
+.plex-integration-panel {
+  background: var(--surface-color, #1e1e2e);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.plex-integration-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color, #2d2d3d);
+}
+
+.plex-integration-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  margin: 0;
+}
+
+.plex-refresh-btn {
+  background: transparent;
+  border: 1px solid var(--border-color, #2d2d3d);
+  color: var(--text-secondary, #a0a0a0);
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.plex-refresh-btn:hover {
+  background: var(--hover-color, #2d2d3d);
+  color: var(--text-primary, #e0e0e0);
+}
+
+/* Status Panel */
+.plex-status-panel {
+  margin-bottom: 1rem;
+}
+
+.plex-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .plex-status-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plex-status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-secondary, #252535);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+}
+
+.plex-status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.plex-status-indicator.status-online {
+  background: var(--success-color, #2ecc71);
+  box-shadow: 0 0 4px var(--success-color, #2ecc71);
+}
+
+.plex-status-indicator.status-offline {
+  background: var(--danger-color, #e74c3c);
+}
+
+.plex-status-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #707080);
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.plex-status-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+}
+
+/* Sessions Panel */
+.plex-sessions-panel {
+  margin-top: 1rem;
+}
+
+.plex-sessions-header {
+  margin-bottom: 0.75rem;
+}
+
+.plex-sessions-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary, #a0a0a0);
+}
+
+.plex-sessions-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted, #707080);
+}
+
+.plex-sessions-empty p {
+  margin: 0.25rem 0;
+}
+
+.plex-sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Session Cards */
+.plex-session-card {
+  background: var(--surface-secondary, #252535);
+  border-radius: 6px;
+  padding: 0.75rem;
+  border-left: 3px solid var(--primary-color, #3498db);
+}
+
+.plex-session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.plex-session-user {
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  font-size: 0.9rem;
+}
+
+.plex-session-state {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+}
+
+.plex-session-state.state-playing {
+  background: var(--success-color, #2ecc71);
+  color: white;
+}
+
+.plex-session-state.state-paused {
+  background: var(--warning-color, #f39c12);
+  color: white;
+}
+
+.plex-session-content {
+  margin-bottom: 0.5rem;
+}
+
+.plex-session-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.85rem;
+  color: var(--text-primary, #e0e0e0);
+  line-height: 1.4;
+}
+
+.plex-session-device {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted, #707080);
+}
+
+.plex-session-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plex-session-transcode {
+  font-size: 0.7rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+}
+
+.plex-session-transcode.transcode-active {
+  background: var(--warning-color, #f39c12);
+  color: white;
+}
+
+.plex-session-transcode.transcode-direct {
+  background: var(--success-color, #2ecc71);
+  color: white;
+}
+
+.plex-session-progress {
+  font-size: 0.75rem;
+  color: var(--text-muted, #707080);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .plex-integration-panel {
+    padding: 0.75rem;
+  }
+
+  .plex-session-card {
+    padding: 0.5rem;
+  }
+
+  .plex-sessions-list {
+    max-height: 200px;
+  }
+}

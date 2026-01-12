@@ -1,0 +1,569 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Map Feature Styles
+ *
+ * MapLibre GL map container, controls, and popups.
+ */
+
+/* Map Container */
+#map-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+#map {
+    width: 100%;
+    height: 50vh;
+    min-height: 400px;
+    max-height: 100vh; /* Prevent canvas from exceeding viewport in headless environments */
+    position: relative; /* Required for absolute positioning of child controls */
+    overflow: hidden; /* Constrain MapLibre canvas to container bounds */
+}
+
+/* Ensure MapLibre canvas stays within bounds */
+#map .maplibregl-canvas-container,
+#map .maplibregl-canvas {
+    max-height: 100% !important;
+}
+
+/* Ensure MapLibre zoom controls are visible within viewport */
+#map .maplibregl-ctrl-top-right,
+#map .maplibregl-ctrl-bottom-right,
+#map .maplibregl-ctrl-bottom-left {
+    position: absolute;
+    z-index: 10;
+}
+
+/* Position top-left controls (geocoder) below the view-toggle-control
+ * to prevent visual overlap and pointer event interception.
+ * View toggle height is ~44px, so we offset by 55px (44px + 10px gap + 1px border).
+ */
+#map .maplibregl-ctrl-top-left {
+    position: absolute;
+    z-index: 10;
+    top: 55px;
+    left: 10px;
+}
+
+#map .maplibregl-ctrl-top-right {
+    top: 10px;
+    right: 10px;
+}
+
+#map .maplibregl-ctrl-zoom-in,
+#map .maplibregl-ctrl-zoom-out {
+    /* Ensure controls are clickable and within viewport */
+    pointer-events: auto;
+}
+
+/* Loading indicator */
+#loading {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 1000;
+    display: none;
+}
+
+#loading.show {
+    display: block;
+}
+
+/* Map visualization mode control */
+#map-mode-control {
+    position: absolute;
+    top: 120px;
+    right: 10px;
+    z-index: 1;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.map-mode-btn {
+    width: auto;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.map-mode-btn:last-child {
+    border-right: none;
+}
+
+.map-mode-btn:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+.map-mode-btn.active {
+    background: var(--highlight);
+    color: white;
+}
+
+.map-mode-btn:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: -2px;
+    z-index: 2;
+}
+
+.map-mode-btn.active:hover {
+    background: var(--highlight);
+    opacity: 0.9;
+}
+
+/* H3 Hexagon Resolution Control */
+.hexagon-resolution-control {
+    position: absolute;
+    top: 168px;
+    right: 10px;
+    z-index: 1;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hexagon-resolution-control .filter-label {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.hexagon-resolution-control select {
+    background: var(--primary-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.hexagon-resolution-control select:hover {
+    border-color: var(--highlight);
+}
+
+.hexagon-resolution-control select:focus {
+    outline: none;
+    border-color: var(--highlight);
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
+}
+
+/* Arc Overlay Control */
+.arc-control {
+    position: absolute;
+    top: 168px;
+    left: 10px;
+    z-index: 2;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.arc-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.arc-toggle-btn:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+.arc-toggle-btn.active,
+.arc-toggle-btn.enabled,
+.arc-toggle-btn.selected {
+    background: var(--highlight);
+    color: white;
+}
+
+.arc-toggle-btn.active:hover,
+.arc-toggle-btn.enabled:hover,
+.arc-toggle-btn.selected:hover {
+    background: var(--highlight);
+    opacity: 0.9;
+}
+
+.arc-toggle-btn:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: -2px;
+    z-index: 2;
+}
+
+.arc-toggle-btn svg {
+    flex-shrink: 0;
+}
+
+/* Fullscreen Toggle Button */
+/* ROOT CAUSE FIX: z-index increased to 20 to ensure visibility above both #map and #globe */
+/* WHY: Button was moved from inside #map to #map-container level for globe view visibility */
+/* (E2E test: 30-fullscreen-mode.spec.ts:183) */
+.fullscreen-toggle-btn {
+    position: absolute;
+    bottom: 100px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.fullscreen-toggle-btn:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+.fullscreen-toggle-btn.active {
+    background: var(--highlight);
+    color: white;
+}
+
+.fullscreen-toggle-btn:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.fullscreen-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Fullscreen exit icon (when in fullscreen mode) */
+.fullscreen-toggle-btn.active .fullscreen-icon svg path {
+    d: path("M6 2v4H2M12 2v4h4M6 16v-4H2M12 16v-4h4");
+}
+
+/* View mode toggle control (2D/3D)
+ * z-index must be higher than MapLibre controls (z-index: 10) to ensure
+ * the geocoder input doesn't intercept pointer events on these buttons.
+ * See: https://github.com/maplibre/maplibre-gl-js/issues/... (pointer-events issue)
+ */
+#view-toggle-control {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 15;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.view-mode-btn {
+    width: auto;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    white-space: nowrap;
+}
+
+.view-mode-btn:last-child {
+    border-right: none;
+}
+
+.view-mode-btn:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+.view-mode-btn.active {
+    background: var(--highlight);
+    color: white;
+}
+
+.view-mode-btn:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: -2px;
+    z-index: 2;
+}
+
+.view-mode-btn.active:hover {
+    background: var(--highlight);
+    opacity: 0.9;
+}
+
+/* Map Popups */
+.maplibregl-popup-content {
+    background: var(--secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Popup arrow/tip theming */
+.maplibregl-popup-tip {
+    border-top-color: var(--secondary-bg);
+    border-bottom-color: var(--secondary-bg);
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: var(--secondary-bg);
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: var(--secondary-bg);
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: var(--secondary-bg);
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: var(--secondary-bg);
+}
+
+.maplibregl-popup-close-button {
+    color: var(--text-primary);
+    font-size: 20px;
+    padding: 4px 8px;
+}
+
+.maplibregl-popup-close-button:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+.popup-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.popup-details {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.popup-stat {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+}
+
+/* Theme-specific popup styles (use CSS variables for theming) */
+/* Light mode popup overrides */
+[data-theme="light"] .maplibregl-popup-content {
+    background: var(--secondary-bg);
+    color: var(--text-primary);
+    border-color: var(--border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .maplibregl-popup-tip {
+    border-top-color: var(--secondary-bg);
+    border-bottom-color: var(--secondary-bg);
+}
+
+[data-theme="light"] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: var(--secondary-bg);
+}
+
+[data-theme="light"] .maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: var(--secondary-bg);
+}
+
+[data-theme="light"] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: var(--secondary-bg);
+}
+
+[data-theme="light"] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: var(--secondary-bg);
+}
+
+[data-theme="light"] .maplibregl-popup-close-button {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .maplibregl-popup-close-button:hover {
+    background: var(--accent);
+}
+
+[data-theme="light"] .popup-title {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .popup-details {
+    color: var(--text-secondary);
+}
+
+/* High contrast mode popup overrides */
+[data-theme="high-contrast"] .maplibregl-popup-content {
+    background: var(--primary-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    box-shadow: 0 0 0 3px var(--primary-bg), 0 0 0 5px var(--text-primary);
+}
+
+[data-theme="high-contrast"] .maplibregl-popup-tip {
+    border-width: 12px;
+}
+
+[data-theme="high-contrast"] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: var(--primary-bg);
+}
+
+[data-theme="high-contrast"] .maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: var(--primary-bg);
+}
+
+[data-theme="high-contrast"] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: var(--primary-bg);
+}
+
+[data-theme="high-contrast"] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: var(--primary-bg);
+}
+
+[data-theme="high-contrast"] .maplibregl-popup-close-button {
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+[data-theme="high-contrast"] .maplibregl-popup-close-button:hover {
+    background: var(--text-primary);
+    color: var(--primary-bg);
+}
+
+[data-theme="high-contrast"] .popup-title {
+    color: var(--highlight);
+    font-weight: bold;
+}
+
+[data-theme="high-contrast"] .popup-details {
+    color: var(--text-primary);
+}
+
+[data-theme="high-contrast"] .popup-stat strong {
+    color: var(--highlight-alt);
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .fullscreen-toggle-btn {
+    background: var(--secondary-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* High contrast mode */
+[data-theme="high-contrast"] .fullscreen-toggle-btn {
+    border-width: 2px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    #map-mode-control {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+
+    .map-mode-btn {
+        flex: 1;
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+
+    .hexagon-resolution-control {
+        top: 58px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+
+    .arc-control {
+        top: 108px;
+        left: 10px;
+        right: auto;
+    }
+
+    .fullscreen-toggle-btn {
+        bottom: 80px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+    }
+
+    #view-toggle-control {
+        top: 10px;
+        left: 10px;
+        right: auto;
+    }
+
+    .view-mode-btn {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    /* Position geocoder below view-toggle on mobile */
+    #map .maplibregl-ctrl-top-left {
+        top: 50px;
+        left: 10px;
+    }
+}

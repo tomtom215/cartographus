@@ -1,0 +1,98 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Footer Layout
+ *
+ * Application footer with branding and links.
+ */
+
+/* Application Footer */
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--panel-bg);
+    border-top: 1px solid var(--border);
+    padding: 8px 16px;
+    z-index: 100;
+    display: none;
+}
+
+/* Show footer when app is visible */
+#app:not(.hidden) ~ .app-footer {
+    display: block;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.footer-brand {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.footer-version {
+    font-family: monospace;
+    color: var(--text-muted);
+}
+
+.footer-separator {
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.footer-link {
+    background: none;
+    border: none;
+    color: var(--highlight);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.footer-link:hover {
+    color: var(--highlight-alt);
+    text-decoration: underline;
+}
+
+.footer-link:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+/* Light theme footer */
+[data-theme="light"] .footer-brand {
+    color: var(--text-primary);
+}
+
+/* High contrast footer */
+[data-theme="high-contrast"] .footer-link {
+    text-decoration: underline;
+}
+
+/* Screen reader only class */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

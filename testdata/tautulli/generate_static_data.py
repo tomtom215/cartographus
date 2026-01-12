@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+"""
+ONE-TIME generator for static test dataset.
+Run with: python3 generate_static_data.py > static_seed_data.sql
+
+IMPORTANT: This uses ZERO randomness. All values are derived
+deterministically from the record ID. Output is 100% reproducible.
+"""
+
+import hashlib
+from datetime import datetime, timedelta
+
+TOTAL_RECORDS = 550
+NUM_USERS = 10
+NUM_MOVIES = 220   # 40%
+NUM_EPISODES = 275  # 50%
+NUM_TRACKS = 55     # 10%
+
+# Fixed user profiles
+USERS = [
+    {"id": 1, "username": "admin", "friendly_name": "Admin User", "ip": "192.168.1.100", "city": "New York", "region": "NY", "country": "US", "postal": "10001", "lat": 40.7128, "lon": -74.0060, "platform": "Chrome", "player": "Plex Web", "product": "Plex Web", "location": "lan", "bandwidth": 50000},
+    {"id": 2, "username": "moviebuff", "friendly_name": "Movie Buff", "ip": "73.45.123.89", "city": "Los Angeles", "region": "CA", "country": "US", "postal": "90001", "lat": 34.0522, "lon": -118.2437, "platform": "Roku", "player": "Plex for Roku", "product": "Plex for Roku", "location": "wan", "bandwidth": 25000},
+    {"id": 3, "username": "tvaddict", "friendly_name": "TV Addict", "ip": "98.234.56.78", "city": "Chicago", "region": "IL", "country": "US", "postal": "60601", "lat": 41.8781, "lon": -87.6298, "platform": "Android", "player": "Plex for Android (TV)", "product": "Plex for Android (TV)", "location": "wan", "bandwidth": 20000},
+    {"id": 4, "username": "musiclover", "friendly_name": "Music Lover", "ip": "82.132.45.67", "city": "London", "region": "ENG", "country": "GB", "postal": "EC1A", "lat": 51.5074, "lon": -0.1278, "platform": "iOS", "player": "Plex for iOS", "product": "Plex for iOS", "location": "wan", "bandwidth": 15000},
+    {"id": 5, "username": "familyaccount", "friendly_name": "Family Account", "ip": "176.89.234.12", "city": "Berlin", "region": "BE", "country": "DE", "postal": "10115", "lat": 52.5200, "lon": 13.4050, "platform": "Samsung", "player": "Plex for Samsung", "product": "Plex for Samsung", "location": "wan", "bandwidth": 30000},
+    {"id": 6, "username": "nightowl", "friendly_name": "Night Owl", "ip": "45.67.89.123", "city": "Tokyo", "region": "TK", "country": "JP", "postal": "100-0001", "lat": 35.6762, "lon": 139.6503, "platform": "Apple TV", "player": "Plex for Apple TV", "product": "Plex for Apple TV", "location": "wan", "bandwidth": 35000},
+    {"id": 7, "username": "casualviewer", "friendly_name": "Casual Viewer", "ip": "203.45.67.89", "city": "Sydney", "region": "NSW", "country": "AU", "postal": "2000", "lat": -33.8688, "lon": 151.2093, "platform": "Firefox", "player": "Plex Web", "product": "Plex Web", "location": "wan", "bandwidth": 22000},
+    {"id": 8, "username": "mobilewatcher", "friendly_name": "Mobile Watcher", "ip": "156.78.90.234", "city": "Toronto", "region": "ON", "country": "CA", "postal": "M5V", "lat": 43.6532, "lon": -79.3832, "platform": "Android", "player": "Plex for Android (Mobile)", "product": "Plex for Android", "location": "wan", "bandwidth": 12000},
+    {"id": 9, "username": "weekendwarrior", "friendly_name": "Weekend Warrior", "ip": "89.123.45.67", "city": "Paris", "region": "IDF", "country": "FR", "postal": "75001", "lat": 48.8566, "lon": 2.3522, "platform": "PlayStation", "player": "Plex for PlayStation", "product": "Plex for PlayStation", "location": "wan", "bandwidth": 28000},
+    {"id": 10, "username": "bingewatcher", "friendly_name": "Binge Watcher", "ip": "112.45.78.90", "city": "Singapore", "region": "SG", "country": "SG", "postal": "018956", "lat": 1.3521, "lon": 103.8198, "platform": "Xbox", "player": "Plex for Xbox", "product": "Plex for Xbox", "location": "wan", "bandwidth": 32000},
+]
+
+MOVIE_TITLES = [
+    "The Matrix", "Inception", "Interstellar", "The Dark Knight", "Pulp Fiction",
+    "Fight Club", "Forrest Gump", "The Shawshank Redemption", "Goodfellas", "The Godfather",
+    "Jurassic Park", "Titanic", "Avatar", "The Avengers", "Iron Man",
+    "Spider-Man", "Batman Begins", "Wonder Woman", "Black Panther", "Guardians of Galaxy",
+    "Star Wars", "Lord of the Rings", "Harry Potter", "Back to the Future", "E.T.",
+]
+
+TV_SHOWS = [
+    "Breaking Bad", "Game of Thrones", "The Office", "Friends", "Stranger Things",
+    "The Mandalorian", "The Crown", "Succession", "Ted Lasso", "House of Dragon",
+]
+
+ARTISTS = ["The Beatles", "Pink Floyd", "Led Zeppelin", "Queen", "David Bowie"]
+
+def generate_machine_id(username):
+    return hashlib.sha256(f"{username}-machine-id".encode()).hexdigest()[:32]
+
+def generate_guid(key):
+    return hashlib.sha256(str(key).encode()).hexdigest()[:24]
+
+def escape_sql(s):
+    return s.replace("'", "''")
+
+def main():
+    # Base timestamp: June 1, 2025 00:00:00 UTC
+    base_time = datetime(2025, 6, 1, 0, 0, 0)
+
+    print("""-- =============================================================================
+-- STATIC CURATED TEST DATASET FOR TAUTULLI SYNC TESTING
+-- =============================================================================
+-- Generated by: python3 generate_static_data.py
+--
+-- CRITICAL PROPERTIES:
+-- - ZERO randomness: Every value is derived from record ID
+-- - 100% deterministic: Identical output every time
+-- - 100% auditable: Every record traceable by ID
+--
+-- Dataset Summary:
+-- - Total records: 550
+-- - Movies: 220 (IDs 1-220)
+-- - Episodes: 275 (IDs 221-495)
+-- - Tracks: 55 (IDs 496-550)
+-- - Users: 10 (55 records each)
+-- - Date range: June 1, 2025 - December 15, 2025
+--
+-- Session Key Format: 'static-session-XXXX' where XXXX is zero-padded ID
+-- This ensures unique, traceable session keys for every record.
+-- =============================================================================
+""")
+
+    # Generate users
+    print("-- Users table")
+    for u in USERS:
+        is_admin = 1 if u["id"] == 1 else 0
+        print(f"INSERT INTO users (id, user_id, username, friendly_name, thumb, email, is_active, is_admin, do_notify, keep_history) VALUES ({u['id']}, {u['id']}, '{u['username']}', '{u['friendly_name']}', '/library/users/{u['id']}/thumb', '{u['username']}@test.local', 1, {is_admin}, 1, 1);")
+
+    print("\n-- Session history, metadata, and media info records")
+
+    for record_id in range(1, TOTAL_RECORDS + 1):
+        user_idx = (record_id - 1) % NUM_USERS
+        user = USERS[user_idx]
+        machine_id = generate_machine_id(user["username"])
+
+        # Deterministic timestamp: base + id * 1 hour
+        session_time = base_time + timedelta(hours=record_id)
+        started = int(session_time.timestamp())
+
+        # Determine media type and properties
+        if record_id <= NUM_MOVIES:
+            # Movies (IDs 1-220)
+            media_type = "movie"
+            duration = 7200  # 2 hours
+            rating_key = 1000 + record_id
+            title = MOVIE_TITLES[(record_id - 1) % len(MOVIE_TITLES)]
+            full_title = title
+            parent_rating_key = "NULL"
+            grandparent_rating_key = "NULL"
+            parent_title = "NULL"
+            grandparent_title = "NULL"
+            section_id = 1
+            library_name = "Movies"
+        elif record_id <= NUM_MOVIES + NUM_EPISODES:
+            # Episodes (IDs 221-495)
+            media_type = "episode"
+            duration = 3600  # 1 hour
+            episode_idx = record_id - NUM_MOVIES - 1
+            show_idx = episode_idx % len(TV_SHOWS)
+            season_num = (episode_idx // 10) % 5 + 1
+            episode_num = episode_idx % 10 + 1
+            rating_key = 4000 + record_id
+            title = f"Episode {episode_num}"
+            parent_title = f"'Season {season_num}'"
+            grandparent_title = f"'{escape_sql(TV_SHOWS[show_idx])}'"
+            full_title = f"{TV_SHOWS[show_idx]} - S{season_num:02d}E{episode_num:02d} - {title}"
+            parent_rating_key = str(3000 + show_idx * 10 + season_num)
+            grandparent_rating_key = str(2000 + show_idx)
+            section_id = 2
+            library_name = "TV Shows"
+        else:
+            # Tracks (IDs 496-550)
+            media_type = "track"
+            duration = 300  # 5 minutes
+            track_idx = record_id - NUM_MOVIES - NUM_EPISODES - 1
+            artist_idx = track_idx % len(ARTISTS)
+            album_num = (track_idx // 5) % 3 + 1
+            track_num = track_idx % 5 + 1
+            rating_key = 7000 + record_id
+            title = f"Track {track_num}"
+            parent_title = f"'Album {album_num}'"
+            grandparent_title = f"'{escape_sql(ARTISTS[artist_idx])}'"
+            full_title = f"{ARTISTS[artist_idx]} - {title}"
+            parent_rating_key = str(6000 + artist_idx * 10 + album_num)
+            grandparent_rating_key = str(5000 + artist_idx)
+            section_id = 3
+            library_name = "Music"
+
+        stopped = started + duration
+        session_key = f"static-session-{record_id:04d}"
+        view_offset = duration * 1000
+        transcode_decision = "transcode" if user["location"] == "wan" and record_id % 3 == 0 else "direct play"
+        year = 2020 + (record_id % 5)
+        duration_ms = duration * 1000
+        guid = f"plex://{media_type}/{generate_guid(rating_key)}"
+
+        # Session history
+        print(f"INSERT INTO session_history (id, reference_id, date, started, stopped, rating_key, parent_rating_key, grandparent_rating_key, media_type, user_id, user, friendly_name, ip_address, platform, player, product, machine_id, bandwidth, location, session_key, view_offset, percent_complete, paused_counter, transcode_decision, geo_city, geo_region, geo_country, geo_code, geo_latitude, geo_longitude) VALUES ({record_id}, {record_id}, {started}, {started}, {stopped}, {rating_key}, {parent_rating_key}, {grandparent_rating_key}, '{media_type}', {user['id']}, '{user['username']}', '{user['friendly_name']}', '{user['ip']}', '{user['platform']}', '{user['player']}', '{user['product']}', '{machine_id}', {user['bandwidth']}, '{user['location']}', '{session_key}', {view_offset}, 100, 0, '{transcode_decision}', '{user['city']}', '{user['region']}', '{user['country']}', '{user['postal']}', {user['lat']:.4f}, {user['lon']:.4f});")
+
+        # Session history metadata
+        if parent_title == "NULL":
+            print(f"INSERT INTO session_history_metadata (id, rating_key, parent_rating_key, grandparent_rating_key, title, parent_title, grandparent_title, full_title, section_id, library_name, media_type, year, duration, guid) VALUES ({record_id}, {rating_key}, NULL, NULL, '{escape_sql(title)}', NULL, NULL, '{escape_sql(full_title)}', {section_id}, '{library_name}', '{media_type}', {year}, {duration_ms}, '{guid}');")
+        else:
+            print(f"INSERT INTO session_history_metadata (id, rating_key, parent_rating_key, grandparent_rating_key, title, parent_title, grandparent_title, full_title, section_id, library_name, media_type, year, duration, guid) VALUES ({record_id}, {rating_key}, {parent_rating_key}, {grandparent_rating_key}, '{escape_sql(title)}', {parent_title}, {grandparent_title}, '{escape_sql(full_title)}', {section_id}, '{library_name}', '{media_type}', {year}, {duration_ms}, '{guid}');")
+
+        # Session history media info
+        video_codec = "" if media_type == "track" else "h264"
+        audio_codec = "flac" if media_type == "track" else "aac"
+        print(f"INSERT INTO session_history_media_info (id, video_codec, audio_codec, container, transcode_decision) VALUES ({record_id}, '{video_codec}', '{audio_codec}', 'mkv', '{transcode_decision}');")
+
+    print("""
+-- =============================================================================
+-- VERIFICATION QUERIES
+-- =============================================================================
+-- Run these to verify the dataset:
+-- SELECT COUNT(*) FROM session_history;                              -- Expected: 550
+-- SELECT COUNT(*) FROM session_history WHERE media_type='movie';     -- Expected: 220
+-- SELECT COUNT(*) FROM session_history WHERE media_type='episode';   -- Expected: 275
+-- SELECT COUNT(*) FROM session_history WHERE media_type='track';     -- Expected: 55
+-- SELECT COUNT(DISTINCT user_id) FROM session_history;               -- Expected: 10
+-- SELECT user_id, COUNT(*) FROM session_history GROUP BY user_id;    -- Expected: 55 each
+-- =============================================================================
+""")
+
+if __name__ == "__main__":
+    main()

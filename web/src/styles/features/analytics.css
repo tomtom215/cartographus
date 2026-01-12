@@ -1,0 +1,1121 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Analytics Feature Styles
+ *
+ * Analytics pages, navigation, dashboard views, and loading states.
+ * Reference: UI/UX Audit
+ */
+
+/* Navigation Tabs */
+#nav-tabs {
+    display: flex;
+    gap: 6px; /* WCAG 2.1 SC 2.5.5: Ensure minimum spacing between touch targets */
+    padding: 10px;
+    background: var(--primary-bg);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.nav-tab {
+    flex: 1;
+    min-width: 80px;
+    min-height: 44px; /* WCAG 2.1 SC 2.5.5: Minimum touch target size */
+    padding: 12px;
+    background: var(--secondary-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-tab:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+    border-color: var(--highlight);
+}
+
+.nav-tab.active {
+    background: var(--highlight);
+    color: white;
+    border-color: var(--highlight);
+}
+
+/* Dashboard Views */
+.dashboard-view {
+    padding: 20px;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.dashboard-view h2 {
+    margin-bottom: 20px;
+    color: var(--highlight);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+}
+
+/* Analytics Sub-Navigation */
+#analytics-nav {
+    display: flex;
+    gap: 6px;
+    padding: 15px 20px;
+    background: var(--secondary-bg);
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) var(--secondary-bg);
+}
+
+#analytics-nav::-webkit-scrollbar {
+    height: 6px;
+}
+
+#analytics-nav::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+}
+
+#analytics-nav::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.analytics-tab {
+    flex-shrink: 0;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44x44px touch target size */
+    min-height: 44px;
+    min-width: 44px;
+    box-sizing: border-box;
+    padding: 12px 20px;
+    background: var(--primary-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.analytics-tab:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+    border-color: var(--highlight);
+    transform: translateY(-1px);
+}
+
+.analytics-tab.active {
+    background: var(--highlight);
+    color: white;
+    border-color: var(--highlight);
+    box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+}
+
+/* Sub-Tabs - Secondary navigation within analytics pages */
+.sub-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 12px 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sub-tab {
+    flex-shrink: 0;
+    min-height: 36px;
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.sub-tab:hover {
+    color: var(--text-primary);
+    background: var(--accent);
+}
+
+.sub-tab.active {
+    color: var(--highlight);
+    border-bottom-color: var(--highlight);
+}
+
+.sub-tab:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+/* Sub-Tab Panels */
+.sub-tab-panel {
+    display: none;
+}
+
+.sub-tab-panel.active {
+    display: block;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb-nav {
+    padding: 10px 20px;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.breadcrumb-list {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.breadcrumb-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+    color: var(--highlight);
+    background: var(--accent);
+}
+
+.breadcrumb-link:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+.breadcrumb-item.current span {
+    color: var(--text-primary);
+    font-weight: 500;
+    padding: 4px 8px;
+}
+
+.breadcrumb-separator {
+    color: var(--text-muted);
+    font-size: 16px;
+    user-select: none;
+}
+
+/* Light theme breadcrumb */
+[data-theme="light"] .breadcrumb-link:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* High contrast breadcrumb */
+[data-theme="high-contrast"] .breadcrumb-link {
+    text-decoration: underline;
+}
+
+[data-theme="high-contrast"] .breadcrumb-item.current span {
+    background: var(--highlight);
+    color: var(--primary-bg);
+    border-radius: 2px;
+}
+
+/* Analytics Pages */
+.analytics-page {
+    padding: 30px 20px;
+    /* E2E FIX: Use slideIn animation instead of fadeIn to avoid opacity:0 causing
+       Playwright to detect charts as hidden. The opacity animation was problematic
+       because CSS opacity is multiplicative - children cannot override parent opacity.
+       Transform-only animation provides visual smoothness without visibility issues. */
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(10px);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Legacy fadeIn keyframes kept for backwards compatibility with other elements */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.analytics-page h2 {
+    margin: 0 0 10px 0;
+    color: var(--highlight);
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.page-description {
+    margin: 0 0 30px 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.section-header {
+    grid-column: 1 / -1;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    color: var(--highlight);
+    border-bottom: 2px solid var(--border);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.section-header:first-child {
+    margin-top: 0;
+}
+
+/* Analytics Page Loading States */
+.analytics-page-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.analytics-loading-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: var(--z-loading, 9999);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 15px;
+    padding: 30px;
+    background: var(--secondary-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.analytics-loading-overlay.active {
+    display: flex;
+}
+
+.analytics-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--highlight);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.analytics-loading-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Analytics Tab Overflow Fix for Mobile */
+/* Wrapper for scroll indicators */
+.analytics-nav-wrapper {
+    position: relative;
+}
+
+/* Scroll indicator gradients (show only when overflowing) */
+.analytics-nav-wrapper::before,
+.analytics-nav-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.analytics-nav-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, var(--secondary-bg), transparent);
+}
+
+.analytics-nav-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, var(--secondary-bg), transparent);
+}
+
+/* Show indicators when scrollable */
+.analytics-nav-wrapper.can-scroll-left::before {
+    opacity: 1;
+}
+
+.analytics-nav-wrapper.can-scroll-right::after {
+    opacity: 1;
+}
+
+/* Activity Dashboard */
+.activity-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.activity-stat-card {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.activity-stat-label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.activity-stat-value {
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Responsive Analytics Navigation */
+@media (max-width: 768px) {
+    #analytics-nav {
+        padding: 10px 15px;
+        gap: 4px;
+        /* Ensure smooth scrolling on touch devices */
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+    }
+
+    .analytics-tab {
+        padding: 8px 16px;
+        font-size: 13px;
+        /* WCAG 2.1 SC 2.5.5: Maintain 44px minimum touch target on mobile */
+        min-height: 44px;
+        min-width: 44px;
+        box-sizing: border-box;
+        /* Snap to center for easier selection */
+        scroll-snap-align: center;
+    }
+
+    .analytics-page {
+        padding: 20px 15px;
+    }
+
+    .analytics-page h2 {
+        font-size: 24px;
+    }
+
+    .section-header {
+        font-size: 18px;
+        margin-top: 30px;
+    }
+}
+
+/* Even smaller screens - compact tabs */
+@media (max-width: 480px) {
+    #analytics-nav {
+        padding: 8px 10px;
+        gap: 3px;
+    }
+
+    .analytics-tab {
+        padding: 6px 12px;
+        font-size: 12px;
+        /* WCAG 2.1 SC 2.5.5: Maintain 44px minimum even on small screens */
+        min-height: 44px;
+        min-width: 44px;
+        box-sizing: border-box;
+    }
+}
+
+/* ============================================
+ * Enhanced Pagination Controls
+ * For Recently Added dashboard and similar
+ * ============================================ */
+
+/* Recently Added Dashboard */
+.recently-added-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.recently-added-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.recently-added-filters label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.recently-added-filters select {
+    padding: 6px 10px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.recently-added-filters select:hover {
+    border-color: var(--highlight);
+}
+
+.recently-added-filters select:focus {
+    outline: none;
+    border-color: var(--highlight);
+    box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.2);
+}
+
+/* Recently Added Grid */
+.recently-added-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Recently Added Card */
+.recently-added-card {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recently-added-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--highlight);
+}
+
+.recently-added-image {
+    position: relative;
+    width: 100%;
+    padding-top: 150%; /* 2:3 aspect ratio for posters */
+    background: var(--accent);
+    overflow: hidden;
+}
+
+.recently-added-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recently-added-image .placeholder-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.recently-added-info {
+    padding: 12px;
+}
+
+.recently-added-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.recently-added-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.recently-added-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.recently-added-meta .media-type-badge {
+    padding: 2px 6px;
+    background: var(--highlight);
+    color: white;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.recently-added-library {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Enhanced Pagination Container */
+.enhanced-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+/* Pagination Button Base */
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44x44px touch target */
+    min-width: 44px;
+    min-height: 44px;
+    padding: 6px 12px;
+    background: var(--primary-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: var(--accent);
+    border-color: var(--highlight);
+    color: var(--highlight);
+}
+
+.pagination-btn:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Icon buttons (first, prev, next, last) */
+.pagination-btn[id$="-first"],
+.pagination-btn[id$="-prev"],
+.pagination-btn[id$="-next"],
+.pagination-btn[id$="-last"] {
+    font-size: 16px;
+    padding: 6px;
+}
+
+/* Page Jump Controls */
+.pagination-jump {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination-jump label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.pagination-jump input[type="number"] {
+    width: 60px;
+    padding: 6px 8px;
+    background: var(--primary-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.pagination-jump input[type="number"]::-webkit-outer-spin-button,
+.pagination-jump input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.pagination-jump input[type="number"]:focus {
+    outline: none;
+    border-color: var(--highlight);
+    box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.2);
+}
+
+.pagination-jump .page-total {
+    font-size: 13px;
+    color: var(--text-secondary);
+    min-width: 40px;
+}
+
+/* Go Button */
+#recently-added-go {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+#recently-added-go:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--highlight) 85%, black);
+    border-color: color-mix(in srgb, var(--highlight) 85%, black);
+    color: white;
+}
+
+/* Page Info */
+.pagination-info {
+    font-size: 13px;
+    color: var(--text-secondary);
+    min-width: 150px;
+    text-align: center;
+}
+
+/* Loading State in Grid */
+.recently-added-loading {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.recently-added-loading .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--highlight);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 10px;
+}
+
+/* Empty State */
+.recently-added-grid .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+/* Error State */
+.recently-added-error-message {
+    grid-column: 1 / -1;
+}
+
+/* Responsive Pagination */
+@media (max-width: 768px) {
+    .enhanced-pagination {
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .pagination-btn {
+        /* WCAG 2.1 SC 2.5.5: Maintain 44px minimum on mobile */
+        min-width: 44px;
+        min-height: 44px;
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+
+    .pagination-jump {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .pagination-info {
+        width: 100%;
+        order: -1;
+        margin-bottom: 8px;
+    }
+
+    .recently-added-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .recently-added-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .recently-added-filters label {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .recently-added-filters select {
+        width: 100%;
+    }
+
+    .recently-added-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination-btn[id$="-first"],
+    .pagination-btn[id$="-last"] {
+        display: none;
+    }
+
+    .pagination-jump input[type="number"] {
+        width: 50px;
+    }
+}
+
+/* Light Theme Pagination (Task 23: use CSS variables) */
+[data-theme="light"] .pagination-btn {
+    background: var(--secondary-bg);
+    border-color: var(--border);
+}
+
+[data-theme="light"] .pagination-btn:hover:not(:disabled) {
+    background: var(--primary-bg);
+}
+
+[data-theme="light"] .enhanced-pagination {
+    background: var(--panel-bg);
+    border-color: var(--border);
+}
+
+/* High Contrast Pagination */
+[data-theme="high-contrast"] .pagination-btn {
+    border-width: 2px;
+}
+
+[data-theme="high-contrast"] .pagination-btn:focus-visible {
+    outline-width: 3px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .recently-added-card,
+    .pagination-btn {
+        transition: none;
+    }
+
+    .recently-added-loading .loading-spinner {
+        animation: none;
+        border-color: var(--highlight);
+    }
+
+    .analytics-page {
+        animation: none;
+    }
+
+    .analytics-loading-spinner {
+        animation: none;
+        border-color: var(--highlight);
+    }
+
+    .nav-tab,
+    .analytics-tab {
+        transition: none;
+    }
+
+    .analytics-tab:hover {
+        transform: none;
+    }
+
+    .breadcrumb-link {
+        transition: none;
+    }
+
+    .analytics-nav-wrapper::before,
+    .analytics-nav-wrapper::after {
+        transition: none;
+    }
+}
+
+/* =================================================================
+   Virtual Scrolling
+   Efficient rendering for large datasets
+   ================================================================= */
+.virtual-scroll-enabled {
+    position: relative;
+    height: 600px;
+    max-height: 70vh;
+    overflow: hidden;
+}
+
+.virtual-scroll-container {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+.virtual-scroll-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 0 4px;
+}
+
+.virtual-scroll-spacer-top,
+.virtual-scroll-spacer-bottom {
+    width: 100%;
+    pointer-events: none;
+}
+
+/* Virtual scroll indicator */
+.virtual-scroll-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.virtual-scroll-icon {
+    color: var(--highlight);
+}
+
+/* Virtual scroll performance hint */
+.virtual-scroll-enabled::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(transparent, var(--primary-bg));
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+/* Scrollbar styling for virtual scroll */
+.virtual-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.virtual-scroll-container::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+    border-radius: 4px;
+}
+
+.virtual-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.virtual-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Light theme virtual scroll (Task 23: use CSS variables) */
+[data-theme="light"] .virtual-scroll-indicator {
+    background: var(--accent);
+    border-color: var(--border);
+}
+
+[data-theme="light"] .virtual-scroll-enabled::after {
+    background: linear-gradient(transparent, var(--panel-bg));
+}
+
+/* High contrast virtual scroll */
+[data-theme="high-contrast"] .virtual-scroll-indicator {
+    border-width: 2px;
+}
+
+/* Responsive virtual scroll */
+@media (max-width: 768px) {
+    .virtual-scroll-enabled {
+        height: 500px;
+        max-height: 60vh;
+    }
+
+    .virtual-scroll-content {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+
+    .virtual-scroll-indicator {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .virtual-scroll-enabled {
+        height: 400px;
+        max-height: 50vh;
+    }
+
+    .virtual-scroll-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ========================================================================
+   Session Management Styles
+   ======================================================================== */
+
+/* Session header actions */
+.session-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Kill session button */
+.btn-kill-session {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44x44px touch target (visual size can be smaller) */
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    opacity: 0.6;
+}
+
+.btn-kill-session:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: var(--color-error);
+    color: var(--color-error);
+    opacity: 1;
+}
+
+.btn-kill-session:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+    opacity: 1;
+}
+
+.btn-kill-session:active {
+    background: var(--color-error);
+    color: white;
+}
+
+.btn-kill-session svg {
+    flex-shrink: 0;
+}
+
+/* Show kill button on hover of session card */
+.activity-session-card:hover .btn-kill-session {
+    opacity: 1;
+}
+
+/* Theme-specific overrides */
+[data-theme="light"] .btn-kill-session:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+[data-theme="high-contrast"] .btn-kill-session {
+    border-width: 2px;
+    opacity: 1;
+}
+
+[data-theme="high-contrast"] .btn-kill-session:hover {
+    border-color: var(--color-error);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .btn-kill-session {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        opacity: 1;
+    }
+
+    .btn-kill-session svg {
+        width: 16px;
+        height: 16px;
+    }
+}

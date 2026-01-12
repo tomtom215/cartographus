@@ -1,0 +1,103 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cartographus
+  namespace: cartographus
+  labels:
+    app.kubernetes.io/name: cartographus
+    app.kubernetes.io/component: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cartographus
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cartographus
+        app.kubernetes.io/component: server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      containers:
+        - name: cartographus
+          image: ghcr.io/tomtom215/cartographus:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: http
+              containerPort: 3857
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: cartographus-config
+            - secretRef:
+                name: cartographus-secrets
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+
+          volumeMounts:
+            - name: data
+              mountPath: /data
+
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cartographus-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cartographus-data
+  namespace: cartographus
+  labels:
+    app.kubernetes.io/name: cartographus
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  # Uncomment and set your storage class if needed:
+  # storageClassName: standard

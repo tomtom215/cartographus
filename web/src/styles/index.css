@@ -1,0 +1,106 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Cartographus - Main CSS Entry Point
+ *
+ * This file imports all modular CSS files in the correct order.
+ * The order matters: base -> layout -> components -> features -> themes -> utilities
+ *
+ * @see docs/working/UI_UX_AUDIT.md
+ */
+
+/* =================================================================
+   Base Styles
+   Foundation including reset, variables, and typography
+   ================================================================= */
+@import './base/reset.css';
+@import './base/variables.css';
+@import './base/typography.css';
+
+/* =================================================================
+   Layout Styles
+   Page structure and layout components
+   ================================================================= */
+@import './layout/app.css';
+@import './layout/sidebar.css';
+@import './layout/header.css';
+@import './layout/footer.css';
+
+/* =================================================================
+   Component Styles
+   Reusable UI components
+   ================================================================= */
+@import './components/buttons.css';
+@import './components/forms.css';
+@import './components/cards.css';
+@import './components/modals.css';
+@import './components/toast.css';
+@import './components/progress.css';
+@import './components/empty-states.css';
+@import './components/controls.css';
+@import './components/security-alerts.css';
+@import './components/data-table.css';
+@import './components/tooltip.css';
+/* Cookie consent banner disabled - self-hosted app with no tracking analytics */
+/* @import './components/cookie-consent.css'; */
+
+/* =================================================================
+   Feature Styles
+   Feature-specific styling
+   ================================================================= */
+@import './features/map.css';
+@import './features/globe.css';
+@import './features/charts.css';
+@import './features/timeline.css';
+@import './features/analytics.css';
+@import './features/login.css';
+@import './features/server-management.css';
+@import './features/session-management.css';
+@import './features/audit-log.css';
+@import './features/library-content.css';
+@import './features/library-details.css';
+@import './features/user-ip-details.css';
+@import './features/export.css';
+@import './features/rating-keys.css';
+@import './features/metadata-deep-dive.css';
+@import './features/search.css';
+@import './features/stream-data.css';
+@import './features/custom-date-comparison.css';
+@import './features/geographic-drilldown.css';
+@import './features/streaming-geojson.css';
+@import './features/chart-timeline-animation.css';
+@import './features/detection-rules.css';
+@import './features/plex-integration.css';
+@import './features/cross-platform.css';
+@import './features/data-governance.css';
+@import './features/onboarding.css';
+@import './features/setup-wizard.css';
+@import './features/progressive-onboarding.css';
+@import './features/data-provenance.css';
+@import './features/recommendations.css';
+@import './features/newsletter.css';
+@import './features/data-sync.css';
+
+/* =================================================================
+   Theme Overrides
+   Color scheme variations
+   ================================================================= */
+@import './themes/light.css';
+@import './themes/colorblind.css';
+@import './themes/high-contrast.css';
+
+/* =================================================================
+   Utilities
+   Utility classes and accessibility features
+   ================================================================= */
+@import './base/utilities.css';
+
+/* =================================================================
+   Print Styles
+   Print-specific styling for paper output
+   ================================================================= */
+@import './base/print.css';

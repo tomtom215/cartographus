@@ -1,0 +1,680 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Chart Feature Styles
+ *
+ * ECharts container, grid, cards, and export functionality.
+ * Reference: UI/UX Audit
+ */
+
+#charts-container {
+    flex: 1;
+    background: var(--primary-bg);
+    overflow-y: auto;
+    padding: 20px;
+}
+
+#charts-container h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.chart-card {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 300px;
+}
+
+.chart-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* Chart title with ellipsis truncation for long titles */
+.chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    /* Truncate long titles with ellipsis */
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* Ensure title attribute shows full text on hover */
+    cursor: default;
+}
+
+/* Show full title on hover via CSS (fallback for no JS) */
+.chart-title:hover {
+    overflow: visible;
+    white-space: normal;
+    word-break: break-word;
+    /* Position relative to parent */
+    position: relative;
+    z-index: 1;
+    background: var(--secondary-bg);
+    padding-right: 8px;
+}
+
+.chart-export {
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44px touch target size */
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.chart-export:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+.chart-content {
+    width: 100%;
+    height: 280px;
+    /* E2E FIX: Ensure chart containers are always fully visible.
+       - display/visibility/opacity are set with !important to override any inheritance
+       - This fixes Playwright detecting charts as hidden during page animations
+       - Note: Parent display:none still hides charts (correct behavior) but parent
+         opacity/visibility animations should not affect chart visibility detection */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Minimum dimensions to prevent 0-size during ECharts init */
+    min-width: 200px;
+    min-height: 200px;
+    /* Position context for ECharts canvas/svg */
+    position: relative;
+}
+
+/* Ensure ECharts rendered elements are visible */
+.chart-content canvas,
+.chart-content svg {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1;
+}
+
+/* When chart is inside a visible analytics page, ensure full visibility */
+.analytics-page:not([style*="display: none"]) .chart-content,
+.analytics-page:not([style*="display:none"]) .chart-content {
+    visibility: visible !important;
+    opacity: 1;
+}
+
+/* Loading skeleton */
+.skeleton {
+    background: linear-gradient(90deg, var(--accent) 25%, var(--secondary-bg) 50%, var(--accent) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-chart {
+    width: 100%;
+    height: 280px;
+}
+
+/* Error state */
+.error-state {
+    padding: 24px;
+    text-align: center;
+    background: rgba(233, 69, 96, 0.1);
+    border: 1px solid rgba(233, 69, 96, 0.3);
+    border-radius: 8px;
+    margin: 20px;
+}
+
+.error-state h3 {
+    color: var(--highlight);
+    margin-bottom: 8px;
+}
+
+.error-state p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.error-state button {
+    width: auto;
+    padding: 8px 16px;
+}
+
+/* Tooltip */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--border) transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext,
+.tooltip:focus-within .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Trend Prediction Toggle Button */
+.prediction-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 36px;
+}
+
+.prediction-toggle:hover {
+    background: var(--accent);
+    border-color: var(--highlight);
+    color: var(--text-primary);
+}
+
+.prediction-toggle:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.prediction-toggle[aria-pressed="true"] {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+.prediction-toggle svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.prediction-toggle-label {
+    font-weight: 500;
+}
+
+/* Prediction Days Selector */
+.prediction-days-selector {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+.prediction-days-select {
+    padding: 6px 10px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    min-height: 36px;
+}
+
+.prediction-days-select:hover {
+    border-color: var(--highlight);
+}
+
+.prediction-days-select:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+/* Trend Indicator Badge */
+.trend-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.trend-indicator.trend-up {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.trend-indicator.trend-down {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-error);
+}
+
+.trend-indicator.trend-stable {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
+}
+
+.trend-indicator-icon {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Prediction controls container */
+.chart-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+/* High contrast theme support */
+[data-theme="high-contrast"] .prediction-toggle,
+[data-theme="high-contrast"] .prediction-days-select {
+    border-width: 2px;
+}
+
+/* Light theme support */
+[data-theme="light"] .prediction-toggle[aria-pressed="true"] {
+    background: var(--highlight);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .prediction-toggle,
+    .prediction-days-select {
+        transition: none;
+    }
+
+    .skeleton {
+        animation: none;
+        background: var(--accent);
+    }
+
+    .chart-export {
+        transition: none;
+    }
+
+    .tooltip .tooltiptext {
+        transition: none;
+    }
+
+    .correlation-card {
+        transition: none;
+    }
+
+    .correlation-card:hover {
+        transform: none;
+    }
+
+    .correlation-loading .correlation-spinner {
+        animation: none;
+        border-color: var(--highlight);
+    }
+
+    .correlation-retry {
+        transition: none;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-controls-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .prediction-toggle-label {
+        display: none;
+    }
+}
+
+/* Correlation Analysis Panel */
+.correlation-panel {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.correlation-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.correlation-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.correlation-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.correlation-quality {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.correlation-quality .quality-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.correlation-quality.quality-excellent {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.correlation-quality.quality-excellent .quality-dot {
+    background: var(--color-success);
+}
+
+.correlation-quality.quality-good {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--highlight-alt);
+}
+
+.correlation-quality.quality-good .quality-dot {
+    background: var(--highlight-alt);
+}
+
+.correlation-quality.quality-limited {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
+}
+
+.correlation-quality.quality-limited .quality-dot {
+    background: var(--color-warning);
+}
+
+/* Correlation Cards */
+.correlation-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.correlation-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.correlation-card:hover {
+    border-color: var(--highlight);
+    transform: translateY(-1px);
+}
+
+.correlation-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.correlation-titles {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.correlation-source,
+.correlation-related {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 14px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.correlation-arrow {
+    color: var(--highlight);
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.correlation-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.correlation-type {
+    text-transform: capitalize;
+    padding: 2px 8px;
+    background: var(--secondary-bg);
+    border-radius: 4px;
+}
+
+/* Correlation Strength Indicator */
+.correlation-strength {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    min-width: 160px;
+}
+
+.correlation-bar {
+    height: 6px;
+    background: var(--strength-color, var(--highlight));
+    border-radius: 3px;
+    flex: 1;
+    max-width: 60px;
+}
+
+.correlation-percent {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--strength-color, var(--highlight));
+    min-width: 36px;
+}
+
+.correlation-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    min-width: 60px;
+}
+
+.correlation-confidence {
+    font-size: 12px;
+    color: var(--color-success);
+    cursor: help;
+}
+
+/* Correlation Footer */
+.correlation-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* Empty State */
+.correlation-empty {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-secondary);
+}
+
+.correlation-empty p {
+    margin: 6px 0;
+}
+
+/* Loading State */
+.correlation-loading .correlation-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 30px auto;
+    border: 3px solid var(--border);
+    border-top-color: var(--highlight);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Error State */
+.correlation-error-message {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+}
+
+.correlation-retry {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: var(--highlight);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.correlation-retry:hover {
+    opacity: 0.9;
+}
+
+/* Theme Support */
+[data-theme="high-contrast"] .correlation-card,
+[data-theme="high-contrast"] .correlation-panel {
+    border-width: 2px;
+}
+
+[data-theme="light"] .correlation-card {
+    background: var(--primary-bg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .correlation-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .correlation-strength {
+        width: 100%;
+        min-width: unset;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border);
+    }
+
+    .correlation-bar {
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .correlation-titles {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .correlation-source,
+    .correlation-related {
+        max-width: 100%;
+    }
+
+    .correlation-arrow {
+        transform: rotate(90deg);
+    }
+}

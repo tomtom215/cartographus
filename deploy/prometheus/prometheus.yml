@@ -1,0 +1,55 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+# Prometheus configuration for Cartographus
+# https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'cartographus'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Rule files - load alerting rules
+rule_files:
+  - "rules/*.yml"
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Cartographus application metrics
+  - job_name: 'cartographus'
+    static_configs:
+      - targets: ['cartographus:3857']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    honor_labels: true
+
+  # Alertmanager metrics
+  - job_name: 'alertmanager'
+    static_configs:
+      - targets: ['alertmanager:9093']
+    metrics_path: '/metrics'
+
+  # Optional: NATS JetStream metrics (if running)
+  # - job_name: 'nats'
+  #   static_configs:
+  #     - targets: ['nats:8222']
+  #   metrics_path: '/metrics'
+
+  # Optional: Node exporter for system metrics
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']

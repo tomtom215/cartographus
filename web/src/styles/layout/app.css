@@ -1,0 +1,24 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * App Container Layout
+ *
+ * Main application container and layout structure.
+ */
+
+#app {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Main content area - takes remaining width */
+#main-content {
+    flex: 1;
+    overflow: auto;
+    transition: margin-left 0.3s ease;
+}

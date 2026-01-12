@@ -1,0 +1,171 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Timeline Feature Styles
+ *
+ * Playback timeline controls for map visualization.
+ */
+
+#timeline-container {
+    background: var(--secondary-bg);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+}
+
+#timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+#timeline-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+#timeline-time {
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+#timeline-count {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+#timeline-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#timeline-reset,
+#timeline-play-pause {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+#timeline-reset:hover,
+#timeline-play-pause:hover {
+    background: var(--highlight);
+    color: white;
+}
+
+#timeline-reset:focus-visible,
+#timeline-play-pause:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+#timeline-speed,
+#timeline-interval {
+    width: auto;
+    min-width: 80px;
+    padding: 6px 10px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+#timeline-scrubber {
+    width: 100%;
+}
+
+#timeline-slider {
+    width: 100%;
+    height: 6px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+#timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--highlight);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#timeline-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--highlight);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#timeline-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+#timeline-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+}
+
+#timeline-slider:focus::-webkit-slider-thumb {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+#timeline-slider:focus::-moz-range-thumb {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    #timeline-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    #timeline-info {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    #timeline-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #timeline-speed,
+    #timeline-interval {
+        flex: 1;
+    }
+}

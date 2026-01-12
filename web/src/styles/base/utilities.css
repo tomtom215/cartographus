@@ -1,0 +1,224 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Utility Styles
+ *
+ * Smooth transitions, reduced motion support, and accessibility utilities.
+ * WCAG 2.3.3 compliant reduced motion support
+ */
+
+/* =================================================================
+   Generic Visibility Utilities
+   Used by JavaScript to show/hide elements
+   ================================================================= */
+.hidden {
+    display: none !important;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Smooth transitions for theme switching */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* =================================================================
+   Reduced Motion Support - WCAG 2.3.3
+   Respects user's prefers-reduced-motion preference
+   Disables or reduces animations for accessibility
+   ================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    /* Disable all transitions and animations globally */
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        animation-duration: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition: none !important;
+        transition-duration: 0s !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Specific element overrides for important animations */
+    .loading-spinner,
+    .analytics-loading-spinner,
+    .spinner,
+    [class*="spinner"] {
+        animation: none !important;
+    }
+
+    /* Keep essential visual feedback but make it instant */
+    .toast,
+    .toast-enter,
+    .toast-exit {
+        transition: none !important;
+        transform: none !important;
+    }
+
+    /* Sidebar transitions */
+    #sidebar,
+    .sidebar-overlay {
+        transition: none !important;
+    }
+
+    /* Button and interactive element transitions */
+    button,
+    a,
+    input,
+    select,
+    .nav-tab,
+    .analytics-tab,
+    .btn,
+    [role="button"] {
+        transition: none !important;
+    }
+
+    /* Map and globe specific */
+    #map,
+    #globe {
+        transition: none !important;
+    }
+
+    /* Onboarding and modal animations */
+    .onboarding-overlay,
+    .onboarding-modal,
+    .onboarding-tooltip {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    /* Chart animations - let ECharts handle this */
+    .chart-content canvas,
+    .chart-card {
+        transition: none !important;
+    }
+
+    /* Mobile menu animations */
+    .menu-toggle span {
+        transition: none !important;
+    }
+}
+
+/* =================================================================
+   SVG Icon Theming
+   Ensures consistent icon colors across all themes
+   ================================================================= */
+
+/* Default icon styling */
+svg {
+    color: var(--icon-color, var(--text-secondary));
+}
+
+/* Icon in buttons inherit button color */
+button svg,
+.btn svg,
+[role="button"] svg {
+    color: inherit;
+}
+
+/* Active state icons */
+.active svg,
+[aria-pressed="true"] svg,
+[aria-selected="true"] svg {
+    color: var(--icon-color-active, var(--highlight));
+}
+
+/* Hover state icons - only for interactive elements */
+button:hover svg,
+.btn:hover svg,
+[role="button"]:hover svg,
+a:hover svg {
+    color: var(--icon-color-hover, var(--text-primary));
+}
+
+/* Navigation icons */
+.nav-tab svg,
+.analytics-tab svg {
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Icon sizes */
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 20px; height: 20px; }
+.icon-lg { width: 24px; height: 24px; }
+.icon-xl { width: 32px; height: 32px; }
+
+/* Status icons */
+.icon-success { color: var(--color-success) !important; }
+.icon-warning { color: var(--color-warning) !important; }
+.icon-error { color: var(--color-error) !important; }
+.icon-info { color: var(--color-info) !important; }
+
+/* =================================================================
+   Image Lazy Loading
+   Optimized image loading with placeholders and transitions
+   ================================================================= */
+
+.lazy-image {
+    background-color: var(--accent);
+    object-fit: cover;
+}
+
+.lazy-loading {
+    filter: blur(5px);
+    transform: scale(1.02);
+}
+
+.lazy-loaded {
+    filter: blur(0);
+    transform: scale(1);
+}
+
+.lazy-error {
+    background-color: var(--accent);
+    filter: grayscale(100%);
+    opacity: 0.7;
+}
+
+/* Skeleton placeholder animation for images */
+.lazy-image:not(.lazy-loaded):not(.lazy-error) {
+    animation: lazy-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes lazy-shimmer {
+    0% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.5; }
+}
+
+/* Reduced motion - disable shimmer and fade effects */
+@media (prefers-reduced-motion: reduce) {
+    .lazy-loading {
+        filter: none;
+        transform: none;
+    }
+
+    .lazy-loaded {
+        transition: none !important;
+    }
+
+    .lazy-image:not(.lazy-loaded):not(.lazy-error) {
+        animation: none;
+    }
+}
+
+/* High contrast mode - ensure images have visible borders */
+[data-theme="high-contrast"] .lazy-image {
+    border: 1px solid var(--text-primary);
+}

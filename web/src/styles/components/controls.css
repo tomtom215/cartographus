@@ -1,0 +1,56 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Control Components
+ *
+ * Theme toggle, colorblind toggle, and header controls.
+ */
+
+/* Header controls container */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#theme-toggle,
+#colorblind-toggle {
+    width: auto;
+    min-height: 44px; /* WCAG 2.1 SC 2.5.5: Minimum touch target size */
+    min-width: 44px;
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#theme-toggle:hover,
+#colorblind-toggle:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+/* Colorblind mode active state */
+#colorblind-toggle.active,
+[data-colorblind="true"] #colorblind-toggle {
+    background: var(--highlight);
+    color: var(--text-primary);
+    border-color: var(--highlight);
+}
+
+#colorblind-toggle.active:hover,
+[data-colorblind="true"] #colorblind-toggle:hover {
+    background: var(--highlight-hover);
+    border-color: var(--highlight-hover);
+}

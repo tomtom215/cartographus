@@ -1,0 +1,439 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Card Components
+ *
+ * Stat cards, insights panels, and other card-based UI elements.
+ * Reference: UI/UX Audit
+ */
+
+/* Stats Container */
+#stats {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.stat-card {
+    background: var(--accent);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Trend Indicators */
+.stat-value-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(160, 160, 160, 0.1);
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.trend-arrow {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.stat-trend-value {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Trend Up - Green */
+.stat-trend[data-direction="up"],
+.stat-trend.trend-up {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.stat-trend[data-direction="up"] .trend-arrow,
+.stat-trend.trend-up .trend-arrow {
+    color: var(--color-success);
+}
+
+/* Trend Down - Red */
+.stat-trend[data-direction="down"],
+.stat-trend.trend-down {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-error);
+}
+
+.stat-trend[data-direction="down"] .trend-arrow,
+.stat-trend.trend-down .trend-arrow {
+    color: var(--color-error);
+}
+
+/* Trend Neutral - Gray */
+.stat-trend[data-direction="neutral"],
+.stat-trend.trend-neutral {
+    background: rgba(160, 160, 160, 0.1);
+    color: var(--text-secondary);
+}
+
+/* ============================================
+ * Sparklines for Stat Cards
+ * Mini trend line visualization
+ * ============================================ */
+.stat-sparkline {
+    width: 100%;
+    height: 24px;
+    margin-top: 8px;
+    opacity: 0.8;
+}
+
+.stat-sparkline svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.stat-sparkline polyline {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Up trend sparkline - green */
+.stat-sparkline.trend-up polyline {
+    stroke: var(--color-success);
+}
+
+.stat-sparkline.trend-up .sparkline-area {
+    fill: url(#sparkline-gradient-up);
+}
+
+/* Down trend sparkline - red */
+.stat-sparkline.trend-down polyline {
+    stroke: var(--color-error);
+}
+
+.stat-sparkline.trend-down .sparkline-area {
+    fill: url(#sparkline-gradient-down);
+}
+
+/* Neutral sparkline - gray */
+.stat-sparkline.trend-neutral polyline {
+    stroke: var(--text-secondary);
+}
+
+.stat-sparkline.trend-neutral .sparkline-area {
+    fill: url(#sparkline-gradient-neutral);
+}
+
+/* Default fallback before data loads */
+.stat-sparkline:empty {
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--border) 50%,
+        transparent 100%);
+    background-size: 200% 100%;
+    animation: sparkline-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkline-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Hide sparkline on very small screens to save space */
+@media (max-width: 360px) {
+    .stat-sparkline {
+        display: none;
+    }
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .stat-sparkline {
+    opacity: 0.9;
+}
+
+/* High contrast mode */
+[data-theme="high-contrast"] .stat-sparkline polyline {
+    stroke-width: 2;
+}
+
+/* ============================================
+ * Automated Insights Panel
+ * ============================================ */
+.insights-panel {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0 20px 15px 20px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.insights-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.insights-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* =================================================================
+   Table View Toggle
+   Alternative table view for chart data
+   ================================================================= */
+
+/* Toggle Button */
+.table-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-right: 8px;
+}
+
+.table-view-toggle:hover {
+    background: var(--accent);
+    border-color: var(--highlight);
+    color: var(--text-primary);
+}
+
+.table-view-toggle:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.table-view-toggle.active {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+.table-view-toggle .table-icon {
+    opacity: 0.8;
+}
+
+.table-view-toggle:hover .table-icon,
+.table-view-toggle.active .table-icon {
+    opacity: 1;
+}
+
+.table-view-toggle .toggle-label {
+    font-weight: 500;
+}
+
+/* Table Container */
+.chart-table-container {
+    padding: 10px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.table-copy-btn:hover {
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: white;
+}
+
+.table-copy-btn:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.table-copy-btn.copied {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+
+.table-row-count {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* Data Table */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+    background: var(--accent);
+    color: var(--text-primary);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.data-table th:hover {
+    background: color-mix(in srgb, var(--highlight) 20%, var(--accent));
+}
+
+.data-table th:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: -2px;
+}
+
+.data-table th .th-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.data-table th .sort-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 4px;
+    opacity: 0.3;
+}
+
+.data-table th[aria-sort="ascending"] .sort-indicator::after {
+    content: "▲";
+    opacity: 1;
+    color: var(--highlight);
+}
+
+.data-table th[aria-sort="descending"] .sort-indicator::after {
+    content: "▼";
+    opacity: 1;
+    color: var(--highlight);
+}
+
+.data-table tbody tr:hover {
+    background: color-mix(in srgb, var(--highlight) 5%, var(--primary-bg));
+}
+
+.data-table td {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Empty State */
+.table-empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* Light Mode */
+[data-theme="light"] .data-table th {
+    background: var(--secondary-bg);
+}
+
+[data-theme="light"] .data-table tbody tr:hover {
+    background: color-mix(in srgb, var(--highlight) 8%, white);
+}
+
+/* High Contrast Mode */
+[data-theme="high-contrast"] .table-view-toggle {
+    border-width: 2px;
+}
+
+[data-theme="high-contrast"] .data-table th,
+[data-theme="high-contrast"] .data-table td {
+    border-width: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .table-view-toggle,
+    .table-copy-btn,
+    .data-table th {
+        transition: none;
+    }
+
+    .stat-trend {
+        transition: none;
+    }
+
+    .stat-sparkline:empty {
+        animation: none;
+        background: var(--border);
+    }
+}

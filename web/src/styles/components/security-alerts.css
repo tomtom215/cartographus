@@ -1,0 +1,355 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Security Alerts Panel Styles (ADR-0020)
+ * Styles for the detection alerts display panel
+ */
+
+/* Panel Container */
+.security-alerts-panel {
+  background: var(--surface-color, #1e1e2e);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.security-alerts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color, #2d2d3d);
+}
+
+.security-alerts-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.security-alerts-badge {
+  display: none;
+  background: var(--danger-color, #e74c3c);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.125rem 0.375rem;
+  border-radius: 10px;
+  min-width: 1.25rem;
+  text-align: center;
+}
+
+.security-alerts-badge-visible {
+  display: inline-block;
+}
+
+.security-alerts-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.security-alerts-actions button {
+  background: transparent;
+  border: 1px solid var(--border-color, #2d2d3d);
+  color: var(--text-secondary, #a0a0a0);
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.security-alerts-actions button:hover {
+  background: var(--hover-color, #2d2d3d);
+  color: var(--text-primary, #e0e0e0);
+}
+
+.security-alerts-actions button:focus-visible {
+  outline: 2px solid var(--focus-indicator, #ff6b8a);
+  outline-offset: 2px;
+}
+
+.security-alerts-actions button.active {
+  background: var(--primary-color, #3498db);
+  border-color: var(--primary-color, #3498db);
+  color: white;
+}
+
+/* Content Area */
+#security-alerts-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Loading State */
+.security-alerts-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary, #a0a0a0);
+  gap: 0.75rem;
+}
+
+.security-alerts-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-color, #2d2d3d);
+  border-top-color: var(--primary-color, #3498db);
+  border-radius: 50%;
+  animation: security-spin 1s linear infinite;
+}
+
+@keyframes security-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .security-alerts-spinner {
+    animation: none;
+    border-color: var(--primary-color, #3498db);
+  }
+}
+
+/* Empty State */
+.security-alerts-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary, #a0a0a0);
+  gap: 0.5rem;
+}
+
+.security-alerts-empty .security-alerts-icon {
+  font-size: 2rem;
+}
+
+/* Alert Cards */
+.security-alert-card {
+  background: var(--surface-secondary, #252535);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--border-color, #2d2d3d);
+  transition: background 0.2s;
+}
+
+.security-alert-card:hover {
+  background: var(--hover-color, #2d2d3d);
+}
+
+.security-alert-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Severity-based border colors */
+.security-alert-critical {
+  border-left-color: var(--danger-color, #e74c3c);
+}
+
+.security-alert-warning {
+  border-left-color: var(--warning-color, #f39c12);
+}
+
+.security-alert-info {
+  border-left-color: var(--info-color, #3498db);
+}
+
+/* Alert Header */
+.security-alert-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.security-alert-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.security-alert-title-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.security-alert-title {
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  font-size: 0.9rem;
+}
+
+.security-alert-severity {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+}
+
+.security-alert-severity-critical {
+  background: var(--danger-color, #e74c3c);
+  color: white;
+}
+
+.security-alert-severity-warning {
+  background: var(--warning-color, #f39c12);
+  color: white;
+}
+
+.security-alert-severity-info {
+  background: var(--info-color, #3498db);
+  color: white;
+}
+
+.security-alert-time {
+  font-size: 0.75rem;
+  color: var(--text-muted, #707080);
+  white-space: nowrap;
+}
+
+/* Alert Body */
+.security-alert-body {
+  margin-left: 1.75rem;
+}
+
+.security-alert-message {
+  color: var(--text-secondary, #a0a0a0);
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.security-alert-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.security-alert-meta span {
+  background: var(--surface-color, #1e1e2e);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  color: var(--text-muted, #707080);
+}
+
+/* Alert Footer */
+.security-alert-footer {
+  margin-top: 0.5rem;
+  margin-left: 1.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.security-alert-acknowledge {
+  background: var(--primary-color, #3498db);
+  color: white;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s;
+}
+
+.security-alert-acknowledge:hover {
+  background: var(--primary-dark, #2980b9);
+}
+
+.security-alert-acknowledge:focus-visible {
+  outline: 2px solid var(--focus-indicator, #ff6b8a);
+  outline-offset: 2px;
+}
+
+.security-alert-acked {
+  color: var(--text-muted, #707080);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Stats Panel */
+.security-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.security-stat {
+  background: var(--surface-secondary, #252535);
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.security-stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.security-stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted, #707080);
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+.security-stat-critical .security-stat-value {
+  color: var(--danger-color, #e74c3c);
+}
+
+.security-stat-warning .security-stat-value {
+  color: var(--warning-color, #f39c12);
+}
+
+.security-stat-info .security-stat-value {
+  color: var(--info-color, #3498db);
+}
+
+.security-stat-unacked .security-stat-value {
+  color: var(--text-primary, #e0e0e0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .security-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .security-alert-header {
+    flex-wrap: wrap;
+  }
+
+  .security-alert-time {
+    width: 100%;
+    margin-left: 1.75rem;
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .security-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -1,0 +1,299 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Chart Timeline Animation Styles
+ * Styles for timeline animation controls on analytics charts
+ */
+
+/* Container */
+.chart-timeline-animation-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--secondary-bg);
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+/* Header */
+.chart-timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chart-timeline-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.chart-timeline-status {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-bg);
+  border-radius: var(--border-radius);
+}
+
+/* Controls */
+.chart-timeline-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Buttons */
+.chart-timeline-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chart-timeline-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.chart-timeline-btn:hover {
+  background: var(--accent);
+  border-color: var(--highlight);
+}
+
+.chart-timeline-btn:focus {
+  outline: 2px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+.chart-timeline-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-play,
+.icon-pause,
+.icon-reset {
+  font-family: inherit;
+  font-style: normal;
+  line-height: 1;
+}
+
+/* Slider */
+.chart-timeline-slider-container {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.chart-timeline-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.chart-timeline-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--highlight);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.chart-timeline-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.chart-timeline-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--highlight);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.chart-timeline-slider:focus {
+  outline: none;
+}
+
+.chart-timeline-slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+}
+
+.chart-timeline-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.chart-timeline-date {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.chart-timeline-frame {
+  color: var(--text-secondary);
+}
+
+/* Options */
+.chart-timeline-options {
+  display: flex;
+  gap: 1rem;
+}
+
+.chart-timeline-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.chart-timeline-option select {
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.chart-timeline-option select:focus {
+  outline: 2px solid var(--highlight);
+  outline-offset: 1px;
+}
+
+/* Progress bar */
+.chart-timeline-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.chart-timeline-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--highlight), var(--highlight-alt, var(--highlight)));
+  transition: width 0.3s ease-out;
+}
+
+/* Light theme */
+[data-theme="light"] .chart-timeline-animation-container {
+  background: var(--secondary-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .chart-timeline-btn {
+  background: var(--secondary-bg);
+}
+
+[data-theme="light"] .chart-timeline-option select {
+  background: var(--secondary-bg);
+}
+
+/* High contrast theme */
+[data-theme="high-contrast"] .chart-timeline-animation-container {
+  border: 2px solid var(--border);
+}
+
+[data-theme="high-contrast"] .chart-timeline-btn {
+  border-width: 2px;
+}
+
+[data-theme="high-contrast"] .chart-timeline-btn:focus {
+  outline-width: 3px;
+}
+
+[data-theme="high-contrast"] .chart-timeline-slider::-webkit-slider-thumb {
+  border: 2px solid var(--primary-bg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chart-timeline-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chart-timeline-buttons {
+    justify-content: center;
+  }
+
+  .chart-timeline-options {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-timeline-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chart-timeline-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .chart-timeline-btn:active {
+    transform: none;
+  }
+
+  .chart-timeline-slider::-webkit-slider-thumb:hover {
+    transform: none;
+  }
+
+  .chart-timeline-progress-bar {
+    transition: none;
+  }
+}
+
+/* Hidden state when no data */
+.chart-timeline-animation-container.hidden {
+  display: none;
+}
+
+/* Loading state */
+.chart-timeline-animation-container.loading .chart-timeline-controls {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Playing state */
+.chart-timeline-animation-container.playing .chart-timeline-btn:first-child {
+  background: var(--highlight);
+  color: var(--text-primary);
+}

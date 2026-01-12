@@ -1,0 +1,2 @@
+# This directory stores Playwright authentication state
+# Auth files (user.json) are gitignored but this file keeps the directory in version control

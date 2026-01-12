@@ -1,0 +1,166 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+#
+# =============================================================================
+# E2E Test Configuration for Cartographus with Real Tautulli Integration
+# =============================================================================
+#
+# This docker-compose file is used by Playwright E2E tests.
+# It provides a production-representative test environment with:
+# - Real Tautulli container with seeded database (550+ sessions)
+# - Cartographus syncing from Tautulli (like production)
+# - JWT authentication with test credentials
+#
+# =============================================================================
+# PREREQUISITES (LOCAL DEVELOPMENT)
+# =============================================================================
+#
+# Before running locally, generate the seed database:
+#
+#   # Generate seed.db (required - contains 550+ playback sessions)
+#   go test -v -run TestGenerateSeedDatabase ./testdata/tautulli/
+#
+# The config.ini is already committed to the repository.
+#
+# =============================================================================
+# USAGE
+# =============================================================================
+#
+# Start the E2E test environment:
+#   docker-compose -f docker-compose.e2e.yml up
+#
+# Run Playwright tests (in another terminal):
+#   npx playwright test
+#
+# Stop and clean up:
+#   docker-compose -f docker-compose.e2e.yml down -v
+#
+# =============================================================================
+# TEST CREDENTIALS
+# =============================================================================
+#
+#   Username: admin
+#   Password: E2eTestPass123!
+#
+# =============================================================================
+# ARCHITECTURE
+# =============================================================================
+#
+#   ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
+#   │    Tautulli     │  sync   │   Cartographus  │  test   │   Playwright    │
+#   │   (seeded DB)   │ ──────> │    (DuckDB)     │ <────── │    (E2E)        │
+#   │   8181/tcp      │         │   3857/tcp      │         │                 │
+#   └─────────────────┘         └─────────────────┘         └─────────────────┘
+#
+# =============================================================================
+
+services:
+  # Tautulli container with seeded test database
+  # Uses the official linuxserver/tautulli image with pre-populated data
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli-e2e
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: UTC
+    volumes:
+      # Mount seeded database (550+ sessions across 6 months)
+      - ./testdata/tautulli/seed.db:/config/tautulli.db:ro
+      # Mount config with pre-configured API key
+      - ./testdata/tautulli/config.ini:/config/config.ini:rw
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8181/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - e2e-network
+
+  # Cartographus application syncing from Tautulli
+  cartographus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cartographus-e2e
+    depends_on:
+      tautulli:
+        condition: service_healthy
+    ports:
+      - "3857:3857"
+    environment:
+      # === Tautulli Connection (Real Integration) ===
+      # Points to the Tautulli container on the Docker network
+      TAUTULLI_URL: http://tautulli:8181
+      # API key matching testdata/tautulli/config.ini (32-char hex format)
+      TAUTULLI_API_KEY: 0123456789abcdef0123456789abcdef
+
+      # === Sync Configuration ===
+      # Short interval for quick initial sync, then normal operation
+      SYNC_INTERVAL: 1m
+      # SYNC_ALL=true fetches all historical data regardless of timestamps.
+      # This is deterministic and works regardless of when the test runs.
+      SYNC_ALL: "true"
+      # Fallback lookback (5 years) in case SYNC_ALL isn't recognized
+      # This ensures we never fall back to the 24h default
+      SYNC_LOOKBACK: 43800h
+      # Large batch size for faster initial sync
+      SYNC_BATCH_SIZE: 1000
+
+      # === Database Configuration ===
+      DUCKDB_PATH: /data/cartographus.duckdb
+      # Reduced from 2GB to prevent OOM in CI containers with limited memory
+      # CI containers typically have 1.8-2GB available, 1GB leaves ~800MB headroom
+      DUCKDB_MAX_MEMORY: 1GB
+
+      # === NATS Configuration ===
+      # Smaller batch size to reduce memory pressure during batch inserts
+      # Default is 1000, reduced for CI with limited memory
+      NATS_BATCH_SIZE: 50
+
+      # === Server Configuration ===
+      HTTP_PORT: 3857
+      HTTP_HOST: 0.0.0.0
+      LOG_LEVEL: info
+
+      # === API Configuration ===
+      API_DEFAULT_PAGE_SIZE: 20
+      API_MAX_PAGE_SIZE: 10000
+
+      # === Authentication Configuration ===
+      # Use AUTH_MODE=none for E2E data integrity tests (auth is tested separately in unit tests)
+      AUTH_MODE: none
+      # JWT config retained for reference if auth testing is needed
+      JWT_SECRET: e2e-test-secret-key-at-least-32-characters-long
+      # Credentials match test fixtures defaults (tests/e2e/fixtures/constants.ts)
+      # Password must meet NIST SP 800-63B policy (12+ chars, uppercase, lowercase, digit, special)
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: E2eTestPass123!
+      SESSION_TIMEOUT: 24h
+
+      # === Server Location ===
+      SERVER_LATITUDE: "40.7128"
+      SERVER_LONGITUDE: "-74.0060"
+
+      # === Security Configuration ===
+      # Higher rate limit for E2E tests which make many rapid requests
+      RATE_LIMIT_REQUESTS: 10000
+      RATE_LIMIT_WINDOW: 1m
+    volumes:
+      # Use a separate data directory for E2E tests to avoid conflicts
+      - ./data-e2e:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3857/api/v1/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - e2e-network
+
+networks:
+  e2e-network:
+    driver: bridge

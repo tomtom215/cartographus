@@ -1,0 +1,56 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cartographus
+  namespace: cartographus
+  labels:
+    app.kubernetes.io/name: cartographus
+    app.kubernetes.io/component: ingress
+  annotations:
+    # For nginx ingress controller
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+
+    # For cert-manager (automatic TLS)
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+    # For Traefik ingress controller (uncomment if using Traefik)
+    # traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    # traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: nginx  # Change to your ingress class (nginx, traefik, etc.)
+  tls:
+    - hosts:
+        - cartographus.example.com  # Replace with your domain
+      secretName: cartographus-tls  # TLS certificate secret
+  rules:
+    - host: cartographus.example.com  # Replace with your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cartographus
+                port:
+                  name: http
+---
+# Optional: Certificate resource for cert-manager
+# Uncomment if using cert-manager for automatic TLS certificates
+#
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: cartographus-tls
+#   namespace: cartographus
+# spec:
+#   secretName: cartographus-tls
+#   issuerRef:
+#     name: letsencrypt-prod
+#     kind: ClusterIssuer
+#   dnsNames:
+#     - cartographus.example.com

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Dark background -->
+  <rect width="512" height="512" fill="#1a1a2e"/>
+  
+  <!-- Simplified map pin icon -->
+  <g transform="translate(256, 180)">
+    <!-- Pin body -->
+    <circle cx="0" cy="0" r="50" fill="#e94560" stroke="#fff" stroke-width="8"/>
+    <!-- Pin point -->
+    <path d="M 0,40 L 20,100 L -20,100 Z" fill="#e94560" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+    <!-- Inner dot -->
+    <circle cx="0" cy="0" r="20" fill="#fff"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="256" y="400" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#eaeaea" text-anchor="middle">
+    Cartographus
+  </text>
+</svg>

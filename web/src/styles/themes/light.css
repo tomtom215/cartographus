@@ -1,0 +1,78 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Light Theme
+ *
+ * Light color scheme overrides for the application.
+ * Reference: UI/UX Audit
+ */
+
+[data-theme="light"] {
+    --primary-bg: #f5f5f5;
+    --secondary-bg: #ffffff;
+    --accent: #e8eaf6;
+    --highlight: #7c3aed;           /* Violet - consistent with dark mode */
+    --highlight-hover: #6d28d9;
+    --highlight-alt: #2563eb;       /* Darker blue for light bg */
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --border: #e0e0e0;
+
+    /* Surface and panel colors for light theme */
+    --surface-color: #ffffff;
+    --border-color: #e0e0e0;
+    --panel-bg: #f8f8f8;
+
+    /* Semantic colors - slightly darker for light background */
+    --color-success: #059669;
+    --color-success-light: #10b981;
+    --color-warning: #d97706;
+    --color-warning-light: #f59e0b;
+    --color-error: #dc2626;
+    --color-error-light: #ef4444;
+    --color-info: #0891b2;
+    --color-info-light: #06b6d4;
+
+    /* Chart colors - same palette, works on light bg */
+    --chart-primary: #7c3aed;
+    --chart-color-1: #7c3aed;
+    --chart-color-2: #2563eb;
+    --chart-color-3: #059669;
+    --chart-color-4: #d97706;
+    --chart-color-5: #db2777;
+    --chart-color-6: #0891b2;
+    --chart-color-7: #7c3aed;
+    --chart-color-8: #0d9488;
+    --chart-color-9: #ea580c;
+    --chart-color-10: #4f46e5;
+
+    /* Heatmap gradient for light mode */
+    --heatmap-1: #dbeafe;
+    --heatmap-2: #bfdbfe;
+    --heatmap-3: #93c5fd;
+    --heatmap-4: #7c3aed;
+    --heatmap-5: #a855f7;
+    --heatmap-6: #ec4899;
+    --heatmap-7: #f43f5e;
+
+    /* Globe visualization colors for light mode */
+    --globe-marker-high: #db2777;         /* Pink - darker for light bg */
+    --globe-marker-medium-high: #ea580c;  /* Orange - darker for light bg */
+    --globe-marker-medium: #d97706;       /* Amber - darker for light bg */
+    --globe-marker-low: #0d9488;          /* Teal - darker for light bg */
+    --globe-tooltip-bg: rgba(255, 255, 255, 0.95);
+    --globe-tooltip-border: #0d9488;
+    --globe-tooltip-text: #1a1a1a;
+
+    /* Focus indicator - AAA compliant contrast for light mode */
+    --focus-indicator: #6d28d9; /* Dark violet - 7.1:1 contrast on light background */
+
+    /* Icon colors for light mode */
+    --icon-color: var(--text-secondary);
+    --icon-color-active: var(--highlight);
+    --icon-color-hover: var(--text-primary);
+}

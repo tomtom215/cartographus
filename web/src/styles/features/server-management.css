@@ -1,0 +1,1048 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Server Management Styles
+ *
+ * Styles for the server management dashboard including:
+ * - Tautulli info card
+ * - Multi-server list
+ * - PMS update status
+ * - NATS health monitoring
+ */
+
+/* Server Management Section */
+.server-management-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.server-management-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.server-management-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.btn-refresh-server {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: auto;
+    min-width: auto;
+}
+
+.btn-refresh-server:hover {
+    background: var(--highlight);
+    border-color: var(--highlight);
+}
+
+.btn-refresh-server:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.btn-refresh-server svg {
+    flex-shrink: 0;
+}
+
+/* Server Card Base */
+.server-card {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.server-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.server-card-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Status Indicators */
+.server-status {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+}
+
+.status-online {
+    color: var(--color-success);
+}
+
+.status-offline {
+    color: var(--color-error);
+}
+
+.status-warning {
+    color: var(--color-warning);
+}
+
+.status-loading {
+    color: var(--text-secondary);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.status-error {
+    color: var(--color-error);
+}
+
+/* Server Details */
+.server-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.server-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.server-detail-label {
+    color: var(--text-secondary);
+}
+
+.server-detail-value {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Tautulli Info Card */
+.tautulli-card {
+    margin-bottom: 16px;
+}
+
+/* Server Update Section */
+.server-update-section {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.btn-check-update {
+    padding: 6px 12px;
+    background: var(--highlight);
+    border: none;
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: auto;
+    min-width: auto;
+}
+
+.btn-check-update:hover {
+    opacity: 0.9;
+}
+
+.btn-check-update:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+/* PMS Update Notice */
+.pms-update-notice {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid var(--color-warning);
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.pms-update-notice .update-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: rgba(245, 158, 11, 0.2);
+    border-radius: 50%;
+    color: var(--color-warning);
+}
+
+.pms-update-notice .update-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pms-update-notice .update-info strong {
+    color: var(--color-warning);
+    font-size: 14px;
+}
+
+.pms-update-notice .update-info span {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.pms-no-update {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 8px;
+    margin-top: 12px;
+    color: var(--color-success);
+    font-size: 13px;
+}
+
+/* Server List Section */
+.server-list-section {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.server-list-section h4 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.server-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.server-list-loading,
+.server-list-empty,
+.server-list-error {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.server-list-item {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.15s ease;
+}
+
+.server-list-item:hover {
+    border-color: var(--highlight);
+}
+
+.server-list-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.server-list-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.server-list-status {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.server-list-status.status-local {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.server-list-status.status-cloud {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--highlight-alt);
+}
+
+.server-list-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.server-list-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.server-list-label {
+    color: var(--text-secondary);
+}
+
+.server-list-value {
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* NATS Health Section */
+.nats-health-section {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.nats-unavailable {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(160, 160, 160, 0.1);
+    border-radius: 8px;
+    margin-top: 12px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* Server Error State */
+.server-error-state {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-error);
+}
+
+/* Theme-specific overrides */
+[data-theme="light"] .server-card,
+[data-theme="light"] .server-update-section,
+[data-theme="light"] .server-list-section,
+[data-theme="light"] .nats-health-section {
+    background: var(--secondary-bg);
+}
+
+[data-theme="light"] .server-list-item {
+    background: var(--primary-bg);
+}
+
+[data-theme="high-contrast"] .server-card,
+[data-theme="high-contrast"] .server-update-section,
+[data-theme="high-contrast"] .server-list-section,
+[data-theme="high-contrast"] .nats-health-section,
+[data-theme="high-contrast"] .server-list-item {
+    border-width: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .server-management-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .server-list-details {
+        grid-template-columns: 1fr;
+    }
+
+    .pms-update-notice {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .btn-refresh-server,
+    .btn-check-update,
+    .server-list-item {
+        transition: none;
+    }
+
+    .status-loading {
+        animation: none;
+    }
+}
+
+/* ============================================================================
+ * Multi-Server Manager Styles
+ * ============================================================================ */
+
+/* Multi-Server Panel Container */
+.multi-server-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.multi-server-panel {
+    background: var(--secondary-bg);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+/* Header */
+.multi-server-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.multi-server-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.multi-server-title h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.server-count-badge {
+    background: var(--highlight);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.multi-server-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Status Summary Cards */
+.server-status-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.status-card {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.status-card .status-count {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.status-card .status-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.status-card.status-connected .status-count {
+    color: var(--color-success);
+}
+
+.status-card.status-syncing .status-count {
+    color: var(--highlight);
+}
+
+.status-card.status-error .status-count {
+    color: var(--color-error);
+}
+
+/* Server List */
+.server-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.server-list-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.server-list-empty svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.server-list-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.server-list-empty .hint {
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.server-list-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.server-list-loading .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--highlight);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+/* Multi-Server Card */
+.multi-server-panel .server-card {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 0;
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.multi-server-panel .server-card:hover {
+    border-color: var(--highlight);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.multi-server-panel .server-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 16px;
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 12px;
+}
+
+.multi-server-panel .server-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.multi-server-panel .server-platform {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.multi-server-panel .server-platform svg {
+    width: 16px;
+    height: 16px;
+}
+
+.multi-server-panel .platform-name {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.multi-server-panel .server-name {
+    margin: 4px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.multi-server-panel .server-url {
+    font-size: 12px;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.multi-server-panel .server-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.multi-server-panel .status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.multi-server-panel .status-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Server Details Section */
+.multi-server-panel .server-details {
+    padding: 0 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.multi-server-panel .server-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.multi-server-panel .feature-badge {
+    background: var(--highlight);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.multi-server-panel .server-sync-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.multi-server-panel .sync-label {
+    color: var(--text-secondary);
+}
+
+.multi-server-panel .sync-time {
+    color: var(--text-primary);
+}
+
+.multi-server-panel .server-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--color-error);
+}
+
+.multi-server-panel .server-error svg {
+    flex-shrink: 0;
+}
+
+/* Server Card Footer */
+.multi-server-panel .server-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--secondary-bg);
+    border-top: 1px solid var(--border);
+}
+
+.multi-server-panel .server-source {
+    display: flex;
+    align-items: center;
+}
+
+.multi-server-panel .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.multi-server-panel .source-badge.source-env {
+    background: rgba(107, 114, 128, 0.15);
+    color: var(--text-secondary);
+}
+
+.multi-server-panel .source-badge.source-ui {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--highlight);
+}
+
+.multi-server-panel .server-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.multi-server-panel .btn-icon {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+    min-height: auto;
+    min-width: auto;
+}
+
+.multi-server-panel .btn-icon:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+    border-color: var(--highlight);
+}
+
+.multi-server-panel .btn-icon.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-error);
+    border-color: var(--color-error);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border);
+    transition: 0.2s;
+    border-radius: 22px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--color-success);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(18px);
+}
+
+.toggle-switch input:focus + .toggle-slider {
+    box-shadow: 0 0 0 2px var(--focus-indicator);
+}
+
+/* Server Modal */
+.server-modal-content {
+    max-width: 500px;
+    width: 100%;
+}
+
+.server-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.server-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.server-form .form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.server-form .form-hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.server-form .form-group-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.server-form .checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+.server-form .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.server-form .checkbox-label input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--highlight);
+}
+
+.server-form .input-with-button {
+    display: flex;
+    gap: 8px;
+}
+
+.server-form .input-with-button input {
+    flex: 1;
+}
+
+.server-form .input-with-button .btn-icon {
+    flex-shrink: 0;
+}
+
+/* Test Result */
+.test-result {
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+.test-result.test-success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--color-success);
+}
+
+.test-result.test-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--color-error);
+}
+
+.test-result-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.test-result .test-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.test-result.test-success .test-icon {
+    color: var(--color-success);
+}
+
+.test-result.test-error .test-icon {
+    color: var(--color-error);
+}
+
+.test-result .test-message {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+/* Delete Confirm Modal */
+.delete-confirm-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.delete-confirm-content .modal-body {
+    padding: 24px;
+}
+
+.delete-confirm-content .delete-server-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text-primary);
+    padding: 12px;
+    background: var(--accent);
+    border-radius: 8px;
+    margin: 12px 0;
+}
+
+.delete-confirm-content .delete-warning {
+    font-size: 13px;
+    color: var(--color-error);
+}
+
+/* Button variants */
+.btn-danger {
+    background: var(--color-error);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-danger:hover {
+    opacity: 0.9;
+}
+
+.btn-danger:focus-visible {
+    outline: 2px solid var(--color-error);
+    outline-offset: 2px;
+}
+
+/* Modal footer alignment */
+.modal-footer-right {
+    display: flex;
+    gap: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .server-status-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .server-form .form-group-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .multi-server-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .multi-server-panel .server-card-footer {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .multi-server-panel .server-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .status-card,
+    .multi-server-panel .server-card,
+    .multi-server-panel .btn-icon,
+    .toggle-slider,
+    .toggle-slider:before {
+        transition: none;
+    }
+
+    .server-list-loading .loading-spinner {
+        animation: none;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

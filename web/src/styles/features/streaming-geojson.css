@@ -1,0 +1,118 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Streaming GeoJSON Styles
+ * Styles for streaming GeoJSON loading feature
+ */
+
+/* Container */
+.streaming-geojson-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: var(--secondary-bg);
+  border-radius: var(--border-radius);
+  margin-bottom: 0.5rem;
+}
+
+/* Toggle */
+.streaming-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.streaming-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.streaming-checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--highlight);
+}
+
+.streaming-toggle-text {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.streaming-threshold-info {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Status */
+.streaming-status {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-bg);
+  border-radius: var(--border-radius);
+  min-height: 1.5rem;
+}
+
+.streaming-status:empty {
+  display: none;
+}
+
+/* Progress bar */
+.streaming-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.streaming-progress-bar {
+  height: 100%;
+  background: var(--highlight);
+  transition: width 0.3s ease-out;
+}
+
+/* Light theme */
+[data-theme="light"] .streaming-geojson-controls {
+  background: var(--secondary-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* High contrast theme */
+[data-theme="high-contrast"] .streaming-geojson-controls {
+  border: 2px solid var(--border);
+}
+
+[data-theme="high-contrast"] .streaming-checkbox:focus {
+  outline: 2px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .streaming-geojson-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .streaming-status {
+    width: 100%;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .streaming-progress-bar {
+    transition: none;
+  }
+}

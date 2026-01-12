@@ -1,0 +1,278 @@
+<!--
+  Cartographus - Media Server Analytics and Geographic Visualization
+  Copyright 2026 Tom F. (tomtom215)
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  https://github.com/tomtom215/cartographus
+-->
+{{/* Alertmanager notification templates for Cartographus */}}
+
+{{/* Slack notification title */}}
+{{ define "slack.title" }}
+[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+{{ end }}
+
+{{/* Slack notification text */}}
+{{ define "slack.text" }}
+{{ range .Alerts }}
+*Alert:* {{ .Labels.alertname }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+*Description:* {{ .Annotations.description }}
+*Details:*
+{{ range .Labels.SortedPairs }}  - {{ .Name }}: `{{ .Value }}`
+{{ end }}
+{{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+{{ end }}
+{{ end }}
+
+{{/* Telegram message format */}}
+{{ define "telegram.message" }}
+{{ if eq .Status "firing" }}🚨{{ else }}✅{{ end }} <b>{{ .Status | toUpper }}</b>
+
+{{ range .Alerts }}
+<b>{{ .Labels.alertname }}</b>{{ if .Labels.severity }} [{{ .Labels.severity }}]{{ end }}
+
+{{ .Annotations.description }}
+
+{{ range .Labels.SortedPairs }}<code>{{ .Name }}</code>: {{ .Value }}
+{{ end }}
+{{ if .Annotations.runbook_url }}📖 <a href="{{ .Annotations.runbook_url }}">Runbook</a>{{ end }}
+---
+{{ end }}
+{{ end }}
+
+{{/* Discord webhook format (JSON body) */}}
+{{ define "discord.message" }}
+{
+  "content": "{{ if eq .Status "firing" }}🚨{{ else }}✅{{ end }} **Cartographus Alert**",
+  "embeds": [
+    {{ range $i, $alert := .Alerts }}{{ if $i }},{{ end }}
+    {
+      "title": "{{ $alert.Labels.alertname }}",
+      "description": "{{ $alert.Annotations.description }}",
+      "color": {{ if eq $.Status "firing" }}{{ if eq $alert.Labels.severity "critical" }}15158332{{ else }}15105570{{ end }}{{ else }}3066993{{ end }},
+      "fields": [
+        {{ range $j, $pair := $alert.Labels.SortedPairs }}{{ if $j }},{{ end }}
+        {
+          "name": "{{ $pair.Name }}",
+          "value": "{{ $pair.Value }}",
+          "inline": true
+        }
+        {{ end }}
+      ],
+      "footer": {
+        "text": "Cartographus Monitoring"
+      },
+      "timestamp": "{{ $alert.StartsAt.Format "2006-01-02T15:04:05Z07:00" }}"
+    }
+    {{ end }}
+  ]
+}
+{{ end }}
+
+{{/* Email subject */}}
+{{ define "email.subject" }}
+[{{ .Status | toUpper }}] Cartographus: {{ .CommonLabels.alertname }}
+{{ end }}
+
+{{/* Email body (HTML) */}}
+{{ define "email.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .alert { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    .critical { border-left: 4px solid #e74c3c; background: #fdf2f2; }
+    .warning { border-left: 4px solid #f39c12; background: #fef9e7; }
+    .info { border-left: 4px solid #3498db; background: #eaf2f8; }
+    .resolved { border-left: 4px solid #27ae60; background: #e8f8f5; }
+    .label { background: #eee; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+    h1 { color: #333; }
+    h2 { color: #666; margin-top: 0; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+  <h1>{{ if eq .Status "firing" }}🚨 Alert Firing{{ else }}✅ Alert Resolved{{ end }}</h1>
+
+  {{ range .Alerts }}
+  <div class="alert {{ if eq $.Status "resolved" }}resolved{{ else }}{{ .Labels.severity }}{{ end }}">
+    <h2>{{ .Labels.alertname }}</h2>
+    <p><strong>Severity:</strong> <span class="label">{{ .Labels.severity }}</span></p>
+    <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+
+    <table>
+      <tr><th>Label</th><th>Value</th></tr>
+      {{ range .Labels.SortedPairs }}
+      <tr><td>{{ .Name }}</td><td><code>{{ .Value }}</code></td></tr>
+      {{ end }}
+    </table>
+
+    {{ if .Annotations.runbook_url }}
+    <p><a href="{{ .Annotations.runbook_url }}">📖 View Runbook</a></p>
+    {{ end }}
+
+    <p><small>Started: {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}</small></p>
+  </div>
+  {{ end }}
+
+  <hr>
+  <p><small>Sent by Cartographus Alertmanager</small></p>
+</body>
+</html>
+{{ end }}
+
+{{/* WAL-specific Slack message */}}
+{{ define "slack.wal" }}
+{{ range .Alerts }}
+*WAL Alert:* {{ .Labels.alertname }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+*Description:* {{ .Annotations.description }}
+*Impact:* {{ if .Annotations.impact }}{{ .Annotations.impact }}{{ else }}Events may not be persisted to database{{ end }}
+*Details:*
+{{ range .Labels.SortedPairs }}  - {{ .Name }}: `{{ .Value }}`
+{{ end }}
+{{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+{{ end }}
+{{ end }}
+
+{{/* Backup-specific Slack message */}}
+{{ define "slack.backup" }}
+{{ range .Alerts }}
+*Backup Alert:* {{ .Labels.alertname }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+*Description:* {{ .Annotations.description }}
+*Impact:* {{ if .Annotations.impact }}{{ .Annotations.impact }}{{ else }}Backup operations may be affected{{ end }}
+*Details:*
+{{ range .Labels.SortedPairs }}  - {{ .Name }}: `{{ .Value }}`
+{{ end }}
+{{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+{{ end }}
+{{ end }}
+
+{{/* WAL-specific email section */}}
+{{ define "email.wal.section" }}
+<div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 15px; margin: 10px 0;">
+  <h3 style="color: #856404; margin-top: 0;">Write-Ahead Log (WAL) Alert</h3>
+  {{ range .Alerts }}
+  <div class="alert {{ if eq $.Status "resolved" }}resolved{{ else }}{{ .Labels.severity }}{{ end }}">
+    <h4>{{ .Labels.alertname }}</h4>
+    <p><strong>Severity:</strong> <span class="label">{{ .Labels.severity }}</span></p>
+    <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+    {{ if .Annotations.impact }}<p><strong>Impact:</strong> {{ .Annotations.impact }}</p>{{ end }}
+    <p><strong>What this means:</strong> The Write-Ahead Log ensures event durability. Issues here may cause data loss if not addressed.</p>
+    <table>
+      <tr><th>Label</th><th>Value</th></tr>
+      {{ range .Labels.SortedPairs }}
+      <tr><td>{{ .Name }}</td><td><code>{{ .Value }}</code></td></tr>
+      {{ end }}
+    </table>
+    {{ if .Annotations.runbook_url }}
+    <p><a href="{{ .Annotations.runbook_url }}">View WAL Troubleshooting Guide</a></p>
+    {{ end }}
+  </div>
+  {{ end }}
+</div>
+{{ end }}
+
+{{/* Backup-specific email section */}}
+{{ define "email.backup.section" }}
+<div style="background: #d4edda; border: 1px solid #28a745; border-radius: 5px; padding: 15px; margin: 10px 0;">
+  <h3 style="color: #155724; margin-top: 0;">Backup System Alert</h3>
+  {{ range .Alerts }}
+  <div class="alert {{ if eq $.Status "resolved" }}resolved{{ else }}{{ .Labels.severity }}{{ end }}">
+    <h4>{{ .Labels.alertname }}</h4>
+    <p><strong>Severity:</strong> <span class="label">{{ .Labels.severity }}</span></p>
+    <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+    {{ if .Annotations.impact }}<p><strong>Impact:</strong> {{ .Annotations.impact }}</p>{{ end }}
+    <p><strong>What this means:</strong> Database backups protect against data loss. Issues here may affect recovery capabilities.</p>
+    <table>
+      <tr><th>Label</th><th>Value</th></tr>
+      {{ range .Labels.SortedPairs }}
+      <tr><td>{{ .Name }}</td><td><code>{{ .Value }}</code></td></tr>
+      {{ end }}
+    </table>
+    {{ if .Annotations.runbook_url }}
+    <p><a href="{{ .Annotations.runbook_url }}">View Backup Troubleshooting Guide</a></p>
+    {{ end }}
+  </div>
+  {{ end }}
+</div>
+{{ end }}
+
+{{/* PagerDuty custom details for WAL alerts */}}
+{{ define "pagerduty.wal.details" }}
+{
+  "alert_type": "WAL",
+  "component": "Write-Ahead Log",
+  "impact": "Event durability and data persistence",
+  {{ range .Alerts }}
+  "alert_name": "{{ .Labels.alertname }}",
+  "severity": "{{ .Labels.severity }}",
+  "description": "{{ .Annotations.description }}",
+  {{ if .Annotations.impact }}"impact_detail": "{{ .Annotations.impact }}",{{ end }}
+  {{ end }}
+  "runbook": "https://docs.cartographus.io/troubleshooting/wal"
+}
+{{ end }}
+
+{{/* PagerDuty custom details for Backup alerts */}}
+{{ define "pagerduty.backup.details" }}
+{
+  "alert_type": "Backup",
+  "component": "Backup System",
+  "impact": "Data recovery and disaster preparedness",
+  {{ range .Alerts }}
+  "alert_name": "{{ .Labels.alertname }}",
+  "severity": "{{ .Labels.severity }}",
+  "description": "{{ .Annotations.description }}",
+  {{ if .Annotations.impact }}"impact_detail": "{{ .Annotations.impact }}",{{ end }}
+  {{ end }}
+  "runbook": "https://docs.cartographus.io/troubleshooting/backup"
+}
+{{ end }}
+
+{{/* Summary template for daily/weekly digests */}}
+{{ define "summary.digest" }}
+## Cartographus Alert Summary
+
+**Period:** {{ .StartsAt.Format "2006-01-02" }} to {{ .EndsAt.Format "2006-01-02" }}
+**Total Alerts:** {{ len .Alerts }}
+
+### By Severity
+{{ $critical := 0 }}{{ $warning := 0 }}{{ $info := 0 }}
+{{ range .Alerts }}
+{{ if eq .Labels.severity "critical" }}{{ $critical = add $critical 1 }}{{ end }}
+{{ if eq .Labels.severity "warning" }}{{ $warning = add $warning 1 }}{{ end }}
+{{ if eq .Labels.severity "info" }}{{ $info = add $info 1 }}{{ end }}
+{{ end }}
+- Critical: {{ $critical }}
+- Warning: {{ $warning }}
+- Info: {{ $info }}
+
+### Alert Details
+{{ range .Alerts }}
+- **{{ .Labels.alertname }}** ({{ .Labels.severity }}): {{ .Annotations.summary }}
+{{ end }}
+{{ end }}
+
+{{/* Generic webhook JSON payload */}}
+{{ define "webhook.json" }}
+{
+  "status": "{{ .Status }}",
+  "groupLabels": {{ .GroupLabels | toJson }},
+  "commonLabels": {{ .CommonLabels | toJson }},
+  "commonAnnotations": {{ .CommonAnnotations | toJson }},
+  "externalURL": "{{ .ExternalURL }}",
+  "alerts": [
+    {{ range $i, $alert := .Alerts }}{{ if $i }},{{ end }}
+    {
+      "status": "{{ $alert.Status }}",
+      "labels": {{ $alert.Labels | toJson }},
+      "annotations": {{ $alert.Annotations | toJson }},
+      "startsAt": "{{ $alert.StartsAt.Format "2006-01-02T15:04:05Z07:00" }}",
+      "endsAt": "{{ $alert.EndsAt.Format "2006-01-02T15:04:05Z07:00" }}",
+      "fingerprint": "{{ $alert.Fingerprint }}"
+    }
+    {{ end }}
+  ]
+}
+{{ end }}

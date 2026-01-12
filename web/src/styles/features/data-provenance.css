@@ -1,0 +1,355 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Data Provenance Styles
+ *
+ * Styles for the Data Provenance Manager component that displays
+ * query metadata for data auditability and reproducibility.
+ */
+
+/* =================================================================
+   Base Container
+   ================================================================= */
+.data-provenance {
+    position: fixed;
+    z-index: 1000;
+    font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', Consolas, monospace);
+    font-size: 12px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+}
+
+.data-provenance.provenance-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Position variants */
+.data-provenance--bottom-right {
+    bottom: 20px;
+    right: 20px;
+}
+
+.data-provenance--bottom-left {
+    bottom: 20px;
+    left: 20px;
+}
+
+.data-provenance--top-right {
+    top: 80px;
+    right: 20px;
+}
+
+.data-provenance--top-left {
+    top: 80px;
+    left: 20px;
+}
+
+/* =================================================================
+   Compact View
+   ================================================================= */
+.provenance-compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+}
+
+.provenance-compact:hover {
+    border-color: var(--highlight);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
+}
+
+.provenance-hash-short {
+    font-family: var(--font-mono, monospace);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.provenance-timing {
+    font-weight: 500;
+}
+
+.provenance-cached {
+    padding: 2px 6px;
+    background: var(--accent);
+    color: var(--highlight);
+    border-radius: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* =================================================================
+   Expanded View
+   ================================================================= */
+.provenance-expanded {
+    width: 300px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.provenance-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--accent);
+}
+
+.provenance-title {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.provenance-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.15s ease;
+}
+
+.provenance-close:hover {
+    color: var(--highlight);
+}
+
+.provenance-close:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.provenance-body {
+    padding: 12px;
+}
+
+.provenance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.provenance-row:last-child {
+    border-bottom: none;
+}
+
+.provenance-label {
+    color: var(--text-secondary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.provenance-value {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+}
+
+.provenance-hash {
+    cursor: pointer;
+    padding: 2px 6px;
+    background: var(--accent);
+    border-radius: 4px;
+    font-family: var(--font-mono, monospace);
+    transition: all 0.15s ease;
+}
+
+.provenance-hash:hover {
+    background: var(--highlight);
+    color: white;
+}
+
+.provenance-copied {
+    color: var(--color-success, #10b981);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.provenance-source {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.provenance-footer {
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--accent);
+}
+
+.provenance-info {
+    color: var(--text-muted);
+    font-size: 10px;
+    font-style: italic;
+}
+
+/* =================================================================
+   Icons
+   ================================================================= */
+.provenance-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.provenance-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.icon {
+    vertical-align: middle;
+}
+
+.icon-fast {
+    color: var(--color-success, #10b981);
+}
+
+.icon-normal {
+    color: var(--text-secondary);
+}
+
+.icon-slow {
+    color: var(--color-warning, #f59e0b);
+}
+
+.icon-cached {
+    color: var(--highlight);
+}
+
+/* =================================================================
+   Timing Classes
+   ================================================================= */
+.timing-fast {
+    color: var(--color-success, #10b981);
+}
+
+.timing-normal {
+    color: var(--text-primary);
+}
+
+.timing-slow {
+    color: var(--color-warning, #f59e0b);
+}
+
+.timing-very-slow {
+    color: var(--color-error, #ef4444);
+}
+
+/* =================================================================
+   Light Theme
+   ================================================================= */
+[data-theme="light"] .data-provenance {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .provenance-compact:hover {
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
+}
+
+[data-theme="light"] .provenance-expanded {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* =================================================================
+   High Contrast Theme
+   ================================================================= */
+[data-theme="high-contrast"] .provenance-compact,
+[data-theme="high-contrast"] .provenance-expanded {
+    border-width: 2px;
+}
+
+[data-theme="high-contrast"] .provenance-hash {
+    text-decoration: underline;
+}
+
+[data-theme="high-contrast"] .provenance-close:focus-visible {
+    outline-width: 3px;
+}
+
+/* =================================================================
+   Reduced Motion
+   ================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    .data-provenance {
+        transition: none;
+    }
+
+    .provenance-compact,
+    .provenance-close,
+    .provenance-hash {
+        transition: none;
+    }
+}
+
+/* =================================================================
+   Responsive
+   ================================================================= */
+@media (max-width: 768px) {
+    .data-provenance--bottom-right,
+    .data-provenance--bottom-left {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .provenance-expanded {
+        width: calc(100vw - 20px);
+        max-width: 320px;
+    }
+
+    .provenance-compact {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .data-provenance {
+        font-size: 11px;
+    }
+
+    .provenance-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .provenance-value {
+        text-align: left;
+    }
+
+    .provenance-source {
+        max-width: 100%;
+    }
+}

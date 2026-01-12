@@ -1,0 +1,26 @@
+# Security Policy for Cartographus
+# This file follows RFC 9116 specification
+# https://www.rfc-editor.org/rfc/rfc9116.html
+
+Contact: https://github.com/tomtom215/cartographus/issues
+Contact: https://github.com/tomtom215/cartographus/security/advisories/new
+
+# Expires: Tue, 17 Nov 2026 00:00:00 +0000 (1 year from now)
+Expires: 2026-11-17T00:00:00.000Z
+
+Preferred-Languages: en
+
+# Canonical URL for this security.txt file
+Canonical: https://yourdomain.com/.well-known/security.txt
+
+# Policy information
+Policy: https://github.com/tomtom215/cartographus/blob/main/SECURITY.md
+
+# Acknowledgments page (if you have one)
+# Acknowledgments: https://github.com/tomtom215/cartographus/blob/main/SECURITY.md#acknowledgments
+
+# PGP key for encrypted communications (optional - add if you have one)
+# Encryption: https://example.com/pgp-key.txt
+
+# Please report security vulnerabilities responsibly
+# Do not disclose publicly until we've had a chance to address them

@@ -1,0 +1,392 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Tooltip Component Styles
+ *
+ * Accessible, customizable tooltip styles with:
+ * - Dark/light/high-contrast theme support
+ * - Arrow positioning for all directions
+ * - Responsive design
+ * - Reduced motion support
+ * - Print-friendly (hidden)
+ *
+ * WCAG 2.1 AA compliant with sufficient contrast
+ */
+
+/* =================================================================
+   Base Tooltip Styles
+   ================================================================= */
+
+.tooltip {
+    --tooltip-bg: rgba(0, 0, 0, 0.9);
+    --tooltip-color: #ffffff;
+    --tooltip-border: rgba(255, 255, 255, 0.1);
+    --tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --tooltip-arrow-size: 6px;
+    --tooltip-padding: 8px 12px;
+    --tooltip-radius: 6px;
+    --tooltip-font-size: 13px;
+    --tooltip-line-height: 1.4;
+
+    position: fixed;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-color);
+    border: 1px solid var(--tooltip-border);
+    border-radius: var(--tooltip-radius);
+    box-shadow: var(--tooltip-shadow);
+    font-size: var(--tooltip-font-size);
+    line-height: var(--tooltip-line-height);
+    font-weight: 400;
+    text-align: left;
+    word-wrap: break-word;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+.tooltip-content {
+    padding: var(--tooltip-padding);
+}
+
+/* =================================================================
+   Arrow Styles
+   ================================================================= */
+
+.tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: var(--tooltip-arrow-size) solid transparent;
+}
+
+/* Arrow pointing down (tooltip above) */
+.tooltip-top .tooltip-arrow {
+    border-top-color: var(--tooltip-bg);
+    border-bottom: none;
+}
+
+/* Arrow pointing up (tooltip below) */
+.tooltip-bottom .tooltip-arrow {
+    border-bottom-color: var(--tooltip-bg);
+    border-top: none;
+}
+
+/* Arrow pointing right (tooltip on left) */
+.tooltip-left .tooltip-arrow {
+    border-left-color: var(--tooltip-bg);
+    border-right: none;
+}
+
+/* Arrow pointing left (tooltip on right) */
+.tooltip-right .tooltip-arrow {
+    border-right-color: var(--tooltip-bg);
+    border-left: none;
+}
+
+/* =================================================================
+   Animation Classes
+   ================================================================= */
+
+.tooltip-enter {
+    animation: tooltipFadeIn 0.15s ease-out;
+}
+
+.tooltip-exit {
+    animation: tooltipFadeOut 0.15s ease-in;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes tooltipFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+}
+
+/* =================================================================
+   Tooltip Variants
+   ================================================================= */
+
+/* Info tooltip (default) */
+.tooltip-info {
+    --tooltip-bg: rgba(59, 130, 246, 0.95);
+    --tooltip-border: rgba(59, 130, 246, 0.8);
+}
+
+/* Success tooltip */
+.tooltip-success {
+    --tooltip-bg: rgba(34, 197, 94, 0.95);
+    --tooltip-border: rgba(34, 197, 94, 0.8);
+}
+
+/* Warning tooltip */
+.tooltip-warning {
+    --tooltip-bg: rgba(245, 158, 11, 0.95);
+    --tooltip-color: #1a1a2e;
+    --tooltip-border: rgba(245, 158, 11, 0.8);
+}
+
+/* Error/Danger tooltip */
+.tooltip-error,
+.tooltip-danger {
+    --tooltip-bg: rgba(239, 68, 68, 0.95);
+    --tooltip-border: rgba(239, 68, 68, 0.8);
+}
+
+/* =================================================================
+   Light Theme
+   ================================================================= */
+
+[data-theme="light"] .tooltip {
+    --tooltip-bg: rgba(255, 255, 255, 0.98);
+    --tooltip-color: #1a1a2e;
+    --tooltip-border: rgba(0, 0, 0, 0.1);
+    --tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .tooltip-top .tooltip-arrow {
+    border-top-color: var(--tooltip-bg);
+}
+
+[data-theme="light"] .tooltip-bottom .tooltip-arrow {
+    border-bottom-color: var(--tooltip-bg);
+}
+
+[data-theme="light"] .tooltip-left .tooltip-arrow {
+    border-left-color: var(--tooltip-bg);
+}
+
+[data-theme="light"] .tooltip-right .tooltip-arrow {
+    border-right-color: var(--tooltip-bg);
+}
+
+/* Light theme variants */
+[data-theme="light"] .tooltip-info {
+    --tooltip-bg: rgba(59, 130, 246, 0.98);
+    --tooltip-color: #ffffff;
+}
+
+[data-theme="light"] .tooltip-success {
+    --tooltip-bg: rgba(34, 197, 94, 0.98);
+    --tooltip-color: #ffffff;
+}
+
+[data-theme="light"] .tooltip-warning {
+    --tooltip-bg: rgba(245, 158, 11, 0.98);
+    --tooltip-color: #1a1a2e;
+}
+
+[data-theme="light"] .tooltip-error,
+[data-theme="light"] .tooltip-danger {
+    --tooltip-bg: rgba(239, 68, 68, 0.98);
+    --tooltip-color: #ffffff;
+}
+
+/* =================================================================
+   High Contrast Theme
+   ================================================================= */
+
+[data-theme="high-contrast"] .tooltip {
+    --tooltip-bg: #000000;
+    --tooltip-color: #ffffff;
+    --tooltip-border: #ffffff;
+    --tooltip-shadow: none;
+    border-width: 2px;
+}
+
+[data-theme="high-contrast"] .tooltip-info {
+    --tooltip-bg: #0066cc;
+    --tooltip-border: #ffffff;
+}
+
+[data-theme="high-contrast"] .tooltip-success {
+    --tooltip-bg: #008000;
+    --tooltip-border: #ffffff;
+}
+
+[data-theme="high-contrast"] .tooltip-warning {
+    --tooltip-bg: #cc8800;
+    --tooltip-color: #000000;
+    --tooltip-border: #000000;
+}
+
+[data-theme="high-contrast"] .tooltip-error,
+[data-theme="high-contrast"] .tooltip-danger {
+    --tooltip-bg: #cc0000;
+    --tooltip-border: #ffffff;
+}
+
+/* =================================================================
+   Rich Content Styles
+   ================================================================= */
+
+.tooltip-content strong,
+.tooltip-content b {
+    font-weight: 600;
+}
+
+.tooltip-content em,
+.tooltip-content i {
+    font-style: italic;
+}
+
+.tooltip-content code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+[data-theme="light"] .tooltip-content code {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.tooltip-content kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85em;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .tooltip-content kbd {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-content a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.tooltip-content a:hover {
+    text-decoration: none;
+}
+
+.tooltip-content ul,
+.tooltip-content ol {
+    margin: 4px 0;
+    padding-left: 18px;
+}
+
+.tooltip-content li {
+    margin: 2px 0;
+}
+
+/* =================================================================
+   Size Variants
+   ================================================================= */
+
+.tooltip-sm {
+    --tooltip-padding: 4px 8px;
+    --tooltip-font-size: 11px;
+    --tooltip-radius: 4px;
+}
+
+.tooltip-lg {
+    --tooltip-padding: 12px 16px;
+    --tooltip-font-size: 14px;
+    --tooltip-radius: 8px;
+}
+
+/* =================================================================
+   Reduced Motion
+   ================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .tooltip {
+        transition: none;
+    }
+
+    .tooltip-enter,
+    .tooltip-exit {
+        animation: none;
+    }
+}
+
+/* =================================================================
+   Print Styles
+   ================================================================= */
+
+@media print {
+    .tooltip {
+        display: none !important;
+    }
+}
+
+/* =================================================================
+   Interactive Tooltips (when pointer-events are enabled)
+   ================================================================= */
+
+.tooltip-interactive {
+    pointer-events: auto;
+}
+
+.tooltip-interactive .tooltip-content {
+    cursor: default;
+}
+
+.tooltip-interactive a {
+    cursor: pointer;
+}
+
+/* =================================================================
+   Touch Device Adjustments
+   ================================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets on mobile */
+    .tooltip {
+        --tooltip-padding: 12px 16px;
+        --tooltip-font-size: 14px;
+    }
+}
+
+/* =================================================================
+   Focus Visible for Keyboard Users
+   ================================================================= */
+
+[data-tooltip]:focus-visible {
+    outline: 2px solid var(--focus-indicator, #3b82f6);
+    outline-offset: 2px;
+}
+
+/* =================================================================
+   Screen Reader Considerations
+   ================================================================= */
+
+/* The tooltip content is linked via aria-describedby,
+   so screen readers will announce it when focusing the trigger.
+   This ensures tooltips are accessible even when hidden. */
+
+/* Hidden but accessible to screen readers */
+.tooltip[aria-hidden="true"] {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.tooltip[aria-hidden="false"] {
+    visibility: visible;
+    opacity: 1;
+}

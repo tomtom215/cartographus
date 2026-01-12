@@ -1,0 +1,151 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Login Feature Styles
+ *
+ * Authentication login page and form styles.
+ */
+
+#login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--primary-bg);
+    /* Subtle gradient background for branding */
+    background: linear-gradient(
+        135deg,
+        var(--primary-bg) 0%,
+        var(--secondary-bg) 50%,
+        var(--primary-bg) 100%
+    );
+    /* Subtle pattern overlay */
+    background-size: 400% 400%;
+    animation: login-gradient 15s ease infinite;
+}
+
+@keyframes login-gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    #login-container {
+        animation: none;
+        background: var(--primary-bg);
+    }
+}
+
+#login-box {
+    background: var(--secondary-bg);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    /* Subtle glow effect */
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px var(--border),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Login Logo */
+.login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.login-logo svg {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
+}
+
+.login-logo svg:hover {
+    transform: scale(1.05);
+}
+
+/* Login Title */
+.login-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    text-align: center;
+    color: var(--text-primary);
+    /* Subtle gradient text for branding */
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--highlight) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Login Subtitle */
+.login-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin: 0 0 32px 0;
+}
+
+/* Legacy selectors for backwards compatibility */
+#login-box h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+#login-box p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44px touch target height */
+    min-height: 44px;
+    height: 44px; /* Explicit height to ensure WCAG compliance */
+    box-sizing: border-box;
+    line-height: 1.2; /* Ensure consistent line height */
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--highlight);
+}
+
+.form-checkbox {
+    width: auto;
+    margin-right: 8px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}

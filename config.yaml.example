@@ -1,0 +1,272 @@
+# Cartographus Configuration File
+# ================================
+#
+# This file provides an alternative to environment variables for configuration.
+# Copy this file to 'config.yaml' and customize as needed.
+#
+# Configuration Loading Order (later sources override earlier ones):
+#   1. Built-in defaults
+#   2. Config file (this file, if present)
+#   3. Environment variables (highest priority)
+#
+# Environment variables still work and take precedence over values in this file.
+# For example, setting TAUTULLI_URL environment variable will override tautulli.url here.
+#
+# Documentation: https://github.com/tomtom215/cartographus
+# ================================
+
+# Tautulli Configuration (OPTIONAL)
+# --------------------------------------------
+# Tautulli is optional. Cartographus can run standalone with direct
+# Plex, Jellyfin, and/or Emby integrations without requiring Tautulli.
+tautulli:
+  # Enable Tautulli integration (default: false)
+  # Set to true only if you have Tautulli running
+  enabled: false
+
+  # Tautulli server URL (include http:// or https://)
+  # Example: http://localhost:8181 or http://tautulli:8181 (Docker)
+  # REQUIRED if enabled: true
+  url: "http://tautulli:8181"
+
+  # Tautulli API key (find in Settings > Web Interface > API key)
+  # REQUIRED if enabled: true
+  api_key: "your_api_key_here"
+
+# Plex Configuration (Optional)
+# -----------------------------
+# Hybrid data architecture: Enables historical playback data from Plex API
+# while maintaining Tautulli as the primary source with complete metadata
+plex:
+  # Enable Plex API integration
+  enabled: false
+
+  # Plex Media Server URL
+  url: "http://plex:32400"
+
+  # X-Plex-Token for authentication
+  # Find at: Settings > Network > Show Advanced > Look for X-Plex-Token in URL
+  token: ""
+
+  # One-time historical backfill of ALL Plex playback history
+  # Set to true for ONE-TIME backfill, then change back to false
+  historical_sync: false
+
+  # How far back to sync Plex history (days)
+  # Range: 7-3650 (1 week to 10 years)
+  sync_days_back: 365
+
+  # How often to check Plex for missed events
+  # Format: Go duration (e.g., "24h", "12h", "1h")
+  sync_interval: "24h"
+
+  # Enable Plex WebSocket for real-time playback notifications
+  realtime_enabled: false
+
+  # OAuth 2.0 PKCE Authentication (optional)
+  oauth_client_id: ""
+  oauth_client_secret: ""
+  oauth_redirect_uri: "http://localhost:3857/api/v1/auth/plex/callback"
+
+  # Transcode Monitoring
+  transcode_monitoring: false
+  transcode_monitoring_interval: "10s"
+
+  # Buffer Health Monitoring
+  buffer_health_monitoring: false
+  buffer_health_poll_interval: "5s"
+  buffer_health_critical_threshold: 20.0
+  buffer_health_risky_threshold: 50.0
+
+  # Webhook Receiver
+  webhooks_enabled: false
+  webhook_secret: ""
+
+# NATS JetStream Configuration (Optional)
+# ----------------------------------------
+# Event-driven architecture for Plex standalone deployments
+nats:
+  # Enable NATS JetStream event processing
+  enabled: true
+
+  # Event Sourcing mode (NATS-First architecture)
+  # true: NATS JetStream is the single source of truth
+  # false: Legacy mode - DB-first writes
+  event_sourcing: true
+
+  # NATS server URL
+  url: "nats://127.0.0.1:4222"
+
+  # Use embedded NATS server (set false for external cluster)
+  embedded_server: true
+
+  # JetStream storage directory
+  store_dir: "/data/nats/jetstream"
+
+  # Maximum memory for JetStream (bytes)
+  # Default: 1GB (1073741824)
+  max_memory: 1073741824
+
+  # Maximum disk storage for JetStream (bytes)
+  # Default: 10GB (10737418240)
+  max_store: 10737418240
+
+  # Event retention period (days)
+  stream_retention_days: 7
+
+  # Batch size for DuckDB writes
+  batch_size: 1000
+
+  # Maximum time between DuckDB flushes
+  flush_interval: "5s"
+
+  # Number of concurrent message processors
+  subscribers_count: 4
+
+  # Consumer durable name
+  durable_name: "media-processor"
+
+  # Queue group for load balancing
+  queue_group: "processors"
+
+# Database Configuration
+# ----------------------
+database:
+  # Path to DuckDB database file
+  path: "/data/cartographus.duckdb"
+
+  # Maximum memory DuckDB can use for queries
+  # Format: Number + unit (e.g., "512MB", "2GB", "4GB")
+  max_memory: "2GB"
+
+  # Enable mock data seeding (for CI/CD screenshot tests only)
+  seed_mock_data: false
+
+# Sync Configuration
+# ------------------
+sync:
+  # How often to sync playback data from Tautulli
+  interval: "5m"
+
+  # How far back to look for playback history on initial sync
+  lookback: "24h"
+
+  # Number of records to fetch per Tautulli API request
+  batch_size: 1000
+
+  # Number of retry attempts for failed sync operations
+  retry_attempts: 5
+
+  # Delay between sync retry attempts
+  retry_delay: "2s"
+
+# Server Configuration
+# --------------------
+server:
+  # HTTP server port
+  port: 3857
+
+  # HTTP server host (use 0.0.0.0 for all interfaces)
+  host: "0.0.0.0"
+
+  # HTTP request timeout
+  timeout: "30s"
+
+  # Server physical location (optional, for globe visualization)
+  # Find your coordinates at: https://www.latlong.net/
+  latitude: 0.0
+  longitude: 0.0
+
+# API Configuration
+# -----------------
+api:
+  # Default number of results per page
+  default_page_size: 20
+
+  # Maximum allowed page size
+  max_page_size: 100
+
+# Security Configuration
+# ----------------------
+security:
+  # Authentication mode: 'jwt' (recommended), 'basic', or 'none'
+  auth_mode: "jwt"
+
+  # JWT signing secret (REQUIRED if auth_mode is jwt)
+  # MUST be at least 32 characters
+  # Generate with: openssl rand -base64 32
+  jwt_secret: ""
+
+  # How long JWT tokens remain valid
+  session_timeout: "24h"
+
+  # Admin credentials (REQUIRED for jwt and basic modes)
+  admin_username: ""
+  admin_password: ""
+
+  # Rate limiting
+  rate_limit_reqs: 100
+  rate_limit_window: "1m"
+  rate_limit_disabled: false
+
+  # CORS origins (comma-separated in env, list in YAML)
+  cors_origins:
+    - "*"
+
+  # Trusted proxy IP addresses
+  trusted_proxies: []
+
+# Logging Configuration
+# ---------------------
+logging:
+  # Log level: trace, debug, info, warn, error
+  level: "info"
+
+  # Log format: json (structured) or console (human-readable)
+  format: "json"
+
+  # Include caller file:line in logs
+  caller: false
+
+# Server Environment
+# ------------------
+server:
+  port: 3857
+  host: "0.0.0.0"
+  timeout: "30s"
+
+  # Environment mode: development, staging, production
+  # Production mode safeguards:
+  #   - AUTH_MODE=none is rejected
+  #   - CORS_ORIGINS=* is rejected with authentication
+  environment: "development"
+
+# VPN Detection Configuration
+# ---------------------------
+vpn:
+  # Enable VPN detection for accurate geolocation
+  enabled: true
+
+  # Path to gluetun servers.json (optional)
+  data_file: ""
+
+  # Lookup cache entries
+  cache_size: 10000
+
+# Import Configuration
+# --------------------
+import:
+  # Enable database import functionality
+  enabled: false
+
+  # Path to Tautulli SQLite database
+  db_path: ""
+
+  # Records per batch
+  batch_size: 1000
+
+  # Validate without importing
+  dry_run: false
+
+  # Auto-start import on startup
+  auto_start: false

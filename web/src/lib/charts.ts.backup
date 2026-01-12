@@ -1,0 +1,3310 @@
+import * as echarts from 'echarts';
+import type {
+    API,
+    LocationFilter,
+    TrendsResponse,
+    GeographicResponse,
+    UsersResponse,
+    BingeAnalyticsResponse,
+    WatchPartyAnalyticsResponse,
+    PopularAnalyticsResponse,
+    BandwidthAnalyticsResponse,
+    UserEngagementAnalyticsResponse,
+    ComparativeAnalyticsResponse,
+    TemporalHeatmapResponse,
+    ResolutionMismatchAnalytics,
+    HDRAnalytics,
+    AudioAnalytics,
+    SubtitleAnalytics,
+    ConnectionSecurityAnalytics,
+    PausePatternAnalytics,
+    ConcurrentStreamsAnalytics
+} from './api';
+
+export class ChartManager {
+    private charts: Map<string, echarts.ECharts> = new Map();
+    private pendingData: Map<string, any> = new Map();
+    private observer: IntersectionObserver | null = null;
+
+    constructor(private api: API) {
+        this.setupLazyLoading();
+        this.setupExportButtons();
+        window.addEventListener('resize', () => this.resizeCharts());
+    }
+
+    /**
+     * Get enhanced tooltip configuration with rich formatting
+     */
+    private getEnhancedTooltip(config?: echarts.TooltipComponentOption): echarts.TooltipComponentOption {
+        return {
+            trigger: config?.trigger || 'axis',
+            backgroundColor: 'rgba(22, 33, 62, 0.98)',
+            borderColor: '#e94560',
+            borderWidth: 1,
+            padding: [12, 16],
+            textStyle: {
+                color: '#eaeaea',
+                fontSize: 13,
+            },
+            extraCssText: 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); border-radius: 6px;',
+            ...config,
+        };
+    }
+
+    /**
+     * Get enhanced legend configuration with better styling and interaction
+     */
+    private getEnhancedLegend(config?: echarts.LegendComponentOption): echarts.LegendComponentOption {
+        return {
+            textStyle: {
+                color: '#a0a0a0',
+                fontSize: 12,
+            },
+            itemGap: 16,
+            itemWidth: 20,
+            itemHeight: 12,
+            icon: 'roundRect',
+            inactiveColor: '#3a3a4e',
+            ...config,
+        };
+    }
+
+    /**
+     * Format number with thousand separators
+     */
+    private formatNumber(num: number): string {
+        return num.toLocaleString();
+    }
+
+    /**
+     * Format percentage with one decimal place
+     */
+    private formatPercent(num: number): string {
+        return `${num.toFixed(1)}%`;
+    }
+
+    private setupLazyLoading(): void {
+        if (typeof IntersectionObserver === 'undefined') {
+            this.initializeCharts();
+            return;
+        }
+
+        this.observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const container = entry.target as HTMLElement;
+                        const chartId = container.id;
+
+                        if (!this.charts.has(chartId)) {
+                            const chart = echarts.init(container, 'dark');
+                            this.charts.set(chartId, chart);
+
+                            if (this.pendingData.has(chartId)) {
+                                const data = this.pendingData.get(chartId);
+                                if (data) {
+                                    this.renderChartById(chartId, data);
+                                    this.pendingData.delete(chartId);
+                                }
+                            }
+                        }
+
+                        this.observer?.unobserve(container);
+                    }
+                });
+            },
+            {
+                root: null,
+                rootMargin: '50px',
+                threshold: 0.1,
+            }
+        );
+
+        const chartIds = [
+            'chart-trends', 'chart-countries', 'chart-cities', 'chart-media', 'chart-users', 'chart-heatmap',
+            'chart-platforms', 'chart-players', 'chart-completion', 'chart-transcode', 'chart-resolution', 'chart-codec',
+            'chart-libraries', 'chart-ratings', 'chart-duration', 'chart-years',
+            'chart-binge-summary', 'chart-binge-shows', 'chart-binge-users',
+            'chart-watch-parties-summary', 'chart-watch-parties-content', 'chart-watch-parties-users',
+            'chart-popular-movies', 'chart-popular-shows', 'chart-popular-episodes',
+            'chart-bandwidth-trends', 'chart-bandwidth-transcode', 'chart-bandwidth-resolution', 'chart-bandwidth-users',
+            'chart-engagement-summary', 'chart-engagement-hours', 'chart-engagement-days'
+        ];
+        chartIds.forEach((id) => {
+            const container = document.getElementById(id);
+            if (container && this.observer) {
+                this.observer.observe(container);
+            }
+        });
+    }
+
+    private initializeCharts(): void {
+        const chartIds = [
+            'chart-trends', 'chart-countries', 'chart-cities', 'chart-media', 'chart-users', 'chart-heatmap',
+            'chart-platforms', 'chart-players', 'chart-completion', 'chart-transcode', 'chart-resolution', 'chart-codec',
+            'chart-libraries', 'chart-ratings', 'chart-duration', 'chart-years',
+            'chart-binge-summary', 'chart-binge-shows', 'chart-binge-users',
+            'chart-watch-parties-summary', 'chart-watch-parties-content', 'chart-watch-parties-users',
+            'chart-popular-movies', 'chart-popular-shows', 'chart-popular-episodes',
+            'chart-bandwidth-trends', 'chart-bandwidth-transcode', 'chart-bandwidth-resolution', 'chart-bandwidth-users',
+            'chart-engagement-summary', 'chart-engagement-hours', 'chart-engagement-days'
+        ];
+
+        chartIds.forEach(id => {
+            const container = document.getElementById(id);
+            if (container) {
+                const chart = echarts.init(container, 'dark');
+                this.charts.set(id, chart);
+            }
+        });
+    }
+
+    private setupExportButtons(): void {
+        document.querySelectorAll('.chart-export').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const chartName = target.getAttribute('data-chart');
+                if (chartName) {
+                    this.exportChart(chartName);
+                }
+            });
+        });
+    }
+
+    async loadAllCharts(filter: LocationFilter = {}): Promise<void> {
+        const chartIds = [
+            'chart-trends', 'chart-countries', 'chart-cities', 'chart-media', 'chart-users', 'chart-heatmap',
+            'chart-platforms', 'chart-players', 'chart-completion', 'chart-transcode', 'chart-resolution', 'chart-codec',
+            'chart-libraries', 'chart-ratings', 'chart-duration', 'chart-years',
+            'chart-binge-summary', 'chart-binge-shows', 'chart-binge-users',
+            'chart-watch-parties-summary', 'chart-watch-parties-content', 'chart-watch-parties-users',
+            'chart-popular-movies', 'chart-popular-shows', 'chart-popular-episodes',
+            'chart-bandwidth-trends', 'chart-bandwidth-transcode', 'chart-bandwidth-resolution', 'chart-bandwidth-users',
+            'chart-engagement-summary', 'chart-engagement-hours', 'chart-engagement-days',
+            'chart-comparative-metrics', 'chart-comparative-content', 'chart-comparative-users',
+            'chart-temporal-heatmap',
+            'chart-resolution-mismatch', 'chart-hdr-analytics', 'chart-audio-analytics',
+            'chart-subtitle-analytics', 'chart-connection-security', 'chart-pause-patterns',
+            'chart-concurrent-streams'
+        ];
+
+        // Show loading skeletons for all charts
+        chartIds.forEach(id => {
+            if (this.charts.has(id)) {
+                this.showLoadingSkeleton(id);
+            }
+        });
+
+        try {
+            // Get comparison type from selector (default to 'week')
+            const comparisonTypeSelector = document.getElementById('comparison-type-selector') as HTMLSelectElement;
+            const comparisonType = (comparisonTypeSelector?.value as 'week' | 'month' | 'quarter' | 'year') || 'week';
+
+            // Get temporal interval from selector (default to 'day')
+            const temporalIntervalSelector = document.getElementById('temporal-interval-selector') as HTMLSelectElement;
+            const temporalInterval = (temporalIntervalSelector?.value as 'hour' | 'day' | 'week' | 'month') || 'day';
+
+            const [trendsData, geographicData, usersData, bingeData, watchPartiesData, popularData, bandwidthData, engagementData, comparativeData, temporalHeatmapData, resolutionMismatchData, hdrData, audioData, subtitleData, connectionSecurityData, pausePatternData, concurrentStreamsData] = await Promise.all([
+                this.api.getAnalyticsTrends(filter),
+                this.api.getAnalyticsGeographic(filter),
+                this.api.getAnalyticsUsers(filter, 10),
+                this.api.getAnalyticsBinge(filter),
+                this.api.getAnalyticsWatchParties(filter),
+                this.api.getAnalyticsPopular(filter, 10),
+                this.api.getAnalyticsBandwidth(filter),
+                this.api.getAnalyticsUserEngagement(filter, 10),
+                this.api.getAnalyticsComparative(filter, comparisonType),
+                this.api.getAnalyticsTemporalHeatmap(filter, temporalInterval),
+                this.api.getAnalyticsResolutionMismatch(filter),
+                this.api.getAnalyticsHDR(filter),
+                this.api.getAnalyticsAudio(filter),
+                this.api.getAnalyticsSubtitles(filter),
+                this.api.getAnalyticsConnectionSecurity(filter),
+                this.api.getAnalyticsPausePatterns(filter),
+                this.api.getAnalyticsConcurrentStreams(filter),
+            ]);
+
+            const chartDataMap: Record<string, any> = {
+                'chart-trends': trendsData,
+                'chart-countries': geographicData,
+                'chart-cities': geographicData,
+                'chart-media': geographicData,
+                'chart-users': usersData,
+                'chart-heatmap': geographicData,
+                'chart-platforms': geographicData,
+                'chart-players': geographicData,
+                'chart-completion': geographicData,
+                'chart-transcode': geographicData,
+                'chart-resolution': geographicData,
+                'chart-codec': geographicData,
+                'chart-libraries': geographicData,
+                'chart-ratings': geographicData,
+                'chart-duration': geographicData,
+                'chart-years': geographicData,
+                'chart-binge-summary': bingeData,
+                'chart-binge-shows': bingeData,
+                'chart-binge-users': bingeData,
+                'chart-watch-parties-summary': watchPartiesData,
+                'chart-watch-parties-content': watchPartiesData,
+                'chart-watch-parties-users': watchPartiesData,
+                'chart-popular-movies': popularData,
+                'chart-popular-shows': popularData,
+                'chart-popular-episodes': popularData,
+                'chart-bandwidth-trends': bandwidthData,
+                'chart-bandwidth-transcode': bandwidthData,
+                'chart-bandwidth-resolution': bandwidthData,
+                'chart-bandwidth-users': bandwidthData,
+                'chart-engagement-summary': engagementData,
+                'chart-engagement-hours': engagementData,
+                'chart-engagement-days': engagementData,
+                'chart-comparative-metrics': comparativeData,
+                'chart-comparative-content': comparativeData,
+                'chart-comparative-users': comparativeData,
+                'chart-temporal-heatmap': temporalHeatmapData,
+                'chart-resolution-mismatch': resolutionMismatchData,
+                'chart-hdr-analytics': hdrData,
+                'chart-audio-analytics': audioData,
+                'chart-subtitle-analytics': subtitleData,
+                'chart-connection-security': connectionSecurityData,
+                'chart-pause-patterns': pausePatternData,
+                'chart-concurrent-streams': concurrentStreamsData,
+            };
+
+            Object.entries(chartDataMap).forEach(([chartId, data]) => {
+                if (this.charts.has(chartId)) {
+                    this.hideLoadingSkeleton(chartId);
+                    this.renderChartById(chartId, data);
+                } else {
+                    this.pendingData.set(chartId, data);
+                }
+            });
+        } catch (error) {
+            console.error('Failed to load charts:', error);
+            // Hide skeletons and show error message on failure
+            chartIds.forEach(id => {
+                if (this.charts.has(id)) {
+                    this.hideLoadingSkeleton(id);
+                    this.showEmptyState(id, 'Failed to load chart data. Please try again.');
+                }
+            });
+        }
+    }
+
+    private renderChartById(chartId: string, data: any): void {
+        switch (chartId) {
+            case 'chart-trends':
+                this.renderTrendsChart(data as TrendsResponse);
+                break;
+            case 'chart-countries':
+                this.renderCountriesChart(data as GeographicResponse);
+                break;
+            case 'chart-cities':
+                this.renderCitiesChart(data as GeographicResponse);
+                break;
+            case 'chart-media':
+                this.renderMediaChart(data as GeographicResponse);
+                break;
+            case 'chart-users':
+                this.renderUsersChart(data as UsersResponse);
+                break;
+            case 'chart-heatmap':
+                this.renderHeatmapChart(data as GeographicResponse);
+                break;
+            case 'chart-platforms':
+                this.renderPlatformsChart(data as GeographicResponse);
+                break;
+            case 'chart-players':
+                this.renderPlayersChart(data as GeographicResponse);
+                break;
+            case 'chart-completion':
+                this.renderCompletionChart(data as GeographicResponse);
+                break;
+            case 'chart-transcode':
+                this.renderTranscodeChart(data as GeographicResponse);
+                break;
+            case 'chart-resolution':
+                this.renderResolutionChart(data as GeographicResponse);
+                break;
+            case 'chart-codec':
+                this.renderCodecChart(data as GeographicResponse);
+                break;
+            case 'chart-libraries':
+                this.renderLibrariesChart(data as GeographicResponse);
+                break;
+            case 'chart-ratings':
+                this.renderRatingsChart(data as GeographicResponse);
+                break;
+            case 'chart-duration':
+                this.renderDurationChart(data as GeographicResponse);
+                break;
+            case 'chart-years':
+                this.renderYearsChart(data as GeographicResponse);
+                break;
+            case 'chart-binge-summary':
+                this.renderBingeSummaryChart(data as BingeAnalyticsResponse);
+                break;
+            case 'chart-binge-shows':
+                this.renderBingeShowsChart(data as BingeAnalyticsResponse);
+                break;
+            case 'chart-binge-users':
+                this.renderBingeUsersChart(data as BingeAnalyticsResponse);
+                break;
+            case 'chart-watch-parties-summary':
+                this.renderWatchPartiesSummaryChart(data as WatchPartyAnalyticsResponse);
+                break;
+            case 'chart-watch-parties-content':
+                this.renderWatchPartiesContentChart(data as WatchPartyAnalyticsResponse);
+                break;
+            case 'chart-watch-parties-users':
+                this.renderWatchPartiesUsersChart(data as WatchPartyAnalyticsResponse);
+                break;
+            case 'chart-popular-movies':
+                this.renderPopularMoviesChart(data as PopularAnalyticsResponse);
+                break;
+            case 'chart-popular-shows':
+                this.renderPopularShowsChart(data as PopularAnalyticsResponse);
+                break;
+            case 'chart-popular-episodes':
+                this.renderPopularEpisodesChart(data as PopularAnalyticsResponse);
+                break;
+            case 'chart-bandwidth-trends':
+                this.renderBandwidthTrendsChart(data as BandwidthAnalyticsResponse);
+                break;
+            case 'chart-bandwidth-transcode':
+                this.renderBandwidthTranscodeChart(data as BandwidthAnalyticsResponse);
+                break;
+            case 'chart-bandwidth-resolution':
+                this.renderBandwidthResolutionChart(data as BandwidthAnalyticsResponse);
+                break;
+            case 'chart-bandwidth-users':
+                this.renderBandwidthUsersChart(data as BandwidthAnalyticsResponse);
+                break;
+            case 'chart-engagement-summary':
+                this.renderEngagementSummaryChart(data as UserEngagementAnalyticsResponse);
+                break;
+            case 'chart-engagement-hours':
+                this.renderEngagementHoursChart(data as UserEngagementAnalyticsResponse);
+                break;
+            case 'chart-engagement-days':
+                this.renderEngagementDaysChart(data as UserEngagementAnalyticsResponse);
+                break;
+            case 'chart-comparative-metrics':
+                this.renderComparativeMetricsChart(data as ComparativeAnalyticsResponse);
+                break;
+            case 'chart-comparative-content':
+                this.renderComparativeContentChart(data as ComparativeAnalyticsResponse);
+                break;
+            case 'chart-comparative-users':
+                this.renderComparativeUsersChart(data as ComparativeAnalyticsResponse);
+                break;
+            case 'chart-temporal-heatmap':
+                this.renderTemporalHeatmapChart(data as TemporalHeatmapResponse);
+                break;
+            case 'chart-resolution-mismatch':
+                this.renderResolutionMismatchChart(data as ResolutionMismatchAnalytics);
+                break;
+            case 'chart-hdr-analytics':
+                this.renderHDRAnalyticsChart(data as HDRAnalytics);
+                break;
+            case 'chart-audio-analytics':
+                this.renderAudioAnalyticsChart(data as AudioAnalytics);
+                break;
+            case 'chart-subtitle-analytics':
+                this.renderSubtitleAnalyticsChart(data as SubtitleAnalytics);
+                break;
+            case 'chart-connection-security':
+                this.renderConnectionSecurityChart(data as ConnectionSecurityAnalytics);
+                break;
+            case 'chart-pause-patterns':
+                this.renderPausePatternChart(data as PausePatternAnalytics);
+                break;
+            case 'chart-concurrent-streams':
+                this.renderConcurrentStreamsChart(data as ConcurrentStreamsAnalytics);
+                break;
+        }
+    }
+
+    private renderTrendsChart(data: TrendsResponse): void {
+        const chart = this.charts.get('chart-trends');
+        if (!chart) return;
+
+        const dates = data.playback_trends.map(t => t.date);
+        const playbacks = data.playback_trends.map(t => t.playback_count);
+        const users = data.playback_trends.map(t => t.unique_users);
+
+        // Enable downsampling for large datasets (>1000 points) to improve rendering performance
+        const enableSampling = data.playback_trends.length > 1000;
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params)) return '';
+                    const date = params[0].axisValue;
+                    let html = `<div style="font-weight: 600; margin-bottom: 8px;">${date}</div>`;
+                    params.forEach((param: any) => {
+                        const value = this.formatNumber(param.value);
+                        html += `<div style="margin: 4px 0;">
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${param.color}; margin-right: 8px;"></span>
+                            <span style="font-weight: 500;">${param.seriesName}:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                        </div>`;
+                    });
+                    return html;
+                },
+            }),
+            legend: this.getEnhancedLegend({
+                data: ['Playbacks', 'Unique Users'],
+                top: 0,
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'category',
+                data: dates,
+                boundaryGap: false,
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Playbacks',
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2a2a3e',
+                        },
+                    },
+                    axisLabel: {
+                        color: '#a0a0a0',
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#2a2a3e',
+                        },
+                    },
+                },
+                {
+                    type: 'value',
+                    name: 'Users',
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2a2a3e',
+                        },
+                    },
+                    axisLabel: {
+                        color: '#a0a0a0',
+                    },
+                    splitLine: {
+                        show: false,
+                    },
+                },
+            ],
+            series: [
+                {
+                    name: 'Playbacks',
+                    type: 'line',
+                    smooth: true,
+                    data: playbacks,
+                    // Enable LTTB downsampling for large datasets (Largest-Triangle-Three-Buckets algorithm)
+                    sampling: enableSampling ? 'lttb' : undefined,
+                    // Hide symbols for performance when dealing with many data points
+                    showSymbol: !enableSampling,
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(233, 69, 96, 0.5)' },
+                            { offset: 1, color: 'rgba(233, 69, 96, 0.1)' },
+                        ]),
+                    },
+                    lineStyle: {
+                        color: '#e94560',
+                        width: 2,
+                    },
+                    itemStyle: {
+                        color: '#e94560',
+                    },
+                },
+                {
+                    name: 'Unique Users',
+                    type: 'line',
+                    smooth: true,
+                    yAxisIndex: 1,
+                    data: users,
+                    // Enable LTTB downsampling for large datasets
+                    sampling: enableSampling ? 'lttb' : undefined,
+                    // Hide symbols for performance when dealing with many data points
+                    showSymbol: !enableSampling,
+                    lineStyle: {
+                        color: '#0f3460',
+                        width: 2,
+                    },
+                    itemStyle: {
+                        color: '#0f3460',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderCountriesChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-countries');
+        if (!chart) return;
+
+        const countries = data.top_countries.map(c => c.country);
+        const counts = data.top_countries.map(c => c.playback_count);
+        const total = counts.reduce((sum, count) => sum + count, 0);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const param = params[0];
+                    const value = this.formatNumber(param.value);
+                    const percentage = total > 0 ? this.formatPercent((param.value / total) * 100) : '0%';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${param.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                            <span style="color: #a0a0a0; margin-left: 8px;">(${percentage})</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+            },
+            yAxis: {
+                type: 'category',
+                data: countries.reverse(),
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: counts.reverse(),
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                            { offset: 0, color: '#e94560' },
+                            { offset: 1, color: '#0f3460' },
+                        ]),
+                        borderRadius: [0, 4, 4, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderCitiesChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-cities');
+        if (!chart) return;
+
+        const cities = data.top_cities.map(c => c.city);
+        const counts = data.top_cities.map(c => c.playback_count);
+        const total = counts.reduce((sum, count) => sum + count, 0);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const param = params[0];
+                    const value = this.formatNumber(param.value);
+                    const percentage = total > 0 ? this.formatPercent((param.value / total) * 100) : '0%';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${param.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                            <span style="color: #a0a0a0; margin-left: 8px;">(${percentage})</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+            },
+            yAxis: {
+                type: 'category',
+                data: cities.reverse(),
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: counts.reverse(),
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                            { offset: 0, color: '#0f3460' },
+                            { offset: 1, color: '#e94560' },
+                        ]),
+                        borderRadius: [0, 4, 4, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderMediaChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-media');
+        if (!chart) return;
+
+        const chartData = data.media_type_distribution.map(m => ({
+            name: m.media_type,
+            value: m.playback_count,
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'item',
+                formatter: (params: any) => {
+                    const value = this.formatNumber(params.value);
+                    const percentage = this.formatPercent(params.percent);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${params.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Percentage:</span>
+                            <span style="color: #e94560; font-weight: 600;">${percentage}</span>
+                        </div>`;
+                },
+            }),
+            legend: this.getEnhancedLegend({
+                orient: 'vertical',
+                left: 'left',
+            }),
+            series: [
+                {
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 8,
+                        borderColor: '#1a1a2e',
+                        borderWidth: 2,
+                    },
+                    label: {
+                        show: true,
+                        color: '#eaeaea',
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                        },
+                    },
+                    data: chartData,
+                    color: ['#e94560', '#0f3460', '#16213e', '#533483', '#f07b3f', '#ea5455', '#2d4059'],
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderUsersChart(data: UsersResponse): void {
+        const chart = this.charts.get('chart-users');
+        if (!chart) return;
+
+        const users = data.top_users.map(u => u.username);
+        const counts = data.top_users.map(u => u.playback_count);
+        const total = counts.reduce((sum, count) => sum + count, 0);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const param = params[0];
+                    const value = this.formatNumber(param.value);
+                    const percentage = total > 0 ? this.formatPercent((param.value / total) * 100) : '0%';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${param.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                            <span style="color: #a0a0a0; margin-left: 8px;">(${percentage})</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+            },
+            yAxis: {
+                type: 'category',
+                data: users.reverse(),
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: counts.reverse(),
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                            { offset: 0, color: '#e94560' },
+                            { offset: 1, color: '#533483' },
+                        ]),
+                        borderRadius: [0, 4, 4, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderHeatmapChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-heatmap');
+        if (!chart) return;
+
+        const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        const heatmapData = data.viewing_hours_heatmap.map(h => [h.hour, h.day_of_week, h.playback_count]);
+
+        const maxValue = Math.max(...data.viewing_hours_heatmap.map(h => h.playback_count));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                position: 'top',
+                formatter: (params: any) => {
+                    const hour = params.value[0];
+                    const day = days[params.value[1]];
+                    const count = this.formatNumber(params.value[2]);
+                    const percentage = maxValue > 0 ? this.formatPercent((params.value[2] / maxValue) * 100) : '0%';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${day} ${hour}:00</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${count}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Activity Level:</span>
+                            <span style="color: #e94560; font-weight: 600;">${percentage} of peak</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '10%',
+                right: '10%',
+                top: '10%',
+                bottom: '10%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'category',
+                data: hours,
+                splitArea: {
+                    show: true,
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            yAxis: {
+                type: 'category',
+                data: days,
+                splitArea: {
+                    show: true,
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            visualMap: {
+                min: 0,
+                max: maxValue,
+                calculable: true,
+                orient: 'horizontal',
+                left: 'center',
+                bottom: '0%',
+                inRange: {
+                    color: ['#0f3460', '#16213e', '#533483', '#e94560', '#ea5455'],
+                },
+                textStyle: {
+                    color: '#a0a0a0',
+                },
+            },
+            series: [
+                {
+                    type: 'heatmap',
+                    data: heatmapData,
+                    label: {
+                        show: false,
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(233, 69, 96, 0.5)',
+                        },
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderPlatformsChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-platforms');
+        if (!chart) return;
+
+        const platforms = data.platform_distribution.map(p => p.platform);
+        const counts = data.platform_distribution.map(p => p.playback_count);
+        const total = counts.reduce((sum, count) => sum + count, 0);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const param = params[0];
+                    const value = this.formatNumber(param.value);
+                    const percentage = total > 0 ? this.formatPercent((param.value / total) * 100) : '0%';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${param.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                            <span style="color: #a0a0a0; margin-left: 8px;">(${percentage})</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+            },
+            yAxis: {
+                type: 'category',
+                data: platforms.reverse(),
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: counts.reverse(),
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                            { offset: 0, color: '#533483' },
+                            { offset: 1, color: '#e94560' },
+                        ]),
+                        borderRadius: [0, 4, 4, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderPlayersChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-players');
+        if (!chart) return;
+
+        const chartData = data.player_distribution.map(p => ({
+            name: p.player,
+            value: p.playback_count,
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'item',
+                formatter: (params: any) => {
+                    const value = this.formatNumber(params.value);
+                    const percentage = this.formatPercent(params.percent);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${params.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Percentage:</span>
+                            <span style="color: #e94560; font-weight: 600;">${percentage}</span>
+                        </div>`;
+                },
+            }),
+            legend: this.getEnhancedLegend({
+                orient: 'vertical',
+                left: 'left',
+            }),
+            series: [
+                {
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 8,
+                        borderColor: '#1a1a2e',
+                        borderWidth: 2,
+                    },
+                    label: {
+                        show: true,
+                        color: '#eaeaea',
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                        },
+                    },
+                    data: chartData,
+                    color: ['#e94560', '#533483', '#f07b3f', '#0f3460', '#16213e', '#ea5455', '#2d4059', '#ffc93c'],
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderCompletionChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-completion');
+        if (!chart) return;
+
+        const completionStats = data.content_completion_stats;
+        const buckets = completionStats.buckets.map(b => b.bucket);
+        const counts = completionStats.buckets.map(b => b.playback_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const param = params[0];
+                    const bucketData = completionStats.buckets[param.dataIndex];
+                    const value = this.formatNumber(param.value);
+                    const avgCompletion = this.formatPercent(bucketData.avg_completion);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${param.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Completion:</span>
+                            <span style="color: #e94560; font-weight: 600;">${avgCompletion}</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'category',
+                data: buckets,
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            yAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: counts,
+                    itemStyle: {
+                        color: (params: any) => {
+                            const colors = ['#e94560', '#ea5455', '#f07b3f', '#ffc93c', '#2ecc71'];
+                            return colors[params.dataIndex] || '#e94560';
+                        },
+                        borderRadius: [4, 4, 0, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#eaeaea',
+                        formatter: (params: any) => {
+                            const total = completionStats.total_playbacks;
+                            const pct = (params.value / total * 100).toFixed(1);
+                            return `${params.value}\n(${pct}%)`;
+                        },
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderTranscodeChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-transcode');
+        if (!chart) return;
+
+        const chartData = data.transcode_distribution.map(t => ({
+            name: t.transcode_decision,
+            value: t.playback_count,
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'item',
+                formatter: (params: any) => {
+                    const value = this.formatNumber(params.value);
+                    const percentage = this.formatPercent(params.percent);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${params.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Percentage:</span>
+                            <span style="color: #e94560; font-weight: 600;">${percentage}</span>
+                        </div>`;
+                },
+            }),
+            legend: this.getEnhancedLegend({
+                orient: 'horizontal',
+                bottom: '0%',
+            }),
+            series: [
+                {
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['50%', '45%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 8,
+                        borderColor: '#1a1a2e',
+                        borderWidth: 2,
+                    },
+                    label: {
+                        show: true,
+                        color: '#eaeaea',
+                        formatter: '{b}\n{d}%',
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                        },
+                    },
+                    data: chartData,
+                    color: ['#2ecc71', '#e94560', '#ffc93c'],
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderResolutionChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-resolution');
+        if (!chart) return;
+
+        const resolutions = data.resolution_distribution.map(r => r.video_resolution);
+        const counts = data.resolution_distribution.map(r => r.playback_count);
+        const total = counts.reduce((sum, count) => sum + count, 0);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const param = params[0];
+                    const value = this.formatNumber(param.value);
+                    const percentage = total > 0 ? this.formatPercent((param.value / total) * 100) : '0%';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${param.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                            <span style="color: #a0a0a0; margin-left: 8px;">(${percentage})</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'category',
+                data: resolutions,
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+            },
+            yAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: counts,
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#e94560' },
+                            { offset: 1, color: '#533483' },
+                        ]),
+                        borderRadius: [4, 4, 0, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderCodecChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-codec');
+        if (!chart) return;
+
+        const labels = data.codec_distribution.map(c => `${c.video_codec}\n+\n${c.audio_codec}`);
+        const counts = data.codec_distribution.map(c => c.playback_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const param = params[0];
+                    const codec = data.codec_distribution[param.dataIndex];
+                    const value = this.formatNumber(param.value);
+                    const percentage = this.formatPercent(codec.percentage);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${codec.video_codec} + ${codec.audio_codec}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Percentage:</span>
+                            <span style="color: #e94560; font-weight: 600;">${percentage}</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'category',
+                data: labels,
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                    interval: 0,
+                    rotate: 0,
+                    fontSize: 10,
+                },
+            },
+            yAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+                axisLabel: {
+                    color: '#a0a0a0',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2a2a3e',
+                    },
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: counts,
+                    itemStyle: {
+                        color: (params: any) => {
+                            const colors = ['#e94560', '#533483', '#f07b3f', '#2ecc71', '#ffc93c', '#ea5455', '#0f3460', '#16213e', '#2d4059', '#e74c3c'];
+                            return colors[params.dataIndex % colors.length];
+                        },
+                        borderRadius: [4, 4, 0, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderLibrariesChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-libraries');
+        if (!chart) return;
+
+        const libraries = data.library_distribution || [];
+        const libraryNames = libraries.map(l => l.library_name);
+        const playbackCounts = libraries.map(l => l.playback_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const p = params[0];
+                    const lib = libraries[p.dataIndex];
+                    const watchTimeHours = Math.round(lib.total_duration_minutes / 60);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${lib.library_name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(lib.playback_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Unique Users:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(lib.unique_users)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Time:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(watchTimeHours)}h</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Completion:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatPercent(lib.avg_completion)}</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '15%',
+                right: '10%',
+                bottom: '10%',
+                top: '10%',
+            },
+            xAxis: {
+                type: 'value',
+                axisLabel: {
+                    color: '#eaeaea',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2c2c54',
+                    },
+                },
+            },
+            yAxis: {
+                type: 'category',
+                data: libraryNames,
+                axisLabel: {
+                    color: '#eaeaea',
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: playbackCounts,
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                            { offset: 0, color: '#e94560' },
+                            { offset: 1, color: '#533483' },
+                        ]),
+                        borderRadius: [0, 4, 4, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderRatingsChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-ratings');
+        if (!chart) return;
+
+        const ratings = data.rating_distribution || [];
+        const ratingLabels = ratings.map(r => r.content_rating);
+        const playbackCounts = ratings.map(r => r.playback_count);
+        const percentages = ratings.map(r => r.percentage);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'item',
+                formatter: (params: any) => {
+                    const value = this.formatNumber(params.value);
+                    const percentage = this.formatPercent(percentages[params.dataIndex]);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${params.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Percentage:</span>
+                            <span style="color: #e94560; font-weight: 600;">${percentage}</span>
+                        </div>`;
+                },
+            }),
+            legend: this.getEnhancedLegend({
+                orient: 'vertical',
+                left: 'left',
+            }),
+            series: [
+                {
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#1a1a2e',
+                        borderWidth: 2,
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}: {d}%',
+                        color: '#eaeaea',
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                        },
+                    },
+                    data: ratingLabels.map((label, index) => ({
+                        name: label,
+                        value: playbackCounts[index],
+                    })),
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderDurationChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-duration');
+        if (!chart) return;
+
+        const stats = data.duration_stats;
+        if (!stats) return;
+
+        const durationByType = stats.duration_by_media_type || [];
+        const mediaTypes = durationByType.map(d => d.media_type);
+        const avgDurations = durationByType.map(d => d.avg_duration);
+        const totalDurations = durationByType.map(d => d.total_duration);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const idx = params[0].dataIndex;
+                    const type = durationByType[idx];
+                    const totalHours = Math.round(type.total_duration / 60);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${type.media_type}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Duration:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(type.avg_duration)} min</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Total Duration:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(totalHours)}h</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(type.playback_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Completion:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatPercent(type.avg_completion)}</span>
+                        </div>`;
+                },
+            }),
+            legend: this.getEnhancedLegend({
+                data: ['Average Duration (min)', 'Total Watch Time (hours)'],
+            }),
+            grid: {
+                left: '10%',
+                right: '10%',
+                bottom: '10%',
+                top: '15%',
+            },
+            xAxis: {
+                type: 'category',
+                data: mediaTypes,
+                axisLabel: {
+                    color: '#eaeaea',
+                },
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Avg Duration (min)',
+                    position: 'left',
+                    axisLabel: {
+                        color: '#eaeaea',
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#2c2c54',
+                        },
+                    },
+                },
+                {
+                    type: 'value',
+                    name: 'Total (hours)',
+                    position: 'right',
+                    axisLabel: {
+                        color: '#eaeaea',
+                        formatter: (value: number) => Math.round(value).toString(),
+                    },
+                },
+            ],
+            series: [
+                {
+                    name: 'Average Duration (min)',
+                    type: 'bar',
+                    data: avgDurations,
+                    itemStyle: {
+                        color: '#2ecc71',
+                        borderRadius: [4, 4, 0, 0],
+                    },
+                },
+                {
+                    name: 'Total Watch Time (hours)',
+                    type: 'bar',
+                    yAxisIndex: 1,
+                    data: totalDurations.map(d => d / 60),
+                    itemStyle: {
+                        color: '#3498db',
+                        borderRadius: [4, 4, 0, 0],
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private renderYearsChart(data: GeographicResponse): void {
+        const chart = this.charts.get('chart-years');
+        if (!chart) return;
+
+        const years = data.year_distribution || [];
+        const yearLabels = years.map(y => y.year.toString());
+        const playbackCounts = years.map(y => y.playback_count);
+        const total = playbackCounts.reduce((sum, count) => sum + count, 0);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const p = params[0];
+                    const value = this.formatNumber(p.value);
+                    const percentage = total > 0 ? this.formatPercent((p.value / total) * 100) : '0%';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">Year: ${p.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${value}</span>
+                            <span style="color: #a0a0a0; margin-left: 8px;">(${percentage})</span>
+                        </div>`;
+                },
+            }),
+            grid: {
+                left: '10%',
+                right: '10%',
+                bottom: '10%',
+                top: '10%',
+            },
+            xAxis: {
+                type: 'category',
+                data: yearLabels,
+                axisLabel: {
+                    color: '#eaeaea',
+                    rotate: 45,
+                },
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    color: '#eaeaea',
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#2c2c54',
+                    },
+                },
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: playbackCounts,
+                    itemStyle: {
+                        color: (params: any) => {
+                            const colors = ['#e94560', '#533483', '#f07b3f', '#2ecc71', '#ffc93c', '#ea5455', '#0f3460', '#16213e', '#2d4059', '#e74c3c'];
+                            return colors[params.dataIndex % colors.length];
+                        },
+                        borderRadius: [4, 4, 0, 0],
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#eaeaea',
+                    },
+                },
+            ],
+        };
+
+        chart.setOption(option);
+    }
+
+    private resizeCharts(): void {
+        this.charts.forEach(chart => chart.resize());
+    }
+
+    private exportChart(chartName: string): void {
+        const chartId = `chart-${chartName}`;
+        const chart = this.charts.get(chartId);
+
+        if (!chart) {
+            console.error(`Chart ${chartName} not found`);
+            return;
+        }
+
+        const url = chart.getDataURL({
+            type: 'png',
+            pixelRatio: 2,
+            backgroundColor: '#1a1a2e',
+        });
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `cartographus-${chartName}-${new Date().toISOString().split('T')[0]}.png`;
+        link.click();
+    }
+
+    private showLoadingSkeleton(containerId: string): void {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const skeleton = document.createElement('div');
+        skeleton.className = 'chart-skeleton';
+        skeleton.innerHTML = `
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+        `;
+
+        container.innerHTML = '';
+        container.appendChild(skeleton);
+    }
+
+    private hideLoadingSkeleton(containerId: string): void {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const skeleton = container.querySelector('.chart-skeleton');
+        if (skeleton) {
+            container.innerHTML = '';
+        }
+    }
+
+    private showEmptyState(containerId: string, message: string = 'No data available'): void {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+
+        const icon = document.createElement('div');
+        icon.className = 'empty-state-icon';
+        icon.textContent = '📊';
+
+        const title = document.createElement('div');
+        title.className = 'empty-state-title';
+        title.textContent = 'No Data Found';
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'empty-state-message';
+        messageDiv.textContent = message;  // Safe from XSS - uses textContent
+
+        emptyState.appendChild(icon);
+        emptyState.appendChild(title);
+        emptyState.appendChild(messageDiv);
+
+        container.innerHTML = '';
+        container.appendChild(emptyState);
+    }
+
+    private renderBingeSummaryChart(data: BingeAnalyticsResponse): void {
+        const chart = this.charts.get('chart-binge-summary');
+        if (!chart) return;
+
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const bingesByDay = data.binges_by_day.map(b => ({
+            day: days[b.day_of_week],
+            count: b.binge_count,
+            avgEpisodes: b.avg_episodes
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: `${this.formatNumber(data.total_binge_sessions)} Binge Sessions | ${this.formatNumber(data.total_episodes_binged)} Episodes`,
+                left: 'center',
+                top: 10,
+                textStyle: { color: '#eaeaea', fontSize: 16, fontWeight: 600 }
+            },
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const dayData = bingesByDay[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${dayData.day}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Binge Sessions:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(dayData.count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Episodes:</span>
+                            <span style="color: #e94560; font-weight: 600;">${dayData.avgEpisodes.toFixed(1)}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '10%', right: '10%', bottom: '10%', top: '20%' },
+            xAxis: {
+                type: 'category',
+                data: bingesByDay.map(b => b.day),
+                axisLabel: { color: '#eaeaea', rotate: 30 }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Sessions',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            series: [{
+                type: 'bar',
+                data: bingesByDay.map(b => b.count),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#e94560' },
+                        { offset: 1, color: '#533483' }
+                    ]),
+                    borderRadius: [4, 4, 0, 0]
+                },
+                label: { show: true, position: 'top', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderBingeShowsChart(data: BingeAnalyticsResponse): void {
+        const chart = this.charts.get('chart-binge-shows');
+        if (!chart) return;
+
+        const shows = data.top_binge_shows.map(s => s.show_name);
+        const counts = data.top_binge_shows.map(s => s.binge_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const show = data.top_binge_shows[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${show.show_name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Binge Sessions:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(show.binge_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Total Episodes:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(show.total_episodes)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Unique Watchers:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(show.unique_watchers)}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: shows.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: counts.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#e94560' },
+                        { offset: 1, color: '#0f3460' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderBingeUsersChart(data: BingeAnalyticsResponse): void {
+        const chart = this.charts.get('chart-binge-users');
+        if (!chart) return;
+
+        const users = data.top_binge_watchers.map(u => u.username);
+        const counts = data.top_binge_watchers.map(u => u.total_episodes);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const user = data.top_binge_watchers[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${user.username}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Binge Sessions:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(user.binge_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Total Episodes:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(user.total_episodes)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Favorite Show:</span>
+                            <span style="color: #e94560; font-weight: 600;">${user.favorite_show}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                name: 'Episodes Binged',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: users.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: counts.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#533483' },
+                        { offset: 1, color: '#e94560' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderWatchPartiesSummaryChart(data: WatchPartyAnalyticsResponse): void {
+        const chart = this.charts.get('chart-watch-parties-summary');
+        if (!chart) return;
+
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const partiesByDay = data.parties_by_day.map(p => ({
+            day: days[p.day_of_week],
+            count: p.party_count,
+            avgParticipants: p.avg_participants
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: `${this.formatNumber(data.total_watch_parties)} Watch Parties | ${this.formatNumber(data.total_participants)} Participants`,
+                left: 'center',
+                top: 10,
+                textStyle: { color: '#eaeaea', fontSize: 16, fontWeight: 600 }
+            },
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const dayData = partiesByDay[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${dayData.day}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Parties:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(dayData.count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Participants:</span>
+                            <span style="color: #e94560; font-weight: 600;">${dayData.avgParticipants.toFixed(1)}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '10%', right: '10%', bottom: '10%', top: '20%' },
+            xAxis: {
+                type: 'category',
+                data: partiesByDay.map(p => p.day),
+                axisLabel: { color: '#eaeaea', rotate: 30 }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Watch Parties',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            series: [{
+                type: 'bar',
+                data: partiesByDay.map(p => p.count),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#2ecc71' },
+                        { offset: 1, color: '#0f3460' }
+                    ]),
+                    borderRadius: [4, 4, 0, 0]
+                },
+                label: { show: true, position: 'top', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderWatchPartiesContentChart(data: WatchPartyAnalyticsResponse): void {
+        const chart = this.charts.get('chart-watch-parties-content');
+        if (!chart) return;
+
+        const content = data.top_content.map(c => c.title);
+        const counts = data.top_content.map(c => c.party_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const item = data.top_content[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${item.title}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Parties:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(item.party_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Total Participants:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(item.total_participants)}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: content.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: counts.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#2ecc71' },
+                        { offset: 1, color: '#f07b3f' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderWatchPartiesUsersChart(data: WatchPartyAnalyticsResponse): void {
+        const chart = this.charts.get('chart-watch-parties-users');
+        if (!chart) return;
+
+        const users = data.top_social_users.map(u => u.username);
+        const counts = data.top_social_users.map(u => u.party_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const user = data.top_social_users[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${user.username}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Parties:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(user.party_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Party Size:</span>
+                            <span style="color: #e94560; font-weight: 600;">${user.avg_party_size.toFixed(1)}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: users.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: counts.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#ffc93c' },
+                        { offset: 1, color: '#2ecc71' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderPopularMoviesChart(data: PopularAnalyticsResponse): void {
+        const chart = this.charts.get('chart-popular-movies');
+        if (!chart) return;
+
+        const movies = data.top_movies.map(m => m.title);
+        const counts = data.top_movies.map(m => m.playback_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const movie = data.top_movies[params[0].dataIndex];
+                    const watchTimeHours = Math.round(movie.total_watch_time_minutes / 60);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${movie.title}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(movie.playback_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Unique Users:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(movie.unique_users)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Time:</span>
+                            <span style="color: #e94560; font-weight: 600;">${watchTimeHours}h</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: movies.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: counts.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#e94560' },
+                        { offset: 1, color: '#533483' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderPopularShowsChart(data: PopularAnalyticsResponse): void {
+        const chart = this.charts.get('chart-popular-shows');
+        if (!chart) return;
+
+        const shows = data.top_shows.map(s => s.title);
+        const counts = data.top_shows.map(s => s.playback_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const show = data.top_shows[params[0].dataIndex];
+                    const watchTimeHours = Math.round(show.total_watch_time_minutes / 60);
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${show.title}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(show.playback_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Unique Users:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(show.unique_users)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Time:</span>
+                            <span style="color: #e94560; font-weight: 600;">${watchTimeHours}h</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: shows.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: counts.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#f07b3f' },
+                        { offset: 1, color: '#0f3460' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderPopularEpisodesChart(data: PopularAnalyticsResponse): void {
+        const chart = this.charts.get('chart-popular-episodes');
+        if (!chart) return;
+
+        const episodes = data.top_episodes.map(e => `${e.grandparent_title} - ${e.title}`);
+        const counts = data.top_episodes.map(e => e.playback_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const episode = data.top_episodes[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${episode.grandparent_title}</div>
+                        <div style="margin: 4px 0; color: #a0a0a0;">${episode.title}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Playbacks:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(episode.playback_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Unique Users:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(episode.unique_users)}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: episodes.reverse(),
+                axisLabel: { color: '#eaeaea', fontSize: 10 }
+            },
+            series: [{
+                type: 'bar',
+                data: counts.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#ffc93c' },
+                        { offset: 1, color: '#533483' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderBandwidthTrendsChart(data: BandwidthAnalyticsResponse): void {
+        const chart = this.charts.get('chart-bandwidth-trends');
+        if (!chart) return;
+
+        const dates = data.trends.map(t => t.date);
+        const bandwidth = data.trends.map(t => t.bandwidth_gb);
+        const mbps = data.trends.map(t => t.avg_mbps);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: `Total: ${data.total_bandwidth_gb.toFixed(1)} GB | Peak: ${data.peak_bandwidth_mbps.toFixed(1)} Mbps`,
+                left: 'center',
+                top: 10,
+                textStyle: { color: '#eaeaea', fontSize: 14 }
+            },
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params)) return '';
+                    const date = params[0].axisValue;
+                    let html = `<div style="font-weight: 600; margin-bottom: 8px;">${date}</div>`;
+                    params.forEach((param: any) => {
+                        html += `<div style="margin: 4px 0;">
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${param.color}; margin-right: 8px;"></span>
+                            <span style="font-weight: 500;">${param.seriesName}:</span>
+                            <span style="color: #e94560; font-weight: 600;">${param.seriesName.includes('GB') ? param.value.toFixed(2) + ' GB' : param.value.toFixed(1) + ' Mbps'}</span>
+                        </div>`;
+                    });
+                    return html;
+                }
+            }),
+            legend: this.getEnhancedLegend({ data: ['Bandwidth (GB)', 'Avg Speed (Mbps)'], top: '10%' }),
+            grid: { left: '10%', right: '10%', bottom: '10%', top: '25%' },
+            xAxis: {
+                type: 'category',
+                data: dates,
+                axisLabel: { color: '#eaeaea' }
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Bandwidth (GB)',
+                    axisLabel: { color: '#eaeaea' },
+                    splitLine: { lineStyle: { color: '#2c2c54' } }
+                },
+                {
+                    type: 'value',
+                    name: 'Speed (Mbps)',
+                    axisLabel: { color: '#eaeaea' },
+                    splitLine: { show: false }
+                }
+            ],
+            series: [
+                {
+                    name: 'Bandwidth (GB)',
+                    type: 'bar',
+                    data: bandwidth,
+                    itemStyle: { color: '#e94560', borderRadius: [4, 4, 0, 0] }
+                },
+                {
+                    name: 'Avg Speed (Mbps)',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: mbps,
+                    smooth: true,
+                    itemStyle: { color: '#2ecc71' },
+                    lineStyle: { width: 3 }
+                }
+            ]
+        };
+        chart.setOption(option);
+    }
+
+    private renderBandwidthTranscodeChart(data: BandwidthAnalyticsResponse): void {
+        const chart = this.charts.get('chart-bandwidth-transcode');
+        if (!chart) return;
+
+        const chartData = data.by_transcode.map(t => ({
+            name: t.transcode_decision,
+            value: t.bandwidth_gb
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'item',
+                formatter: (params: any) => {
+                    const item = data.by_transcode.find(t => t.transcode_decision === params.name);
+                    if (!item) return '';
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${params.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Bandwidth:</span>
+                            <span style="color: #e94560; font-weight: 600;">${item.bandwidth_gb.toFixed(2)} GB</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Percentage:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatPercent(item.percentage)}</span>
+                        </div>`;
+                }
+            }),
+            legend: this.getEnhancedLegend({ orient: 'vertical', left: 'left' }),
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                itemStyle: { borderRadius: 8, borderColor: '#1a1a2e', borderWidth: 2 },
+                label: { show: true, formatter: '{b}: {d}%', color: '#eaeaea' },
+                data: chartData,
+                color: ['#2ecc71', '#e94560', '#ffc93c']
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderBandwidthResolutionChart(data: BandwidthAnalyticsResponse): void {
+        const chart = this.charts.get('chart-bandwidth-resolution');
+        if (!chart) return;
+
+        const resolutions = data.by_resolution.map(r => r.resolution);
+        const bandwidth = data.by_resolution.map(r => r.bandwidth_gb);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const res = data.by_resolution[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${res.resolution}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Bandwidth:</span>
+                            <span style="color: #e94560; font-weight: 600;">${res.bandwidth_gb.toFixed(2)} GB</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Avg Speed:</span>
+                            <span style="color: #e94560; font-weight: 600;">${res.avg_bandwidth_mbps.toFixed(1)} Mbps</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '10%', right: '10%', bottom: '10%', top: '10%' },
+            xAxis: {
+                type: 'category',
+                data: resolutions,
+                axisLabel: { color: '#eaeaea' }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Bandwidth (GB)',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            series: [{
+                type: 'bar',
+                data: bandwidth,
+                itemStyle: {
+                    color: (params: any) => {
+                        const colors = ['#e94560', '#f07b3f', '#ffc93c', '#2ecc71', '#533483'];
+                        return colors[params.dataIndex % colors.length];
+                    },
+                    borderRadius: [4, 4, 0, 0]
+                },
+                label: { show: true, position: 'top', color: '#eaeaea', formatter: '{c} GB' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderBandwidthUsersChart(data: BandwidthAnalyticsResponse): void {
+        const chart = this.charts.get('chart-bandwidth-users');
+        if (!chart) return;
+
+        const users = data.top_users.map(u => u.username);
+        const bandwidth = data.top_users.map(u => u.bandwidth_gb);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const user = data.top_users[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${user.username}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Bandwidth:</span>
+                            <span style="color: #e94560; font-weight: 600;">${user.bandwidth_gb.toFixed(2)} GB</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Direct Play:</span>
+                            <span style="color: #2ecc71; font-weight: 600;">${user.direct_play_count}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Transcode:</span>
+                            <span style="color: #e94560; font-weight: 600;">${user.transcode_count}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                name: 'Bandwidth (GB)',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: users.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: bandwidth.reverse(),
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        { offset: 0, color: '#e94560' },
+                        { offset: 1, color: '#0f3460' }
+                    ]),
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: { show: true, position: 'right', color: '#eaeaea', formatter: '{c} GB' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderEngagementSummaryChart(data: UserEngagementAnalyticsResponse): void {
+        const chart = this.charts.get('chart-engagement-summary');
+        if (!chart) return;
+
+        const metrics = [
+            { name: 'Total Users', value: data.summary.total_users },
+            { name: 'Active Users', value: data.summary.active_users },
+            { name: 'Total Sessions', value: data.summary.total_sessions },
+            { name: 'Avg Session (min)', value: Math.round(data.summary.avg_session_minutes) },
+            { name: 'Watch Time (hrs)', value: Math.round(data.summary.total_watch_time_minutes / 60) },
+            { name: 'Completion Rate (%)', value: Math.round(data.summary.avg_completion_rate) }
+        ];
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const metric = metrics[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${metric.name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="color: #e94560; font-weight: 600; font-size: 16px;">${this.formatNumber(metric.value)}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '10%', right: '10%', bottom: '15%', top: '10%' },
+            xAxis: {
+                type: 'category',
+                data: metrics.map(m => m.name),
+                axisLabel: { color: '#eaeaea', rotate: 30, fontSize: 11 }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            series: [{
+                type: 'bar',
+                data: metrics.map(m => m.value),
+                itemStyle: {
+                    color: (params: any) => {
+                        const colors = ['#e94560', '#2ecc71', '#ffc93c', '#533483', '#f07b3f', '#0f3460'];
+                        return colors[params.dataIndex % colors.length];
+                    },
+                    borderRadius: [4, 4, 0, 0]
+                },
+                label: { show: true, position: 'top', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderEngagementHoursChart(data: UserEngagementAnalyticsResponse): void {
+        const chart = this.charts.get('chart-engagement-hours');
+        if (!chart) return;
+
+        const hours = data.viewing_patterns_by_hour.map(h => h.hour_of_day.toString().padStart(2, '0'));
+        const sessions = data.viewing_patterns_by_hour.map(h => h.session_count);
+        const watchTime = data.viewing_patterns_by_hour.map(h => Math.round(h.watch_time_minutes / 60));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params)) return '';
+                    const hourData = data.viewing_patterns_by_hour[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">Hour: ${hourData.hour_of_day}:00</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Sessions:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(hourData.session_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Time:</span>
+                            <span style="color: #e94560; font-weight: 600;">${Math.round(hourData.watch_time_minutes / 60)}h</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Unique Users:</span>
+                            <span style="color: #e94560; font-weight: 600;">${hourData.unique_users}</span>
+                        </div>`;
+                }
+            }),
+            legend: this.getEnhancedLegend({ data: ['Sessions', 'Watch Time (hrs)'] }),
+            grid: { left: '10%', right: '10%', bottom: '10%', top: '15%' },
+            xAxis: {
+                type: 'category',
+                data: hours,
+                axisLabel: { color: '#eaeaea' }
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Sessions',
+                    axisLabel: { color: '#eaeaea' },
+                    splitLine: { lineStyle: { color: '#2c2c54' } }
+                },
+                {
+                    type: 'value',
+                    name: 'Hours',
+                    axisLabel: { color: '#eaeaea' },
+                    splitLine: { show: false }
+                }
+            ],
+            series: [
+                {
+                    name: 'Sessions',
+                    type: 'bar',
+                    data: sessions,
+                    itemStyle: { color: '#e94560', borderRadius: [4, 4, 0, 0] }
+                },
+                {
+                    name: 'Watch Time (hrs)',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: watchTime,
+                    smooth: true,
+                    itemStyle: { color: '#2ecc71' },
+                    lineStyle: { width: 3 }
+                }
+            ]
+        };
+        chart.setOption(option);
+    }
+
+    private renderEngagementDaysChart(data: UserEngagementAnalyticsResponse): void {
+        const chart = this.charts.get('chart-engagement-days');
+        if (!chart) return;
+
+        const days = data.viewing_patterns_by_day.map(d => d.day_name);
+        const sessions = data.viewing_patterns_by_day.map(d => d.session_count);
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const dayData = data.viewing_patterns_by_day[params[0].dataIndex];
+                    return `<div style="font-weight: 600; margin-bottom: 8px;">${dayData.day_name}</div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Sessions:</span>
+                            <span style="color: #e94560; font-weight: 600;">${this.formatNumber(dayData.session_count)}</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Watch Time:</span>
+                            <span style="color: #e94560; font-weight: 600;">${Math.round(dayData.watch_time_minutes / 60)}h</span>
+                        </div>
+                        <div style="margin: 4px 0;">
+                            <span style="font-weight: 500;">Unique Users:</span>
+                            <span style="color: #e94560; font-weight: 600;">${dayData.unique_users}</span>
+                        </div>`;
+                }
+            }),
+            grid: { left: '10%', right: '10%', bottom: '10%', top: '10%' },
+            xAxis: {
+                type: 'category',
+                data: days,
+                axisLabel: { color: '#eaeaea' }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Sessions',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            series: [{
+                type: 'bar',
+                data: sessions,
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#2ecc71' },
+                        { offset: 1, color: '#0f3460' }
+                    ]),
+                    borderRadius: [4, 4, 0, 0]
+                },
+                label: { show: true, position: 'top', color: '#eaeaea' }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderComparativeMetricsChart(data: ComparativeAnalyticsResponse): void {
+        const chart = this.charts.get('chart-comparative-metrics');
+        if (!chart) return;
+
+        const metrics = data.metrics_comparison;
+        const metricNames = metrics.map(m => m.metric);
+        const currentValues = metrics.map(m => m.current_value);
+        const previousValues = metrics.map(m => m.previous_value);
+        const percentChanges = metrics.map(m => m.percentage_change);
+
+        const option: echarts.EChartsOption = {
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: (params: any) => {
+                    const metric = metrics[params[0].dataIndex];
+                    return `
+                        <strong>${metric.metric}</strong><br/>
+                        Current: ${this.formatNumber(metric.current_value)}<br/>
+                        Previous: ${this.formatNumber(metric.previous_value)}<br/>
+                        Change: ${metric.percentage_change >= 0 ? '+' : ''}${this.formatPercent(metric.percentage_change)}
+                        <span style="color: ${metric.is_improvement ? '#2ecc71' : '#e74c3c'}">${metric.is_improvement ? '↑' : '↓'}</span>
+                    `;
+                }
+            }),
+            legend: this.getEnhancedLegend({ data: ['Current Period', 'Previous Period'] }),
+            grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                data: metricNames,
+                axisLabel: { color: '#eaeaea', rotate: 30, interval: 0 }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            series: [
+                {
+                    name: 'Current Period',
+                    type: 'bar',
+                    data: currentValues,
+                    itemStyle: { color: '#2ecc71' },
+                    label: { show: true, position: 'top', color: '#eaeaea', formatter: (params: any) => {
+                        const pct = percentChanges[params.dataIndex];
+                        return pct >= 0 ? `+${this.formatPercent(pct)}` : this.formatPercent(pct);
+                    }}
+                },
+                {
+                    name: 'Previous Period',
+                    type: 'bar',
+                    data: previousValues,
+                    itemStyle: { color: '#3498db' }
+                }
+            ]
+        };
+        chart.setOption(option);
+
+        // Update insights list
+        const insightsList = document.getElementById('insights-list');
+        if (insightsList) {
+            insightsList.innerHTML = data.key_insights
+                .map(insight => `<li style="padding: 10px 0; border-bottom: 1px solid #2a2a3e;">📊 ${insight}</li>`)
+                .join('');
+        }
+    }
+
+    private renderComparativeContentChart(data: ComparativeAnalyticsResponse): void {
+        const chart = this.charts.get('chart-comparative-content');
+        if (!chart) return;
+
+        const content = data.top_content_comparison.slice(0, 10);
+        const titles = content.map(c => c.title.length > 30 ? c.title.substring(0, 27) + '...' : c.title);
+        const currentCounts = content.map(c => c.current_count);
+        const trendingIcons = content.map(c => {
+            if (c.trending === 'new') return '🆕';
+            if (c.trending === 'rising') return '📈';
+            if (c.trending === 'falling') return '📉';
+            return '➡️';
+        });
+
+        const option: echarts.EChartsOption = {
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: (params: any) => {
+                    const item = content[params[0].dataIndex];
+                    return `
+                        <strong>${item.title}</strong><br/>
+                        Current Rank: #${item.current_rank}<br/>
+                        Previous Rank: ${item.previous_rank > 0 ? '#' + item.previous_rank : 'New'}<br/>
+                        Playbacks: ${item.current_count}<br/>
+                        Change: ${item.count_change >= 0 ? '+' : ''}${item.count_change} (${item.count_change_pct >= 0 ? '+' : ''}${this.formatPercent(item.count_change_pct)})
+                    `;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: titles.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: currentCounts.reverse(),
+                itemStyle: {
+                    color: (params: any) => {
+                        const trending = content[content.length - 1 - params.dataIndex].trending;
+                        if (trending === 'new') return '#9b59b6';
+                        if (trending === 'rising') return '#2ecc71';
+                        if (trending === 'falling') return '#e74c3c';
+                        return '#3498db';
+                    },
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: {
+                    show: true,
+                    position: 'right',
+                    color: '#eaeaea',
+                    formatter: (params: any) => trendingIcons.reverse()[params.dataIndex]
+                }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderComparativeUsersChart(data: ComparativeAnalyticsResponse): void {
+        const chart = this.charts.get('chart-comparative-users');
+        if (!chart) return;
+
+        const users = data.top_user_comparison.slice(0, 10);
+        const usernames = users.map(u => u.username);
+        const currentWatchTime = users.map(u => u.current_watch_time);
+        const trendingIcons = users.map(u => {
+            if (u.trending === 'new') return '🆕';
+            if (u.trending === 'rising') return '📈';
+            if (u.trending === 'falling') return '📉';
+            return '➡️';
+        });
+
+        const option: echarts.EChartsOption = {
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: (params: any) => {
+                    const user = users[params[0].dataIndex];
+                    return `
+                        <strong>${user.username}</strong><br/>
+                        Current Rank: #${user.current_rank}<br/>
+                        Previous Rank: ${user.previous_rank > 0 ? '#' + user.previous_rank : 'New'}<br/>
+                        Watch Time: ${this.formatNumber(user.current_watch_time)} min<br/>
+                        Change: ${user.watch_time_change >= 0 ? '+' : ''}${this.formatNumber(user.watch_time_change)} min (${user.watch_time_change_pct >= 0 ? '+' : ''}${this.formatPercent(user.watch_time_change_pct)})
+                    `;
+                }
+            }),
+            grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                name: 'Minutes',
+                axisLabel: { color: '#eaeaea' },
+                splitLine: { lineStyle: { color: '#2c2c54' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: usernames.reverse(),
+                axisLabel: { color: '#eaeaea' }
+            },
+            series: [{
+                type: 'bar',
+                data: currentWatchTime.reverse(),
+                itemStyle: {
+                    color: (params: any) => {
+                        const trending = users[users.length - 1 - params.dataIndex].trending;
+                        if (trending === 'new') return '#9b59b6';
+                        if (trending === 'rising') return '#2ecc71';
+                        if (trending === 'falling') return '#e74c3c';
+                        return '#3498db';
+                    },
+                    borderRadius: [0, 4, 4, 0]
+                },
+                label: {
+                    show: true,
+                    position: 'right',
+                    color: '#eaeaea',
+                    formatter: (params: any) => trendingIcons.reverse()[params.dataIndex]
+                }
+            }]
+        };
+        chart.setOption(option);
+    }
+
+    private renderTemporalHeatmapChart(data: TemporalHeatmapResponse): void {
+        // For the temporal heatmap, we need a more complex implementation with animation
+        // This is a placeholder that shows summary information
+        // The actual map animation should be implemented separately
+        const container = document.getElementById('temporal-label');
+        if (container && data.buckets.length > 0) {
+            container.textContent = `${data.buckets.length} time periods (${data.interval})`;
+        }
+
+        // Store temporal data for animation control
+        (window as any).temporalHeatmapData = data;
+    }
+
+
+    private renderResolutionMismatchChart(data: ResolutionMismatchAnalytics): void {
+        const chart = this.charts.get('chart-resolution-mismatch');
+        if (!chart) return;
+
+        const nodes: Array<{name: string}> = [];
+        const links: Array<{source: string; target: string; value: number}> = [];
+        const nodeNames = new Set<string>();
+
+        data.mismatches.forEach(mismatch => {
+            nodeNames.add(mismatch.source_resolution);
+            nodeNames.add(mismatch.stream_resolution);
+        });
+
+        nodeNames.forEach(name => nodes.push({name}));
+        data.mismatches.forEach(mismatch => {
+            links.push({
+                source: mismatch.source_resolution,
+                target: mismatch.stream_resolution,
+                value: mismatch.playback_count
+            });
+        });
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Resolution Quality Loss Analysis',
+                subtext: `${this.formatPercent(data.mismatch_rate)} downgraded`,
+                textStyle: { color: '#eaeaea', fontSize: 18, fontWeight: 600 },
+                subtextStyle: { color: '#a0a0a0', fontSize: 12 }
+            },
+            tooltip: this.getEnhancedTooltip({ trigger: 'item' }),
+            series: [{
+                type: 'sankey',
+                data: nodes,
+                links: links,
+                emphasis: { focus: 'adjacency' },
+                lineStyle: { color: 'gradient', curveness: 0.5 }
+            }]
+        };
+        chart.setOption(option, true);
+    }
+
+    private renderHDRAnalyticsChart(data: HDRAnalytics): void {
+        const chart = this.charts.get('chart-hdr-analytics');
+        if (!chart) return;
+
+        const formatData = data.format_distribution.map(f => ({
+            name: f.dynamic_range,
+            value: f.playback_count
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'HDR & Dynamic Range Distribution',
+                textStyle: { color: '#eaeaea', fontSize: 18, fontWeight: 600 }
+            },
+            tooltip: this.getEnhancedTooltip({ trigger: 'item' }),
+            legend: this.getEnhancedLegend(),
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                data: formatData
+            }]
+        };
+        chart.setOption(option, true);
+    }
+
+    private renderAudioAnalyticsChart(data: AudioAnalytics): void {
+        const chart = this.charts.get('chart-audio-analytics');
+        if (!chart) return;
+
+        const channelData = data.channel_distribution.map(c => ({
+            name: c.layout || c.channels,
+            value: c.playback_count
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Audio Quality Distribution',
+                textStyle: { color: '#eaeaea', fontSize: 18, fontWeight: 600 }
+            },
+            tooltip: this.getEnhancedTooltip({ trigger: 'axis' }),
+            xAxis: {
+                type: 'category',
+                data: channelData.map(c => c.name),
+                axisLabel: { color: '#a0a0a0', rotate: 45 }
+            },
+            yAxis: { type: 'value' },
+            series: [{ type: 'bar', data: channelData.map(c => c.value) }]
+        };
+        chart.setOption(option, true);
+    }
+
+    private renderSubtitleAnalyticsChart(data: SubtitleAnalytics): void {
+        const chart = this.charts.get('chart-subtitle-analytics');
+        if (!chart) return;
+
+        const languageData = data.language_distribution.map(lang => ({
+            name: lang.language,
+            value: lang.playback_count
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Subtitle Usage by Language',
+                textStyle: { color: '#eaeaea', fontSize: 18, fontWeight: 600 }
+            },
+            tooltip: this.getEnhancedTooltip({ trigger: 'item' }),
+            series: [{ type: 'pie', radius: '60%', data: languageData }]
+        };
+        chart.setOption(option, true);
+    }
+
+    private renderConnectionSecurityChart(data: ConnectionSecurityAnalytics): void {
+        const chart = this.charts.get('chart-connection-security');
+        if (!chart) return;
+
+        const securityData = [
+            { name: 'Secure', value: data.secure_connections },
+            { name: 'Insecure', value: data.insecure_connections },
+            { name: 'Relayed', value: data.relayed_connections.count }
+        ];
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Connection Security Overview',
+                textStyle: { color: '#eaeaea', fontSize: 18, fontWeight: 600 }
+            },
+            tooltip: this.getEnhancedTooltip({ trigger: 'item' }),
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                data: securityData.map((item, idx) => ({
+                    ...item,
+                    itemStyle: {
+                        color: idx === 0 ? '#4caf50' : idx === 1 ? '#f44336' : '#ff9800'
+                    }
+                }))
+            }]
+        };
+        chart.setOption(option, true);
+    }
+
+    private renderPausePatternChart(data: PausePatternAnalytics): void {
+        const chart = this.charts.get('chart-pause-patterns');
+        if (!chart) return;
+
+        const distributionData = data.pause_distribution.map(d => ({
+            name: d.pause_bucket,
+            value: d.playback_count
+        }));
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Pause Pattern Distribution',
+                textStyle: { color: '#eaeaea', fontSize: 18, fontWeight: 600 }
+            },
+            tooltip: this.getEnhancedTooltip({ trigger: 'axis' }),
+            xAxis: {
+                type: 'category',
+                data: distributionData.map(d => d.name)
+            },
+            yAxis: { type: 'value' },
+            series: [{ type: 'bar', data: distributionData.map(d => d.value) }]
+        };
+        chart.setOption(option, true);
+    }
+    updateFilter(filter: LocationFilter): void {
+        this.loadAllCharts(filter);
+    }
+
+    private renderConcurrentStreamsChart(data: ConcurrentStreamsAnalytics): void {
+        const chart = this.charts.get('chart-concurrent-streams');
+        if (!chart) return;
+
+        const timestamps = data.time_series_data.map(d => d.timestamp);
+        const directPlayData = data.time_series_data.map(d => d.direct_play);
+        const directStreamData = data.time_series_data.map(d => d.direct_stream);
+        const transcodeData = data.time_series_data.map(d => d.transcode);
+        const totalConcurrent = data.time_series_data.map(d => d.concurrent_count);
+
+        const peakTimeFormatted = new Date(data.peak_time).toLocaleString();
+
+        const option: echarts.EChartsOption = {
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Concurrent Streams Over Time',
+                subtext: `Peak: ${data.peak_concurrent} streams at ${peakTimeFormatted} | Avg: ${data.avg_concurrent.toFixed(1)} | ${data.capacity_recommendation}`,
+                textStyle: { color: '#eaeaea', fontSize: 18, fontWeight: 600 },
+                subtextStyle: { color: '#a0a0a0', fontSize: 11 }
+            },
+            tooltip: this.getEnhancedTooltip({
+                trigger: 'axis',
+                axisPointer: { type: 'cross' },
+                formatter: (params: any) => {
+                    if (!Array.isArray(params) || params.length === 0) return '';
+                    const time = params[0].axisValue;
+                    let html = `<div style="font-weight: 600; margin-bottom: 8px;">${time}</div>`;
+                    let total = 0;
+                    params.forEach((p: any) => {
+                        total += p.value || 0;
+                        html += `<div style="margin: 4px 0;">
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${p.color}; margin-right: 8px;"></span>
+                            <span style="font-weight: 500;">${p.seriesName}:</span>
+                            <span style="color: #e94560; font-weight: 600;">${p.value || 0}</span>
+                        </div>`;
+                    });
+                    html += `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3a3a4e;">
+                        <strong>Total Concurrent: ${total}</strong>
+                    </div>`;
+                    return html;
+                }
+            }),
+            legend: this.getEnhancedLegend({
+                data: ['Direct Play', 'Direct Stream', 'Transcode', 'Total'],
+                bottom: 20
+            }),
+            grid: {
+                left: 80,
+                right: 40,
+                top: 120,
+                bottom: 80,
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: timestamps,
+                axisLabel: {
+                    color: '#a0a0a0',
+                    rotate: 45,
+                    formatter: (value: string) => {
+                        const date = new Date(value);
+                        return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
+                    }
+                },
+                axisLine: { lineStyle: { color: '#3a3a4e' } }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Concurrent Streams',
+                min: 0,
+                axisLabel: {
+                    color: '#a0a0a0',
+                    formatter: (value: number) => this.formatNumber(value)
+                },
+                axisLine: { lineStyle: { color: '#3a3a4e' } },
+                splitLine: { lineStyle: { color: '#2a2a3e', type: 'dashed' } },
+                nameTextStyle: { color: '#a0a0a0' }
+            },
+            series: [
+                {
+                    name: 'Direct Play',
+                    type: 'line',
+                    stack: 'total',
+                    areaStyle: { opacity: 0.7 },
+                    emphasis: { focus: 'series' },
+                    data: directPlayData,
+                    smooth: true,
+                    itemStyle: { color: '#4caf50' }
+                },
+                {
+                    name: 'Direct Stream',
+                    type: 'line',
+                    stack: 'total',
+                    areaStyle: { opacity: 0.7 },
+                    emphasis: { focus: 'series' },
+                    data: directStreamData,
+                    smooth: true,
+                    itemStyle: { color: '#2196f3' }
+                },
+                {
+                    name: 'Transcode',
+                    type: 'line',
+                    stack: 'total',
+                    areaStyle: { opacity: 0.7 },
+                    emphasis: { focus: 'series' },
+                    data: transcodeData,
+                    smooth: true,
+                    itemStyle: { color: '#ff9800' }
+                },
+                {
+                    name: 'Total',
+                    type: 'line',
+                    data: totalConcurrent,
+                    lineStyle: { type: 'dashed', color: '#e94560', width: 2 },
+                    symbol: 'none',
+                    z: 10,
+                    markLine: {
+                        silent: true,
+                        lineStyle: { color: '#ff0000', type: 'solid', width: 1 },
+                        label: {
+                            formatter: `Peak: ${data.peak_concurrent}`,
+                            color: '#ff0000',
+                            position: 'end'
+                        },
+                        data: [{ yAxis: data.peak_concurrent }]
+                    }
+                }
+            ]
+        };
+
+        chart.setOption(option, true);
+    }
+
+    destroy(): void {
+        if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+        }
+        this.charts.forEach(chart => chart.dispose());
+        this.charts.clear();
+        this.pendingData.clear();
+    }
+}

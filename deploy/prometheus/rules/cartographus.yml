@@ -1,0 +1,662 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+# Prometheus alerting rules for Cartographus
+# https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+
+groups:
+  # ============================================================================
+  # Application Health Alerts
+  # ============================================================================
+  - name: cartographus_health
+    interval: 30s
+    rules:
+      - alert: CartographusDown
+        expr: up{job="cartographus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Cartographus is down"
+          description: "Cartographus instance {{ $labels.instance }} has been down for more than 1 minute."
+          runbook_url: "https://github.com/tomtom215/cartographus/blob/main/docs/TROUBLESHOOTING.md#application-down"
+
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(api_requests_total{status=~"5.."}[5m])) /
+          sum(rate(api_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      - alert: CriticalErrorRate
+        expr: |
+          sum(rate(api_requests_total{status=~"5.."}[5m])) /
+          sum(rate(api_requests_total[5m])) > 0.15
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 15%)"
+
+  # ============================================================================
+  # API Latency Alerts
+  # ============================================================================
+  - name: cartographus_latency
+    interval: 30s
+    rules:
+      - alert: HighP99Latency
+        expr: |
+          histogram_quantile(0.99, sum(rate(api_request_duration_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency (p99)"
+          description: "99th percentile API latency is {{ $value | humanizeDuration }} (threshold: 2s)"
+
+      - alert: CriticalP99Latency
+        expr: |
+          histogram_quantile(0.99, sum(rate(api_request_duration_seconds_bucket[5m])) by (le)) > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical API latency (p99)"
+          description: "99th percentile API latency is {{ $value | humanizeDuration }} (threshold: 5s)"
+
+      - alert: SlowEndpoint
+        expr: |
+          histogram_quantile(0.95, sum(rate(api_request_duration_seconds_bucket[5m])) by (le, endpoint)) > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow endpoint detected"
+          description: "Endpoint {{ $labels.endpoint }} has p95 latency of {{ $value | humanizeDuration }}"
+
+  # ============================================================================
+  # Database Alerts
+  # ============================================================================
+  - name: cartographus_database
+    interval: 30s
+    rules:
+      - alert: DatabaseSlowQueries
+        expr: |
+          histogram_quantile(0.95, sum(rate(duckdb_query_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "95th percentile query duration is {{ $value | humanizeDuration }}"
+
+      - alert: DatabaseQueryErrors
+        expr: |
+          sum(rate(duckdb_query_errors_total[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database query errors increasing"
+          description: "Query error rate is {{ $value | humanize }}/s"
+
+      - alert: HighDatabaseConnections
+        expr: duckdb_connections_active > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of database connections"
+          description: "Active DuckDB connections: {{ $value }}"
+
+  # ============================================================================
+  # Circuit Breaker Alerts
+  # ============================================================================
+  - name: cartographus_circuit_breaker
+    interval: 15s
+    rules:
+      - alert: CircuitBreakerOpen
+        expr: circuit_breaker_state == 2
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Circuit breaker is OPEN"
+          description: "Circuit breaker {{ $labels.name }} is open, indicating upstream service failure"
+          runbook_url: "https://github.com/tomtom215/cartographus/blob/main/docs/TROUBLESHOOTING.md#circuit-breaker"
+
+      - alert: CircuitBreakerHalfOpen
+        expr: circuit_breaker_state == 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Circuit breaker is half-open"
+          description: "Circuit breaker {{ $labels.name }} is testing upstream service recovery"
+
+      - alert: CircuitBreakerTrips
+        expr: increase(circuit_breaker_trips_total[15m]) > 3
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Multiple circuit breaker trips"
+          description: "Circuit breaker {{ $labels.name }} has tripped {{ $value }} times in 15 minutes"
+
+  # ============================================================================
+  # Dead Letter Queue Alerts
+  # ============================================================================
+  - name: cartographus_dlq
+    interval: 30s
+    rules:
+      - alert: DLQEntriesGrowing
+        expr: dlq_entries_total > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Dead letter queue is growing"
+          description: "DLQ has {{ $value }} entries that need attention"
+
+      - alert: DLQCritical
+        expr: dlq_entries_total > 1000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Dead letter queue is critically high"
+          description: "DLQ has {{ $value }} entries - investigate failed message processing"
+
+      - alert: DLQProcessingStalled
+        expr: |
+          increase(dlq_entries_total[1h]) > 50 and
+          increase(dlq_processed_total[1h]) == 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DLQ processing appears stalled"
+          description: "DLQ is receiving entries but none are being processed"
+
+  # ============================================================================
+  # Authentication Alerts
+  # ============================================================================
+  - name: cartographus_auth
+    interval: 30s
+    rules:
+      - alert: HighAuthFailureRate
+        expr: |
+          sum(rate(oidc_login_attempts_total{outcome="failure"}[5m])) /
+          sum(rate(oidc_login_attempts_total[5m])) > 0.3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Auth failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: AuthServiceSlow
+        expr: |
+          histogram_quantile(0.95, sum(rate(oidc_login_duration_seconds_bucket[5m])) by (le)) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Authentication service is slow"
+          description: "95th percentile auth latency is {{ $value | humanizeDuration }}"
+
+      - alert: BruteForceAttemptDetected
+        expr: |
+          sum(rate(oidc_login_attempts_total{outcome="failure"}[5m])) by (ip) > 0.5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Possible brute force attack"
+          description: "High login failure rate from IP {{ $labels.ip }}: {{ $value | humanize }}/s"
+
+      - alert: TooManyActiveSessions
+        expr: oidc_active_sessions > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active sessions"
+          description: "Active OIDC sessions: {{ $value }}"
+
+  # ============================================================================
+  # WebSocket Alerts
+  # ============================================================================
+  - name: cartographus_websocket
+    interval: 30s
+    rules:
+      - alert: WebSocketConnectionDrop
+        expr: |
+          (websocket_connections_active - websocket_connections_active offset 5m) /
+          websocket_connections_active offset 5m < -0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Significant WebSocket connection drop"
+          description: "WebSocket connections dropped by {{ $value | humanizePercentage }}"
+
+      - alert: HighWebSocketErrors
+        expr: rate(websocket_errors_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High WebSocket error rate"
+          description: "WebSocket error rate: {{ $value | humanize }}/s"
+
+  # ============================================================================
+  # Sync Service Alerts
+  # ============================================================================
+  - name: cartographus_sync
+    interval: 1m
+    rules:
+      - alert: SyncServiceStalled
+        expr: |
+          time() - sync_last_successful_sync_timestamp > 3600
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Sync service appears stalled"
+          description: "No successful sync for server {{ $labels.server }} in over 1 hour"
+
+      - alert: SyncErrorsHigh
+        expr: |
+          sum(rate(sync_errors_total[15m])) by (server) > 0.1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High sync error rate"
+          description: "Server {{ $labels.server }} has high sync error rate: {{ $value | humanize }}/s"
+
+      - alert: MediaServerUnreachable
+        expr: sync_server_reachable == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Media server unreachable"
+          description: "Cannot connect to {{ $labels.server }} ({{ $labels.platform }})"
+
+  # ============================================================================
+  # NATS/Event Processing Alerts
+  # ============================================================================
+  - name: cartographus_nats
+    interval: 30s
+    rules:
+      - alert: NATSPublishErrors
+        expr: rate(nats_messages_published_errors_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NATS publish errors detected"
+          description: "NATS publish error rate: {{ $value | humanize }}/s"
+
+      - alert: NATSConsumerLag
+        expr: nats_consumer_pending_messages > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NATS consumer lag is high"
+          description: "Consumer {{ $labels.consumer }} has {{ $value }} pending messages"
+
+      - alert: NATSConsumerCriticalLag
+        expr: nats_consumer_pending_messages > 100000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "NATS consumer lag is critical"
+          description: "Consumer {{ $labels.consumer }} has {{ $value }} pending messages - processing may be stalled"
+
+  # ============================================================================
+  # Detection Engine Alerts
+  # ============================================================================
+  - name: cartographus_detection
+    interval: 30s
+    rules:
+      - alert: SecurityAlertTriggered
+        expr: increase(detection_alerts_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Security detection alert triggered"
+          description: "Detection rule {{ $labels.rule }} triggered {{ $value }} times"
+
+      - alert: HighTrustScoreDecrements
+        expr: rate(detection_trust_score_decrements_total[15m]) > 0.1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Unusual trust score activity"
+          description: "High rate of trust score decrements: {{ $value | humanize }}/s"
+
+      - alert: ImpossibleTravelDetected
+        expr: increase(detection_alerts_total{rule="impossible_travel"}[1h]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Impossible travel detected"
+          description: "User {{ $labels.user }} triggered impossible travel detection"
+
+  # ============================================================================
+  # Cache Alerts
+  # ============================================================================
+  - name: cartographus_cache
+    interval: 1m
+    rules:
+      - alert: LowCacheHitRate
+        expr: |
+          sum(rate(cache_hits_total[5m])) /
+          (sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m]))) < 0.5
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} (threshold: 50%)"
+
+      - alert: GeoIPCacheLow
+        expr: |
+          geolocation_cache_hits_total /
+          (geolocation_cache_hits_total + geolocation_cache_misses_total) < 0.7
+        for: 15m
+        labels:
+          severity: info
+        annotations:
+          summary: "GeoIP cache hit rate is low"
+          description: "GeoIP cache hit rate is {{ $value | humanizePercentage }}"
+
+  # ============================================================================
+  # Resource Alerts
+  # ============================================================================
+  - name: cartographus_resources
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 > 2048
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Cartographus is using {{ $value | humanize }}MB of memory"
+
+      - alert: CriticalMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 > 4096
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical memory usage"
+          description: "Cartographus is using {{ $value | humanize }}MB of memory - OOM risk"
+
+      - alert: HighGoroutineCount
+        expr: go_goroutines > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High goroutine count"
+          description: "Goroutine count: {{ $value }} - possible goroutine leak"
+
+      - alert: FileDescriptorExhaustion
+        expr: process_open_fds / process_max_fds > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "File descriptor usage high"
+          description: "Using {{ $value | humanizePercentage }} of available file descriptors"
+
+  # ============================================================================
+  # PAT (Personal Access Token) Alerts
+  # ============================================================================
+  - name: cartographus_pat
+    interval: 1m
+    rules:
+      - alert: PATValidationFailures
+        expr: rate(pat_validation_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High PAT validation failure rate"
+          description: "PAT validation failures: {{ $value | humanize }}/s - possible token abuse"
+
+      - alert: PATExpiringSoon
+        expr: |
+          (pat_expiry_timestamp - time()) / 86400 < 7 and
+          (pat_expiry_timestamp - time()) > 0
+        for: 0m
+        labels:
+          severity: info
+        annotations:
+          summary: "Personal Access Token expiring soon"
+          description: "PAT {{ $labels.token_name }} for user {{ $labels.user }} expires in {{ $value | humanize }} days"
+
+  # ============================================================================
+  # Recommendation Engine Alerts
+  # ============================================================================
+  - name: cartographus_recommendations
+    interval: 1m
+    rules:
+      - alert: RecommendationTrainingFailed
+        expr: increase(recommendation_training_failures_total[1h]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Recommendation model training failed"
+          description: "Algorithm {{ $labels.algorithm }} failed to train"
+
+      - alert: RecommendationSlowInference
+        expr: |
+          histogram_quantile(0.95, sum(rate(recommendation_inference_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow recommendation inference"
+          description: "95th percentile inference time is {{ $value | humanizeDuration }}"
+
+  # ============================================================================
+  # WAL (Write-Ahead Log) Alerts
+  # ADR-0006: BadgerDB Write-Ahead Log
+  # ============================================================================
+  - name: cartographus_wal
+    interval: 30s
+    rules:
+      - alert: WALPendingEntriesHigh
+        expr: wal_pending_entries > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL pending entries are high"
+          description: "WAL has {{ $value }} pending entries awaiting NATS confirmation"
+          runbook_url: "https://github.com/tomtom215/cartographus/blob/main/docs/TROUBLESHOOTING.md#wal-issues"
+
+      - alert: WALPendingEntriesCritical
+        expr: wal_pending_entries > 10000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "WAL pending entries are critically high"
+          description: "WAL has {{ $value }} pending entries - NATS may be down or overwhelmed"
+          runbook_url: "https://github.com/tomtom215/cartographus/blob/main/docs/TROUBLESHOOTING.md#wal-issues"
+
+      - alert: WALWriteFailures
+        expr: rate(wal_write_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL write failures detected"
+          description: "WAL write failure rate: {{ $value | humanize }}/s - check BadgerDB health"
+
+      - alert: WALNATSPublishFailures
+        expr: rate(wal_nats_publish_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL NATS publish failures"
+          description: "WAL is failing to publish to NATS at {{ $value | humanize }}/s"
+
+      - alert: WALMaxRetriesExceeded
+        expr: increase(wal_max_retries_exceeded_total[15m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL entries exceeded max retries"
+          description: "{{ $value }} WAL entries have exceeded maximum retry attempts in last 15 minutes"
+
+      - alert: WALExpiredEntries
+        expr: rate(wal_expired_entries_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL entries expiring"
+          description: "WAL entries are expiring before confirmation at {{ $value | humanize }}/s"
+
+      - alert: WALCompactionLag
+        expr: wal_confirmed_entries > 5000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL compaction lag is high"
+          description: "{{ $value }} confirmed entries awaiting compaction - check compaction schedule"
+
+      - alert: WALDBSizeHigh
+        expr: wal_db_size_bytes / 1024 / 1024 > 512
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "BadgerDB WAL size is high"
+          description: "WAL database size is {{ $value | humanize }}MB - consider triggering GC"
+
+      - alert: WALDBSizeCritical
+        expr: wal_db_size_bytes / 1024 / 1024 > 2048
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "BadgerDB WAL size is critical"
+          description: "WAL database size is {{ $value | humanize }}MB - disk space may be at risk"
+
+      - alert: WALSlowWrites
+        expr: |
+          histogram_quantile(0.95, sum(rate(wal_write_latency_seconds_bucket[5m])) by (le)) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WAL writes are slow"
+          description: "95th percentile WAL write latency is {{ $value | humanizeDuration }}"
+
+      - alert: ConsumerWALPendingHigh
+        expr: consumer_wal_pending_entries > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Consumer WAL pending entries high"
+          description: "Consumer WAL has {{ $value }} entries pending DuckDB insertion"
+
+      - alert: ConsumerWALFailures
+        expr: rate(consumer_wal_failures_total[15m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Consumer WAL permanent failures"
+          description: "{{ $value | humanize }} Consumer WAL entries permanently failed per second"
+
+  # ============================================================================
+  # Backup Alerts
+  # ============================================================================
+  - name: cartographus_backup
+    interval: 1m
+    rules:
+      - alert: BackupNotRunRecently
+        expr: |
+          time() - backup_last_successful_timestamp > 172800
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No recent backup"
+          description: "No successful backup in over 48 hours - check backup schedule"
+
+      - alert: BackupFailed
+        expr: increase(backup_failures_total[1h]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backup operation failed"
+          description: "Backup failure detected in the last hour"
+
+      - alert: BackupStorageLow
+        expr: backup_storage_available_bytes / backup_storage_total_bytes < 0.2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backup storage running low"
+          description: "Only {{ $value | humanizePercentage }} backup storage remaining"
+
+      - alert: BackupStorageCritical
+        expr: backup_storage_available_bytes / backup_storage_total_bytes < 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backup storage critically low"
+          description: "Only {{ $value | humanizePercentage }} backup storage remaining - backups will fail"
+
+      - alert: ScheduledBackupMissed
+        expr: |
+          backup_schedule_enabled == 1 and
+          time() - backup_last_scheduled_run_timestamp > backup_schedule_interval_seconds * 1.5
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Scheduled backup missed"
+          description: "Scheduled backup has not run within expected interval"
+
+      - alert: RetentionNotApplied
+        expr: |
+          backup_count > backup_retention_max_count and
+          backup_retention_max_count > 0
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: "Backup retention policy not applied"
+          description: "{{ $value }} backups exist, exceeding max count of {{ $labels.max_count }}"

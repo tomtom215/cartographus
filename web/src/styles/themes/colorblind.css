@@ -1,0 +1,59 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Colorblind-Safe Theme
+ *
+ * Uses blue-orange-teal palette safe for most color vision deficiencies.
+ */
+
+[data-colorblind="true"] {
+    --highlight: #0077bb;           /* Blue - safe for deuteranopia/protanopia */
+    --highlight-hover: #005fa3;
+    --highlight-alt: #ee7733;       /* Orange - distinguishable from blue */
+
+    --color-success: #009988;       /* Teal - safe alternative to green */
+    --color-success-light: #33bbaa;
+    --color-warning: #ee7733;       /* Orange - safe for color blindness */
+    --color-warning-light: #ffaa55;
+    --color-error: #cc3311;         /* Red-orange - better for deuteranopia */
+    --color-error-light: #ee5544;
+    --color-info: #0077bb;          /* Blue */
+    --color-info-light: #33aadd;
+
+    /* Colorblind-safe chart palette */
+    --chart-primary: #0077bb;
+    --chart-color-1: #0077bb;       /* Blue */
+    --chart-color-2: #ee7733;       /* Orange */
+    --chart-color-3: #009988;       /* Teal */
+    --chart-color-4: #cc3311;       /* Red-orange */
+    --chart-color-5: #33bbee;       /* Light blue */
+    --chart-color-6: #ee3377;       /* Magenta */
+    --chart-color-7: #bbbbbb;       /* Grey */
+    --chart-color-8: #000000;       /* Black */
+    --chart-color-9: #ffdd55;       /* Yellow */
+    --chart-color-10: #aa4499;      /* Purple */
+
+    /* Colorblind-safe heatmap */
+    --heatmap-1: #0077bb;
+    --heatmap-2: #33aadd;
+    --heatmap-3: #66ccee;
+    --heatmap-4: #ffdd55;
+    --heatmap-5: #ee7733;
+    --heatmap-6: #cc3311;
+    --heatmap-7: #aa0000;
+
+    /* Globe visualization colors for colorblind mode */
+    --globe-marker-high: #cc3311;         /* Red-orange - visible to most */
+    --globe-marker-medium-high: #ee7733;  /* Orange - distinguishable */
+    --globe-marker-medium: #ffdd55;       /* Yellow - safe */
+    --globe-marker-low: #0077bb;          /* Blue - safe for most CVD */
+    --globe-tooltip-bg: rgba(20, 20, 30, 0.95);
+    --globe-tooltip-border: #0077bb;
+    --globe-tooltip-text: #eaeaea;
+
+    --focus-indicator: #0077bb;
+}

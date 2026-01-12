@@ -1,0 +1,11 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cartographus
+  labels:
+    app.kubernetes.io/name: cartographus
+    app.kubernetes.io/part-of: cartographus

@@ -1,0 +1,1039 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Geographic visualization and analytics platform for Plex Media Server playback activity\n\n## Features\n\n- **Interactive WebGL Map**: Visualize playback locations with clustering for 10,000+ points\n- **3D Globe View**: WebGL-accelerated 3D globe visualization\n- **32 Analytics Charts**: Powered by Apache ECharts across 5 themed sections\n- **Real-time Updates**: WebSocket-based live notifications\n- **Advanced Filtering**: 14+ filter dimensions (users, media types, platforms, codecs)\n- **Data Export**: CSV and GeoJSON export capabilities\n- **Progressive Web App**: Offline support with service worker\n\n## Authentication\n\nMost endpoints require JWT authentication via HTTP-only cookie.\nUse `/api/v1/auth/login` to obtain a token, which will be automatically included in subsequent requests.\n\n## Rate Limiting\n\nDefault rate limit: 100 requests per minute per IP address.\nRate limit headers are included in responses: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`.\n\n## Performance\n\n- API response times (p95): \u003c100ms\n- Map rendering: 60 FPS\n- Data sync (10k events): \u003c30s\n- In-memory caching: 5-minute TTL for analytics\n\n## Error Responses\n\nAll error responses follow this format:\n```json\n{\n\"status\": \"error\",\n\"data\": null,\n\"error\": {\n\"code\": \"ERROR_CODE\",\n\"message\": \"Human-readable error message\",\n\"details\": {}\n},\n\"metadata\": {\n\"timestamp\": \"2025-11-18T12:34:56Z\"\n}\n}\n```",
+        "title": "Cartographus API",
+        "contact": {
+            "name": "GitHub Repository",
+            "url": "https://github.com/tomtom215/cartographus/issues"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:3857",
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "Authenticates user with username and password, returns JWT token in HTTP-only cookie",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Authenticate user",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "password": {
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Authentication successful",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "token": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Authentication disabled",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/export/locations/geojson": {
+            "get": {
+                "description": "Exports location statistics in GeoJSON format for use in GIS applications and mapping tools",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/geo+json"
+                ],
+                "tags": [
+                    "Export"
+                ],
+                "summary": "Export locations as GeoJSON",
+                "responses": {
+                    "200": {
+                        "description": "GeoJSON file download",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/export/playbacks/csv": {
+            "get": {
+                "description": "Exports complete playback history with all metadata to CSV format for external analysis",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/csv"
+                ],
+                "tags": [
+                    "Export"
+                ],
+                "summary": "Export playback history as CSV",
+                "parameters": [
+                    {
+                        "maximum": 100000,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 10000,
+                        "description": "Maximum number of records to export (1-100000)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CSV file download",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Returns comprehensive health status including database connectivity, Tautulli connectivity, last sync time, and uptime",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Get system health status",
+                "responses": {
+                    "200": {
+                        "description": "Health status retrieved successfully",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.HealthStatus"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/health/live": {
+            "get": {
+                "description": "Returns 200 OK if the process is alive, regardless of external dependencies. Used for Kubernetes liveness probes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Kubernetes liveness probe",
+                "responses": {
+                    "200": {
+                        "description": "Service is alive",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health/ready": {
+            "get": {
+                "description": "Returns 200 OK only if the service is ready to handle traffic (database and Tautulli are both connected). Returns 503 if not ready.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Kubernetes readiness probe",
+                "responses": {
+                    "200": {
+                        "description": "Service is ready",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service is not ready",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/locations": {
+            "get": {
+                "description": "Returns aggregated playback statistics by geographic location with support for 14+ filter dimensions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Get location statistics",
+                "parameters": [
+                    {
+                        "maximum": 1000,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Maximum number of locations to return (1-1000)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"2025-01-01T00:00:00Z\"",
+                        "description": "Start date filter (RFC3339 format)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"2025-12-31T23:59:59Z\"",
+                        "description": "End date filter (RFC3339 format)",
+                        "name": "end_date",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 3650,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by last N days (1-3650, alternative to start_date)",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"user1,user2\"",
+                        "description": "Comma-separated list of usernames",
+                        "name": "users",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"movie,episode\"",
+                        "description": "Comma-separated list of media types",
+                        "name": "media_types",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"Android,iOS\"",
+                        "description": "Comma-separated list of platforms",
+                        "name": "platforms",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"Plex for Android,Plex Web\"",
+                        "description": "Comma-separated list of players",
+                        "name": "players",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"transcode,direct play\"",
+                        "description": "Comma-separated transcode decisions",
+                        "name": "transcode_decisions",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"1080,720\"",
+                        "description": "Comma-separated video resolutions",
+                        "name": "video_resolutions",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"h264,hevc\"",
+                        "description": "Comma-separated video codecs",
+                        "name": "video_codecs",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"aac,ac3\"",
+                        "description": "Comma-separated audio codecs",
+                        "name": "audio_codecs",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"Movies,TV Shows\"",
+                        "description": "Comma-separated library names",
+                        "name": "libraries",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"PG,PG-13,R\"",
+                        "description": "Comma-separated content ratings",
+                        "name": "content_ratings",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"2023,2024\"",
+                        "description": "Comma-separated release years",
+                        "name": "years",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"lan,wan\"",
+                        "description": "Comma-separated location types",
+                        "name": "location_types",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Location statistics retrieved successfully",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.LocationStats"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/media-types": {
+            "get": {
+                "description": "Returns a list of all unique media types (movie, episode, track, etc.) found in playback history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Get list of unique media types",
+                "responses": {
+                    "200": {
+                        "description": "List of media types retrieved successfully",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/playbacks": {
+            "get": {
+                "description": "Returns paginated playback event history with detailed metadata including user info, media details, quality metrics, and geolocation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Get playback history",
+                "parameters": [
+                    {
+                        "maximum": 1000,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Number of results per page (1-1000)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 1000000,
+                        "minimum": 0,
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Number of results to skip (0-1000000)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Playback events retrieved successfully",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.PlaybackEvent"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats": {
+            "get": {
+                "description": "Returns overall playback statistics including total playbacks, unique users, unique locations, date range, and last sync time",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Get overall statistics",
+                "responses": {
+                    "200": {
+                        "description": "Statistics retrieved successfully",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Stats"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sync": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Manually triggers a sync with Tautulli to fetch latest playback data. Requires JWT authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Trigger data synchronization",
+                "responses": {
+                    "202": {
+                        "description": "Sync triggered successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Sync already in progress",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Returns a list of all unique usernames that have playback history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Core"
+                ],
+                "summary": "Get list of unique users",
+                "responses": {
+                    "200": {
+                        "description": "List of usernames retrieved successfully",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws": {
+            "get": {
+                "description": "Establishes a WebSocket connection for real-time playback notifications and statistics updates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Realtime"
+                ],
+                "summary": "Establish WebSocket connection",
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.APIError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "details": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.APIResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "$ref": "#/definitions/models.APIError"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/models.Metadata"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CountryStats": {
+            "type": "object",
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "playback_count": {
+                    "type": "integer"
+                },
+                "unique_users": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.HealthStatus": {
+            "type": "object",
+            "properties": {
+                "database_connected": {
+                    "type": "boolean"
+                },
+                "last_sync_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tautulli_connected": {
+                    "type": "boolean"
+                },
+                "uptime_seconds": {
+                    "type": "number"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LocationStats": {
+            "type": "object",
+            "properties": {
+                "avg_completion": {
+                    "type": "number"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "first_seen": {
+                    "type": "string"
+                },
+                "last_seen": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "playback_count": {
+                    "type": "integer"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "unique_users": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Metadata": {
+            "type": "object",
+            "properties": {
+                "query_time_ms": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PlaybackEvent": {
+            "type": "object",
+            "properties": {
+                "audio_bitrate": {
+                    "type": "integer"
+                },
+                "audio_channel_layout": {
+                    "type": "string"
+                },
+                "audio_channels": {
+                    "description": "Audio details",
+                    "type": "string"
+                },
+                "audio_codec": {
+                    "type": "string"
+                },
+                "audio_language": {
+                    "type": "string"
+                },
+                "audio_sample_rate": {
+                    "type": "integer"
+                },
+                "bitrate": {
+                    "type": "integer"
+                },
+                "container": {
+                    "description": "Container and subtitle",
+                    "type": "string"
+                },
+                "content_rating": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "description": "File metadata",
+                    "type": "integer"
+                },
+                "grandparent_title": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "library_name": {
+                    "type": "string"
+                },
+                "local": {
+                    "description": "0 or 1 flag",
+                    "type": "integer"
+                },
+                "location_type": {
+                    "type": "string"
+                },
+                "media_type": {
+                    "type": "string"
+                },
+                "parent_title": {
+                    "type": "string"
+                },
+                "paused_counter": {
+                    "type": "integer"
+                },
+                "percent_complete": {
+                    "type": "integer"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "play_duration": {
+                    "type": "integer"
+                },
+                "player": {
+                    "type": "string"
+                },
+                "relayed": {
+                    "description": "0 or 1 flag",
+                    "type": "integer"
+                },
+                "section_id": {
+                    "type": "integer"
+                },
+                "secure": {
+                    "description": "Connection security",
+                    "type": "integer"
+                },
+                "session_key": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "stopped_at": {
+                    "type": "string"
+                },
+                "stream_audio_channels": {
+                    "type": "string"
+                },
+                "stream_audio_codec": {
+                    "type": "string"
+                },
+                "stream_audio_decision": {
+                    "type": "string"
+                },
+                "stream_bitrate": {
+                    "type": "integer"
+                },
+                "stream_container": {
+                    "type": "string"
+                },
+                "stream_video_decision": {
+                    "type": "string"
+                },
+                "stream_video_resolution": {
+                    "description": "Stream quality fields (what was actually streamed vs source)",
+                    "type": "string"
+                },
+                "subtitle_codec": {
+                    "type": "string"
+                },
+                "subtitle_language": {
+                    "type": "string"
+                },
+                "subtitles": {
+                    "description": "0 or 1 flag",
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "transcode_decision": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "video_bit_depth": {
+                    "type": "integer"
+                },
+                "video_bitrate": {
+                    "type": "integer"
+                },
+                "video_codec": {
+                    "type": "string"
+                },
+                "video_dynamic_range": {
+                    "description": "Video details",
+                    "type": "string"
+                },
+                "video_framerate": {
+                    "type": "string"
+                },
+                "video_height": {
+                    "type": "integer"
+                },
+                "video_resolution": {
+                    "type": "string"
+                },
+                "video_width": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Stats": {
+            "type": "object",
+            "properties": {
+                "database_size_bytes": {
+                    "type": "integer"
+                },
+                "last_sync_time": {
+                    "type": "string"
+                },
+                "recent_activity": {
+                    "type": "integer"
+                },
+                "top_countries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CountryStats"
+                    }
+                },
+                "total_playbacks": {
+                    "type": "integer"
+                },
+                "unique_locations": {
+                    "type": "integer"
+                },
+                "unique_users": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "JWT token stored in HTTP-only cookie. Obtain via /api/v1/auth/login endpoint.",
+            "type": "apiKey",
+            "name": "token",
+            "in": "cookie",
+            "x-logo": "{\"url\": \"https://raw.githubusercontent.com/tomtom215/cartographus/main/web/public/icons/icon.svg\", \"altText\": \"Cartographus Logo\"}"
+        }
+    }
+}

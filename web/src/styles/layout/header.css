@@ -1,0 +1,281 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Header Layout
+ *
+ * Application header, branding, and WebSocket status indicator.
+ */
+
+#header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+#header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.header-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#header h1 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+#header p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* WebSocket Connection Status Indicator */
+.ws-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: var(--accent);
+    font-size: 11px;
+    color: var(--text-secondary);
+    cursor: default;
+    transition: all 0.3s ease;
+}
+
+.ws-status:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.ws-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    transition: background 0.3s ease;
+}
+
+.ws-status-text {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* WebSocket Status States */
+.ws-status[data-status="connected"] {
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.ws-status[data-status="connected"] .ws-status-dot {
+    background: var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
+}
+
+.ws-status[data-status="connected"] .ws-status-text {
+    color: var(--color-success);
+}
+
+.ws-status[data-status="connecting"],
+.ws-status[data-status="reconnecting"] {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.ws-status[data-status="connecting"] .ws-status-dot,
+.ws-status[data-status="reconnecting"] .ws-status-dot {
+    background: var(--color-warning);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.ws-status[data-status="connecting"] .ws-status-text,
+.ws-status[data-status="reconnecting"] .ws-status-text {
+    color: var(--color-warning);
+}
+
+.ws-status[data-status="disconnected"],
+.ws-status[data-status="error"] {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.ws-status[data-status="disconnected"] .ws-status-dot,
+.ws-status[data-status="error"] .ws-status-dot {
+    background: var(--color-error);
+}
+
+.ws-status[data-status="disconnected"] .ws-status-text,
+.ws-status[data-status="error"] .ws-status-text {
+    color: var(--color-error);
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+/* Logout button */
+#btn-logout {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: all 0.2s;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44px touch target size */
+    min-height: 44px;
+    min-width: 44px;
+}
+
+#btn-logout:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+}
+
+/* =================================================================
+   Data Quality Indicator
+   Shows system health, sync status, and connectivity
+   ================================================================= */
+.data-quality-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    margin-top: 4px;
+    border-radius: 6px;
+    background: var(--accent);
+    font-size: 11px;
+}
+
+.data-quality-indicator.hidden {
+    display: none;
+}
+
+/* Status indicator */
+.data-quality-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.data-quality-status .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+}
+
+.data-quality-status .status-text {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+/* Healthy status */
+.data-quality-status.status-healthy .status-dot {
+    background: var(--color-success);
+    box-shadow: 0 0 6px var(--color-success);
+}
+
+.data-quality-status.status-healthy .status-text {
+    color: var(--color-success);
+}
+
+/* Degraded status */
+.data-quality-status.status-degraded .status-dot {
+    background: var(--color-warning);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.data-quality-status.status-degraded .status-text {
+    color: var(--color-warning);
+}
+
+/* Error status */
+.data-quality-status.status-error .status-dot {
+    background: var(--color-error);
+}
+
+.data-quality-status.status-error .status-text {
+    color: var(--color-error);
+}
+
+/* Sync time display */
+.data-quality-sync-time {
+    color: var(--text-secondary);
+    font-size: 10px;
+    padding-left: 8px;
+    border-left: 1px solid var(--border);
+}
+
+/* Connection status indicators */
+.data-quality-connection {
+    display: flex;
+    gap: 4px;
+    padding-left: 8px;
+    border-left: 1px solid var(--border);
+}
+
+.data-quality-connection span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-error);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.data-quality-connection span.connected {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+/* High contrast mode */
+[data-theme="high-contrast"] .data-quality-indicator {
+    border: 1px solid var(--text-primary);
+}
+
+[data-theme="high-contrast"] .data-quality-connection span {
+    border: 1px solid currentColor;
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .ws-status {
+        transition: none;
+    }
+
+    .ws-status-dot {
+        transition: none;
+    }
+
+    .ws-status[data-status="connecting"] .ws-status-dot,
+    .ws-status[data-status="reconnecting"] .ws-status-dot,
+    .data-quality-status.status-degraded .status-dot {
+        animation: none;
+    }
+
+    #btn-logout {
+        transition: none;
+    }
+}

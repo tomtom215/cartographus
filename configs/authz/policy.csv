@@ -1,0 +1,96 @@
+# Casbin RBAC Policy for Cartographus
+# Format: policy_type, subject, object, action
+# ADR-0015: Zero Trust Authentication & Authorization
+
+# =============================================================================
+# Role Hierarchy (g = user/role, parent_role)
+# =============================================================================
+
+# Editor inherits viewer permissions
+g, editor, viewer
+
+# Admin inherits editor permissions (and thus viewer)
+g, admin, editor
+
+# =============================================================================
+# Viewer Permissions (Read-only access)
+# =============================================================================
+
+# Maps - read access
+p, viewer, /api/maps, GET
+p, viewer, /api/maps/:id, GET
+p, viewer, /api/maps/:id/*, GET
+
+# Playbacks - read access
+p, viewer, /api/playbacks, GET
+p, viewer, /api/playbacks/:id, GET
+
+# Analytics - read access
+p, viewer, /api/analytics, GET
+p, viewer, /api/analytics/*, GET
+
+# Server info - read access
+p, viewer, /api/server/info, GET
+
+# User profile - own profile only
+p, viewer, /api/users/me, GET
+
+# Health endpoints - public (but listed for completeness)
+p, viewer, /health, GET
+p, viewer, /ready, GET
+
+# =============================================================================
+# Editor Permissions (Create and edit, inherits viewer)
+# =============================================================================
+
+# Maps - create and edit
+p, editor, /api/maps, POST
+p, editor, /api/maps/:id, PUT
+p, editor, /api/maps/:id, PATCH
+
+# Playbacks - create
+p, editor, /api/playbacks, POST
+
+# Export - allowed for editors
+p, editor, /api/export/*, GET
+p, editor, /api/export/*, POST
+
+# =============================================================================
+# Admin Permissions (Full access, inherits editor)
+# =============================================================================
+
+# Full API access
+p, admin, /api/*, *
+
+# User management
+p, admin, /api/users, GET
+p, admin, /api/users, POST
+p, admin, /api/users/:id, GET
+p, admin, /api/users/:id, PUT
+p, admin, /api/users/:id, DELETE
+
+# Admin-only endpoints
+p, admin, /api/admin/*, *
+
+# Configuration management
+p, admin, /api/config, GET
+p, admin, /api/config, PUT
+p, admin, /api/config/*, GET
+p, admin, /api/config/*, PUT
+
+# Sync management
+p, admin, /api/sync, GET
+p, admin, /api/sync, POST
+p, admin, /api/sync/*, *
+
+# Backup and restore
+p, admin, /api/backup, GET
+p, admin, /api/backup, POST
+p, admin, /api/restore, POST
+
+# =============================================================================
+# Default User Role Assignments
+# These are examples - actual assignments should be managed dynamically
+# =============================================================================
+# g, user_abc123, admin
+# g, user_def456, viewer

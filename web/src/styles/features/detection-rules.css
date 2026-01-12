@@ -1,0 +1,343 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Detection Rules Configuration Styles (ADR-0020)
+ * Styles for configuring detection rules
+ */
+
+/* Panel Container */
+.detection-rules-panel {
+  background: var(--surface-color, #1e1e2e);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detection-rules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color, #2d2d3d);
+}
+
+.detection-rules-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.detection-rules-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.detection-rules-actions button {
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+#detection-rules-save {
+  background: var(--primary-color, #3498db);
+  border: none;
+  color: white;
+}
+
+#detection-rules-save:hover:not(:disabled) {
+  background: var(--primary-dark, #2980b9);
+}
+
+#detection-rules-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#detection-rules-save:focus-visible {
+  outline: 2px solid var(--focus-indicator, #ff6b8a);
+  outline-offset: 2px;
+}
+
+#detection-rules-reset {
+  background: transparent;
+  border: 1px solid var(--border-color, #2d2d3d);
+  color: var(--text-secondary, #a0a0a0);
+}
+
+#detection-rules-reset:hover {
+  background: var(--hover-color, #2d2d3d);
+  color: var(--text-primary, #e0e0e0);
+}
+
+#detection-rules-reset:focus-visible {
+  outline: 2px solid var(--focus-indicator, #ff6b8a);
+  outline-offset: 2px;
+}
+
+/* Content Area */
+#detection-rules-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Loading State */
+.detection-rules-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary, #a0a0a0);
+  gap: 0.75rem;
+}
+
+.detection-rules-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-color, #2d2d3d);
+  border-top-color: var(--primary-color, #3498db);
+  border-radius: 50%;
+  animation: detection-rules-spin 1s linear infinite;
+}
+
+@keyframes detection-rules-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .detection-rules-spinner {
+    animation: none;
+    border-color: var(--primary-color, #3498db);
+  }
+}
+
+/* Empty State */
+.detection-rules-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary, #a0a0a0);
+  gap: 0.5rem;
+}
+
+.detection-rules-empty .detection-rules-icon {
+  font-size: 2rem;
+}
+
+/* Rule Cards */
+.detection-rule-card {
+  background: var(--surface-secondary, #252535);
+  border-radius: 6px;
+  padding: 1rem;
+  border: 1px solid var(--border-color, #2d2d3d);
+  transition: border-color 0.2s;
+}
+
+.detection-rule-card:hover {
+  border-color: var(--primary-color, #3498db);
+}
+
+.detection-rule-card:focus-visible {
+  outline: 2px solid var(--focus-indicator, #ff6b8a);
+  outline-offset: 2px;
+}
+
+.detection-rule-disabled {
+  opacity: 0.6;
+}
+
+/* Rule Header */
+.detection-rule-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.detection-rule-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.detection-rule-title-row {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detection-rule-name {
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  font-size: 1rem;
+}
+
+/* Toggle Switch */
+.detection-rule-toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.detection-rule-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.detection-rule-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border-color, #2d2d3d);
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.detection-rule-toggle-slider:before {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.detection-rule-toggle input:checked + .detection-rule-toggle-slider {
+  background-color: var(--success-color, #27ae60);
+}
+
+.detection-rule-toggle input:checked + .detection-rule-toggle-slider:before {
+  transform: translateX(24px);
+}
+
+/* Rule Description */
+.detection-rule-description {
+  color: var(--text-secondary, #a0a0a0);
+  font-size: 0.85rem;
+  margin: 0 0 1rem 2.25rem;
+  line-height: 1.4;
+}
+
+/* Rule Configuration */
+.detection-rule-config {
+  margin-left: 2.25rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.detection-config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detection-config-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #707080);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detection-config-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.detection-config-input {
+  flex: 1;
+  background: var(--surface-color, #1e1e2e);
+  border: 1px solid var(--border-color, #2d2d3d);
+  color: var(--text-primary, #e0e0e0);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.detection-config-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #3498db);
+}
+
+.detection-config-input[type='number'] {
+  max-width: 100px;
+}
+
+.detection-config-unit {
+  font-size: 0.8rem;
+  color: var(--text-muted, #707080);
+}
+
+.detection-config-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted, #707080);
+  margin-left: 0.5rem;
+}
+
+/* Rule Metrics */
+.detection-rule-metrics {
+  margin-top: 1rem;
+  margin-left: 2.25rem;
+  display: flex;
+  gap: 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #2d2d3d);
+}
+
+.detection-rule-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.detection-rule-metric-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.detection-rule-metric-label {
+  font-size: 0.7rem;
+  color: var(--text-muted, #707080);
+  text-transform: uppercase;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .detection-rule-config {
+    grid-template-columns: 1fr;
+  }
+
+  .detection-rule-header {
+    flex-wrap: wrap;
+  }
+
+  .detection-rule-title-row {
+    width: calc(100% - 2.25rem);
+  }
+
+  .detection-rule-metrics {
+    flex-wrap: wrap;
+  }
+}

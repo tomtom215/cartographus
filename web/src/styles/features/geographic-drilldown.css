@@ -1,0 +1,196 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Geographic Drill-Down Styles
+ * Styles for Country -> Region -> City drill-down feature
+ */
+
+/* Container */
+.geo-drilldown-container {
+  background: var(--secondary-bg);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+/* Header */
+.geo-drilldown-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.geo-drilldown-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Breadcrumb */
+.geo-drilldown-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.geo-breadcrumb-item {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.geo-breadcrumb-item:hover {
+  background: var(--primary-bg);
+  color: var(--text-primary);
+}
+
+.geo-breadcrumb-item.active {
+  color: var(--highlight);
+  font-weight: 600;
+  cursor: default;
+}
+
+.geo-breadcrumb-item.active:hover {
+  background: transparent;
+}
+
+.geo-breadcrumb-separator {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+/* Chart container */
+.geo-drilldown-chart {
+  height: 400px;
+  min-height: 300px;
+}
+
+/* Loading state */
+.geo-drilldown-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Error state */
+.geo-drilldown-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-error);
+  font-size: 0.875rem;
+}
+
+/* Empty state */
+.geo-drilldown-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+/* Stats */
+.geo-drilldown-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.geo-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.geo-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--highlight);
+}
+
+.geo-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .geo-drilldown-container {
+  background: var(--secondary-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .geo-breadcrumb-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* High contrast theme */
+[data-theme="high-contrast"] .geo-drilldown-container {
+  border: 2px solid var(--border);
+}
+
+[data-theme="high-contrast"] .geo-breadcrumb-item {
+  border: 1px solid transparent;
+}
+
+[data-theme="high-contrast"] .geo-breadcrumb-item:focus {
+  border-color: var(--highlight);
+  outline: 2px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+[data-theme="high-contrast"] .geo-drilldown-stats {
+  border-top-width: 2px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .geo-drilldown-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .geo-drilldown-chart {
+    height: 300px;
+  }
+
+  .geo-drilldown-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .geo-stat-value {
+    font-size: 1rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .geo-breadcrumb-item {
+    transition: none;
+  }
+}

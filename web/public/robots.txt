@@ -1,0 +1,15 @@
+# robots.txt for Cartographus
+
+# Allow indexing of the main application
+User-agent: *
+Allow: /
+
+# Disallow API endpoints (no value in indexing API responses)
+Disallow: /api/
+
+# Disallow admin/sensitive paths
+Disallow: /api/v1/auth/
+Disallow: /api/v1/sync
+
+# Crawl-delay to be respectful (in seconds)
+Crawl-delay: 10

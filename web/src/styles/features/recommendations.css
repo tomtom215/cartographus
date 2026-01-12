@@ -1,0 +1,968 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Recommendation Panel Styles
+ *
+ * Styles for the recommendation engine UI components.
+ * Follows the existing settings panel patterns.
+ */
+
+/* Panel overlay */
+.recommendation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: var(--z-modal, 1000);
+    backdrop-filter: blur(2px);
+}
+
+/* Main panel */
+.recommendation-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 900px;
+    max-height: 85vh;
+    background: var(--secondary-bg, #1a1a2e);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: calc(var(--z-modal, 1000) + 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Panel header */
+.recommendation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--primary-bg, #16162a);
+    border-bottom: 1px solid var(--border, #2a2a4a);
+}
+
+.recommendation-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recommendation-title-icon {
+    font-size: 20px;
+}
+
+.recommendation-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #a0a0b0);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.recommendation-close:hover {
+    background: var(--border, #2a2a4a);
+    color: var(--text-primary, #fff);
+}
+
+/* Mode selector */
+.recommendation-modes {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--primary-bg, #16162a);
+    border-bottom: 1px solid var(--border, #2a2a4a);
+}
+
+.mode-button {
+    padding: 8px 16px;
+    border: 1px solid var(--border, #2a2a4a);
+    background: transparent;
+    color: var(--text-secondary, #a0a0b0);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.mode-button:hover {
+    background: var(--border, #2a2a4a);
+    color: var(--text-primary, #fff);
+}
+
+.mode-button.active {
+    background: var(--accent, #4a6cf7);
+    border-color: var(--accent, #4a6cf7);
+    color: #fff;
+}
+
+/* Content area */
+.recommendation-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Recommendation grid */
+.recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+
+/* Recommendation card */
+.recommendation-card {
+    background: var(--primary-bg, #16162a);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border, #2a2a4a);
+}
+
+.recommendation-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.recommendation-card:focus {
+    outline: 2px solid var(--accent, #4a6cf7);
+    outline-offset: 2px;
+}
+
+/* Card poster */
+.recommendation-poster {
+    position: relative;
+    aspect-ratio: 2/3;
+    background: var(--border, #2a2a4a);
+}
+
+.recommendation-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recommendation-poster-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    background: linear-gradient(135deg, var(--border, #2a2a4a), var(--primary-bg, #16162a));
+}
+
+/* Score ring */
+.recommendation-score {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 3;
+}
+
+.score-ring-fill {
+    fill: none;
+    stroke: var(--accent, #4a6cf7);
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+.score-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    z-index: 1;
+}
+
+/* Card info */
+.recommendation-info {
+    padding: 12px;
+}
+
+.recommendation-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recommendation-parent {
+    font-size: 12px;
+    color: var(--text-secondary, #a0a0b0);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.recommendation-metadata {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.recommendation-year,
+.recommendation-genre {
+    background: var(--border, #2a2a4a);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.recommendation-explanation {
+    font-size: 11px;
+    color: var(--text-secondary, #a0a0b0);
+    margin: 8px 0 0;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* Meta information bar */
+.recommendation-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 12px 20px;
+    background: var(--primary-bg, #16162a);
+    border-top: 1px solid var(--border, #2a2a4a);
+    font-size: 12px;
+}
+
+.recommendation-meta-item {
+    display: flex;
+    gap: 4px;
+}
+
+.meta-label {
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.meta-value {
+    color: var(--text-primary, #fff);
+}
+
+.cache-hit {
+    background: rgba(74, 108, 247, 0.2);
+    color: var(--accent, #4a6cf7);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Training status */
+.training-status {
+    padding: 12px 20px;
+    background: var(--primary-bg, #16162a);
+    border-top: 1px solid var(--border, #2a2a4a);
+}
+
+.training-progress {
+    height: 4px;
+    background: var(--border, #2a2a4a);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.training-progress-bar {
+    height: 100%;
+    background: var(--accent, #4a6cf7);
+    transition: width 0.3s;
+}
+
+.training-label {
+    font-size: 13px;
+    color: var(--text-primary, #fff);
+    font-weight: 500;
+}
+
+.training-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.training-detail {
+    font-size: 12px;
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.training-active .training-label {
+    color: var(--accent, #4a6cf7);
+}
+
+/* Config display */
+.recommendation-config {
+    padding: 12px 20px;
+    background: var(--primary-bg, #16162a);
+    border-top: 1px solid var(--border, #2a2a4a);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.config-item {
+    display: flex;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.config-label {
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.config-value {
+    color: var(--text-primary, #fff);
+}
+
+/* Disabled state */
+.recommendation-disabled {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 6px;
+    color: #ffc107;
+}
+
+.disabled-icon {
+    font-size: 18px;
+}
+
+.disabled-text {
+    font-size: 13px;
+}
+
+/* Loading state */
+.recommendation-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    gap: 16px;
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border, #2a2a4a);
+    border-top-color: var(--accent, #4a6cf7);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.recommendation-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    gap: 12px;
+    color: var(--text-secondary, #a0a0b0);
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 48px;
+}
+
+.empty-text {
+    font-size: 14px;
+    max-width: 300px;
+}
+
+/* Error state */
+.recommendation-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    gap: 12px;
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.error-icon {
+    font-size: 48px;
+}
+
+.error-text {
+    font-size: 14px;
+    color: #ff6b6b;
+}
+
+.btn-retry {
+    padding: 8px 16px;
+    background: var(--accent, #4a6cf7);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-retry:hover {
+    background: color-mix(in srgb, var(--accent, #4a6cf7), #000 15%);
+}
+
+/* Actions bar */
+.recommendation-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--primary-bg, #16162a);
+    border-top: 1px solid var(--border, #2a2a4a);
+}
+
+.action-button {
+    padding: 8px 16px;
+    border: 1px solid var(--border, #2a2a4a);
+    background: transparent;
+    color: var(--text-primary, #fff);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.action-button:hover {
+    background: var(--border, #2a2a4a);
+}
+
+.action-button.primary {
+    background: var(--accent, #4a6cf7);
+    border-color: var(--accent, #4a6cf7);
+}
+
+.action-button.primary:hover {
+    background: color-mix(in srgb, var(--accent, #4a6cf7), #000 15%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .recommendation-panel {
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+        top: 0;
+        left: 0;
+        transform: none;
+    }
+
+    .recommendation-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+    }
+
+    .recommendation-modes {
+        flex-wrap: wrap;
+    }
+}
+
+/* High contrast theme support */
+@media (prefers-contrast: high) {
+    .recommendation-card {
+        border-width: 2px;
+    }
+
+    .recommendation-card:focus {
+        outline-width: 3px;
+    }
+}
+
+/* =============================================================================
+   Tab Navigation
+   ============================================================================= */
+
+.recommendation-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 20px;
+    background: var(--primary-bg, #16162a);
+    border-bottom: 1px solid var(--border, #2a2a4a);
+}
+
+.tab-button {
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary, #a0a0b0);
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary, #fff);
+}
+
+.tab-button.active {
+    background: var(--secondary-bg, #1a1a2e);
+    color: var(--text-primary, #fff);
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent, #4a6cf7);
+}
+
+.tab-icon {
+    margin-right: 6px;
+}
+
+/* =============================================================================
+   What's Next Widget Styles
+   ============================================================================= */
+
+.whatsnext-tab-content {
+    padding: 20px;
+}
+
+.whatsnext-header {
+    margin-bottom: 16px;
+}
+
+.whatsnext-source {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.whatsnext-source-label {
+    color: var(--text-secondary, #a0a0b0);
+    font-size: 13px;
+}
+
+.whatsnext-source-title {
+    color: var(--accent, #4a6cf7);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.whatsnext-source-transitions {
+    color: var(--text-secondary, #a0a0b0);
+    font-size: 12px;
+}
+
+.whatsnext-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.whatsnext-card {
+    background: var(--primary-bg, #16162a);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border, #2a2a4a);
+}
+
+.whatsnext-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: var(--accent, #4a6cf7);
+}
+
+.whatsnext-card:focus {
+    outline: 2px solid var(--accent, #4a6cf7);
+    outline-offset: 2px;
+}
+
+.whatsnext-poster {
+    position: relative;
+    aspect-ratio: 2/3;
+    background: var(--border, #2a2a4a);
+}
+
+.whatsnext-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.whatsnext-poster-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    background: linear-gradient(135deg, var(--border, #2a2a4a), var(--primary-bg, #16162a));
+}
+
+.whatsnext-probability {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+}
+
+.probability-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent, #4a6cf7);
+}
+
+.probability-label {
+    font-size: 10px;
+    color: var(--text-secondary, #a0a0b0);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.whatsnext-info {
+    padding: 12px;
+}
+
+.whatsnext-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.whatsnext-parent {
+    font-size: 12px;
+    color: var(--text-secondary, #a0a0b0);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.whatsnext-metadata {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.whatsnext-year,
+.whatsnext-count {
+    background: var(--border, #2a2a4a);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.whatsnext-count {
+    background: rgba(74, 108, 247, 0.15);
+    color: var(--accent, #4a6cf7);
+}
+
+.whatsnext-reason {
+    font-size: 11px;
+    color: var(--text-secondary, #a0a0b0);
+    margin: 8px 0 0;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.whatsnext-meta {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0 0;
+    margin-top: 16px;
+    border-top: 1px solid var(--border, #2a2a4a);
+    font-size: 12px;
+}
+
+.whatsnext-loading,
+.whatsnext-empty,
+.whatsnext-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    gap: 12px;
+    color: var(--text-secondary, #a0a0b0);
+    text-align: center;
+    grid-column: 1 / -1;
+}
+
+/* =============================================================================
+   Algorithms Panel Styles
+   ============================================================================= */
+
+.algorithms-tab-content {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.algorithms-panel {
+    max-width: 800px;
+}
+
+.algorithms-intro {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: rgba(74, 108, 247, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent, #4a6cf7);
+}
+
+.algorithms-intro p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-primary, #fff);
+    line-height: 1.5;
+}
+
+.algorithm-category {
+    margin-bottom: 24px;
+}
+
+.category-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary, #a0a0b0);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border, #2a2a4a);
+}
+
+.algorithm-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.algorithm-card {
+    background: var(--primary-bg, #16162a);
+    border: 1px solid var(--border, #2a2a4a);
+    border-radius: 8px;
+    padding: 14px;
+    cursor: help;
+    transition: all 0.2s;
+}
+
+.algorithm-card:hover {
+    border-color: var(--accent, #4a6cf7);
+    background: rgba(74, 108, 247, 0.05);
+}
+
+.algorithm-card.disabled {
+    opacity: 0.6;
+}
+
+.algorithm-card.enabled {
+    border-left: 3px solid var(--success, #22c55e);
+}
+
+.algorithm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.algorithm-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+}
+
+.algorithm-status {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-enabled {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--success, #22c55e);
+}
+
+.status-disabled {
+    background: rgba(160, 160, 176, 0.2);
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.algorithm-description {
+    font-size: 12px;
+    color: var(--text-secondary, #a0a0b0);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.algorithm-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.algorithm-badge.lightweight {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+/* Algorithm Tooltip */
+.algorithm-tooltip {
+    position: fixed;
+    z-index: calc(var(--z-modal, 1000) + 10);
+    background: var(--primary-bg, #16162a);
+    border: 1px solid var(--border, #2a2a4a);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-primary, #fff);
+    line-height: 1.5;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    animation: tooltipFadeIn 0.15s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================================================
+   Tab Content Containers
+   ============================================================================= */
+
+.recommendations-tab-content {
+    /* Uses existing .recommendation-content styles */
+}
+
+/* Ensure only active tab is visible */
+.whatsnext-tab-content,
+.algorithms-tab-content {
+    display: none;
+}
+
+/* =============================================================================
+   Responsive Adjustments
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .recommendation-tabs {
+        overflow-x: auto;
+        padding: 8px 12px;
+    }
+
+    .tab-button {
+        padding: 8px 12px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .whatsnext-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .algorithm-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =============================================================================
+   Light Theme Adjustments
+   ============================================================================= */
+
+.light-theme .algorithm-tooltip {
+    background: #fff;
+    border-color: #e5e7eb;
+    color: #1f2937;
+}
+
+.light-theme .algorithms-intro {
+    background: rgba(74, 108, 247, 0.08);
+}
+
+.light-theme .algorithm-card {
+    background: #fff;
+    border-color: #e5e7eb;
+}
+
+.light-theme .algorithm-card:hover {
+    background: rgba(74, 108, 247, 0.04);
+}
+
+.light-theme .whatsnext-card {
+    background: #fff;
+    border-color: #e5e7eb;
+}

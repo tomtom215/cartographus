@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+<Container version="2">
+    <Name>cartographus</Name>
+    <Repository>ghcr.io/tomtom215/cartographus:latest</Repository>
+    <Registry>https://github.com/tomtom215/cartographus/pkgs/container/cartographus</Registry>
+    <Network>bridge</Network>
+    <Privileged>false</Privileged>
+    <Support>https://github.com/tomtom215/cartographus/issues</Support>
+    <Project>https://github.com/tomtom215/cartographus</Project>
+    <Overview>Cartographus is a self-hosted media server analytics platform that visualizes playback activity on interactive maps. Features include: WebGL-powered interactive maps with clustering (10,000+ locations), 3D globe visualization with deck.gl, 47+ analytics charts across 6 themed dashboards, multi-server support (Plex, Jellyfin, Emby, Tautulli), real-time WebSocket updates, security detection (impossible travel, concurrent streams), OIDC/Zero Trust authentication, automated newsletters, and recommendation engine.</Overview>
+    <Category>MediaServer:Other Tools:</Category>
+    <WebUI>http://[IP]:[PORT:3857]</WebUI>
+    <Icon>https://raw.githubusercontent.com/tomtom215/cartographus/main/web/public/favicon.svg</Icon>
+    <ExtraParams>--restart unless-stopped</ExtraParams>
+    <PostArgs/>
+    <DonateText/>
+    <DonateLink/>
+    <Requires>Requires at least one media server (Plex, Jellyfin, or Emby) and/or Tautulli for enhanced Plex analytics.</Requires>
+
+    <!-- ========================================== -->
+    <!-- PORT CONFIGURATION                         -->
+    <!-- ========================================== -->
+    <Config Name="WebUI Port" Target="3857" Default="3857" Mode="tcp" Description="Web interface port (EPSG:3857 - Web Mercator projection)" Type="Port" Display="always" Required="true" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- STORAGE CONFIGURATION                      -->
+    <!-- ========================================== -->
+    <Config Name="Data Storage" Target="/data" Default="/mnt/user/appdata/cartographus" Mode="rw" Description="Database and application data storage (DuckDB, models, NATS)" Type="Path" Display="always" Required="true" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- AUTHENTICATION - BASIC SETTINGS            -->
+    <!-- ========================================== -->
+    <Config Name="Auth Mode" Target="AUTH_MODE" Default="jwt" Mode="" Description="Authentication mode: none (dev only), basic, jwt, oidc, plex, or multi (multiple methods)" Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="JWT Secret" Target="JWT_SECRET" Default="" Mode="" Description="Secret key for JWT signing (min 32 chars). Generate with: openssl rand -base64 32" Type="Variable" Display="always" Required="true" Mask="true"/>
+    <Config Name="Admin Username" Target="ADMIN_USERNAME" Default="admin" Mode="" Description="Admin account username for basic/jwt auth" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Admin Password" Target="ADMIN_PASSWORD" Default="" Mode="" Description="Admin account password (NIST compliant: min 12 chars recommended)" Type="Variable" Display="always" Required="true" Mask="true"/>
+    <Config Name="Session Timeout" Target="SESSION_TIMEOUT" Default="24h" Mode="" Description="Session expiration duration (e.g., 1h, 24h, 7d)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Basic Auth Default Role" Target="BASIC_AUTH_DEFAULT_ROLE" Default="viewer" Mode="" Description="Default role for basic auth users: viewer, editor, admin" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- OIDC AUTHENTICATION (Zero Trust)           -->
+    <!-- Set AUTH_MODE=oidc or multi to use         -->
+    <!-- ========================================== -->
+    <Config Name="OIDC Issuer URL" Target="OIDC_ISSUER_URL" Default="" Mode="" Description="OIDC provider issuer URL (e.g., https://auth.example.com/realms/main)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Client ID" Target="OIDC_CLIENT_ID" Default="" Mode="" Description="OAuth 2.0 client ID from your OIDC provider" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Client Secret" Target="OIDC_CLIENT_SECRET" Default="" Mode="" Description="OAuth 2.0 client secret (optional for public clients with PKCE)" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+    <Config Name="OIDC Redirect URL" Target="OIDC_REDIRECT_URL" Default="" Mode="" Description="OAuth callback URL (e.g., http://[IP]:3857/api/v1/auth/oidc/callback)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Scopes" Target="OIDC_SCOPES" Default="openid,profile,email" Mode="" Description="Comma-separated OAuth scopes to request" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC PKCE Enabled" Target="OIDC_PKCE_ENABLED" Default="true" Mode="" Description="Enable PKCE for enhanced security (recommended)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Session Max Age" Target="OIDC_SESSION_MAX_AGE" Default="24h" Mode="" Description="OIDC session maximum age (e.g., 24h, 7d)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Session Secret" Target="OIDC_SESSION_SECRET" Default="" Mode="" Description="Secret for session encryption (auto-generated if empty)" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+    <Config Name="OIDC Cookie Secure" Target="OIDC_COOKIE_SECURE" Default="true" Mode="" Description="Use secure cookies (disable for HTTP-only setups)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Roles Claim" Target="OIDC_ROLES_CLAIM" Default="roles" Mode="" Description="JWT claim containing user roles" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Default Roles" Target="OIDC_DEFAULT_ROLES" Default="viewer" Mode="" Description="Comma-separated default roles for new OIDC users" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="OIDC Post Logout URI" Target="OIDC_POST_LOGOUT_REDIRECT_URI" Default="" Mode="" Description="URI to redirect after OIDC logout" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- PLEX AUTHENTICATION                        -->
+    <!-- Set AUTH_MODE=plex or multi to use         -->
+    <!-- ========================================== -->
+    <Config Name="Plex Auth Client ID" Target="PLEX_AUTH_CLIENT_ID" Default="" Mode="" Description="Plex app client ID for OAuth authentication" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Auth Client Secret" Target="PLEX_AUTH_CLIENT_SECRET" Default="" Mode="" Description="Plex app client secret (optional)" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+    <Config Name="Plex Auth Redirect URI" Target="PLEX_AUTH_REDIRECT_URI" Default="" Mode="" Description="Plex OAuth callback URL" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Auth Default Roles" Target="PLEX_AUTH_DEFAULT_ROLES" Default="viewer" Mode="" Description="Comma-separated default roles for Plex users" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Auth Plex Pass Role" Target="PLEX_AUTH_PLEX_PASS_ROLE" Default="" Mode="" Description="Additional role for Plex Pass subscribers" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Server Owner Role" Target="PLEX_AUTH_SERVER_OWNER_ROLE" Default="admin" Mode="" Description="Role assigned to Plex server owners" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Server Admin Role" Target="PLEX_AUTH_SERVER_ADMIN_ROLE" Default="editor" Mode="" Description="Role assigned to Plex server admins" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Server Detection" Target="PLEX_AUTH_ENABLE_SERVER_DETECTION" Default="true" Mode="" Description="Auto-detect Plex server ownership for role assignment" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Server Machine ID" Target="PLEX_AUTH_SERVER_MACHINE_ID" Default="" Mode="" Description="Limit detection to specific Plex server (machine identifier)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- CASBIN RBAC AUTHORIZATION                  -->
+    <!-- ========================================== -->
+    <Config Name="Casbin Default Role" Target="CASBIN_DEFAULT_ROLE" Default="viewer" Mode="" Description="Default role for users without explicit role assignment" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Casbin Cache Enabled" Target="CASBIN_CACHE_ENABLED" Default="true" Mode="" Description="Enable authorization decision caching" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Casbin Cache TTL" Target="CASBIN_CACHE_TTL" Default="5m" Mode="" Description="Authorization cache TTL" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- SESSION STORE CONFIGURATION                -->
+    <!-- ========================================== -->
+    <Config Name="Session Store" Target="SESSION_STORE" Default="memory" Mode="" Description="Session storage backend: memory (default) or badger (persistent)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Session Store Path" Target="SESSION_STORE_PATH" Default="/data/sessions" Mode="" Description="Path for BadgerDB session storage (when session_store=badger)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- TAUTULLI INTEGRATION                       -->
+    <!-- ========================================== -->
+    <Config Name="Tautulli Enabled" Target="TAUTULLI_ENABLED" Default="false" Mode="" Description="Enable Tautulli integration for enhanced Plex analytics" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Tautulli URL" Target="TAUTULLI_URL" Default="" Mode="" Description="Tautulli server URL (e.g., http://192.168.1.100:8181)" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Tautulli API Key" Target="TAUTULLI_API_KEY" Default="" Mode="" Description="Tautulli API key (Settings > Web Interface > API Key)" Type="Variable" Display="always" Required="false" Mask="true"/>
+    <Config Name="Tautulli Server ID" Target="TAUTULLI_SERVER_ID" Default="" Mode="" Description="Unique identifier for multi-server deduplication" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- PLEX DIRECT INTEGRATION                    -->
+    <!-- ========================================== -->
+    <Config Name="Plex Enabled" Target="PLEX_ENABLED" Default="false" Mode="" Description="Enable direct Plex server integration" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Plex URL" Target="PLEX_URL" Default="" Mode="" Description="Plex server URL (e.g., http://192.168.1.100:32400)" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Plex Token" Target="PLEX_TOKEN" Default="" Mode="" Description="Plex authentication token (X-Plex-Token)" Type="Variable" Display="always" Required="false" Mask="true"/>
+    <Config Name="Plex Server ID" Target="PLEX_SERVER_ID" Default="" Mode="" Description="Unique identifier for multi-server deduplication" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Historical Sync" Target="PLEX_HISTORICAL_SYNC" Default="false" Mode="" Description="One-time backfill of all Plex history" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Sync Days Back" Target="PLEX_SYNC_DAYS_BACK" Default="365" Mode="" Description="How far back to sync history (days)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Sync Interval" Target="PLEX_SYNC_INTERVAL" Default="24h" Mode="" Description="How often to check for missed events" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Realtime Enabled" Target="PLEX_REALTIME_ENABLED" Default="false" Mode="" Description="Enable WebSocket for real-time Plex updates" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Webhooks Enabled" Target="PLEX_WEBHOOKS_ENABLED" Default="false" Mode="" Description="Enable Plex webhook receiver endpoint" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Webhook Secret" Target="PLEX_WEBHOOK_SECRET" Default="" Mode="" Description="HMAC-SHA256 secret for webhook signature verification" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+    <Config Name="Plex Transcode Monitoring" Target="PLEX_TRANSCODE_MONITORING" Default="false" Mode="" Description="Enable active transcode session monitoring" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Transcode Interval" Target="PLEX_TRANSCODE_MONITORING_INTERVAL" Default="10s" Mode="" Description="Transcode monitoring poll interval" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Buffer Health Monitoring" Target="PLEX_BUFFER_HEALTH_MONITORING" Default="false" Mode="" Description="Enable predictive buffer health monitoring" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Buffer Health Interval" Target="BUFFER_HEALTH_POLL_INTERVAL" Default="5s" Mode="" Description="Buffer health poll interval" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Buffer Critical Threshold" Target="BUFFER_HEALTH_CRITICAL_THRESHOLD" Default="20" Mode="" Description="Critical buffer threshold percentage" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex Buffer Risky Threshold" Target="BUFFER_HEALTH_RISKY_THRESHOLD" Default="50" Mode="" Description="Risky buffer threshold percentage" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex OAuth Client ID" Target="PLEX_OAUTH_CLIENT_ID" Default="" Mode="" Description="Plex OAuth 2.0 client ID (for data sync authentication)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Plex OAuth Redirect URI" Target="PLEX_OAUTH_REDIRECT_URI" Default="" Mode="" Description="Plex OAuth callback URL for sync authentication" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- JELLYFIN INTEGRATION                       -->
+    <!-- ========================================== -->
+    <Config Name="Jellyfin Enabled" Target="JELLYFIN_ENABLED" Default="false" Mode="" Description="Enable Jellyfin server integration" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Jellyfin URL" Target="JELLYFIN_URL" Default="" Mode="" Description="Jellyfin server URL (e.g., http://192.168.1.100:8096)" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Jellyfin API Key" Target="JELLYFIN_API_KEY" Default="" Mode="" Description="Jellyfin API key (Dashboard > API Keys)" Type="Variable" Display="always" Required="false" Mask="true"/>
+    <Config Name="Jellyfin Server ID" Target="JELLYFIN_SERVER_ID" Default="" Mode="" Description="Unique identifier for multi-server deduplication" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Jellyfin User ID" Target="JELLYFIN_USER_ID" Default="" Mode="" Description="User ID for user-scoped API keys (optional)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Jellyfin Realtime Enabled" Target="JELLYFIN_REALTIME_ENABLED" Default="false" Mode="" Description="Enable WebSocket for real-time Jellyfin updates" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Jellyfin Session Polling" Target="JELLYFIN_SESSION_POLLING_ENABLED" Default="false" Mode="" Description="Enable session polling as backup to WebSocket" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Jellyfin Polling Interval" Target="JELLYFIN_SESSION_POLLING_INTERVAL" Default="30s" Mode="" Description="Session polling interval" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Jellyfin Webhooks Enabled" Target="JELLYFIN_WEBHOOKS_ENABLED" Default="false" Mode="" Description="Enable webhook receiver (requires jellyfin-plugin-webhook)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Jellyfin Webhook Secret" Target="JELLYFIN_WEBHOOK_SECRET" Default="" Mode="" Description="Secret for webhook signature verification" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+
+    <!-- ========================================== -->
+    <!-- EMBY INTEGRATION                           -->
+    <!-- ========================================== -->
+    <Config Name="Emby Enabled" Target="EMBY_ENABLED" Default="false" Mode="" Description="Enable Emby server integration" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Emby URL" Target="EMBY_URL" Default="" Mode="" Description="Emby server URL (e.g., http://192.168.1.100:8096)" Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Emby API Key" Target="EMBY_API_KEY" Default="" Mode="" Description="Emby API key (Settings > API Keys)" Type="Variable" Display="always" Required="false" Mask="true"/>
+    <Config Name="Emby Server ID" Target="EMBY_SERVER_ID" Default="" Mode="" Description="Unique identifier for multi-server deduplication" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Emby User ID" Target="EMBY_USER_ID" Default="" Mode="" Description="User ID for user-scoped API keys (optional)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Emby Realtime Enabled" Target="EMBY_REALTIME_ENABLED" Default="false" Mode="" Description="Enable WebSocket for real-time Emby updates" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Emby Session Polling" Target="EMBY_SESSION_POLLING_ENABLED" Default="false" Mode="" Description="Enable session polling as backup to WebSocket" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Emby Polling Interval" Target="EMBY_SESSION_POLLING_INTERVAL" Default="30s" Mode="" Description="Session polling interval" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Emby Webhooks Enabled" Target="EMBY_WEBHOOKS_ENABLED" Default="false" Mode="" Description="Enable webhook receiver endpoint" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Emby Webhook Secret" Target="EMBY_WEBHOOK_SECRET" Default="" Mode="" Description="Secret for webhook signature verification" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+
+    <!-- ========================================== -->
+    <!-- TAUTULLI DATABASE IMPORT                   -->
+    <!-- ========================================== -->
+    <Config Name="Import Enabled" Target="IMPORT_ENABLED" Default="false" Mode="" Description="Enable direct Tautulli database import" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Import DB Path" Target="IMPORT_DB_PATH" Default="" Mode="" Description="Path to Tautulli SQLite database file (tautulli.db)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Import Batch Size" Target="IMPORT_BATCH_SIZE" Default="1000" Mode="" Description="Records per batch during import" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Import Dry Run" Target="IMPORT_DRY_RUN" Default="false" Mode="" Description="Validate import without writing to database" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Import Auto Start" Target="IMPORT_AUTO_START" Default="false" Mode="" Description="Start import automatically on startup" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- GEOLOCATION CONFIGURATION                  -->
+    <!-- ========================================== -->
+    <Config Name="GeoIP Provider" Target="GEOIP_PROVIDER" Default="" Mode="" Description="Preferred GeoIP provider: maxmind, ipapi, or empty for auto-detect" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="MaxMind Account ID" Target="MAXMIND_ACCOUNT_ID" Default="" Mode="" Description="MaxMind GeoLite2 account ID (same as Tautulli uses)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="MaxMind License Key" Target="MAXMIND_LICENSE_KEY" Default="" Mode="" Description="MaxMind GeoLite2 license key" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+
+    <!-- ========================================== -->
+    <!-- VPN DETECTION                              -->
+    <!-- ========================================== -->
+    <Config Name="VPN Detection Enabled" Target="VPN_ENABLED" Default="true" Mode="" Description="Enable VPN connection detection for accurate geolocation" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="VPN Data File" Target="VPN_DATA_FILE" Default="" Mode="" Description="Path to custom gluetun servers.json file" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="VPN Cache Size" Target="VPN_CACHE_SIZE" Default="10000" Mode="" Description="Maximum VPN lookup cache entries" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- DETECTION ENGINE (Security)                -->
+    <!-- ========================================== -->
+    <Config Name="Detection Enabled" Target="DETECTION_ENABLED" Default="true" Mode="" Description="Enable security detection engine (impossible travel, concurrent streams)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Trust Score Decrement" Target="DETECTION_TRUST_SCORE_DECREMENT" Default="10" Mode="" Description="Points to deduct per security violation" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Trust Score Recovery" Target="DETECTION_TRUST_SCORE_RECOVERY" Default="1" Mode="" Description="Daily trust score recovery points" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Trust Score Threshold" Target="DETECTION_TRUST_SCORE_THRESHOLD" Default="50" Mode="" Description="Auto-restrict users below this score" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- DISCORD NOTIFICATIONS                      -->
+    <!-- ========================================== -->
+    <Config Name="Discord Webhook Enabled" Target="DISCORD_WEBHOOK_ENABLED" Default="false" Mode="" Description="Enable Discord notifications for security alerts" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Discord Webhook URL" Target="DISCORD_WEBHOOK_URL" Default="" Mode="" Description="Discord webhook URL for notifications" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+    <Config Name="Discord Rate Limit" Target="DISCORD_RATE_LIMIT_MS" Default="1000" Mode="" Description="Minimum milliseconds between Discord messages" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- GENERIC WEBHOOK NOTIFICATIONS              -->
+    <!-- ========================================== -->
+    <Config Name="Webhook Enabled" Target="WEBHOOK_ENABLED" Default="false" Mode="" Description="Enable generic webhook notifications" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Webhook URL" Target="WEBHOOK_URL" Default="" Mode="" Description="Webhook endpoint URL for notifications" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Webhook Rate Limit" Target="WEBHOOK_RATE_LIMIT_MS" Default="500" Mode="" Description="Minimum milliseconds between webhook calls" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Webhook Headers" Target="WEBHOOK_HEADERS" Default="" Mode="" Description="Comma-separated key=value headers (e.g., Authorization=Bearer xyz)" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+
+    <!-- ========================================== -->
+    <!-- NEWSLETTER SCHEDULER                       -->
+    <!-- ========================================== -->
+    <Config Name="Newsletter Enabled" Target="NEWSLETTER_ENABLED" Default="false" Mode="" Description="Enable automated newsletter scheduler" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Newsletter Check Interval" Target="NEWSLETTER_CHECK_INTERVAL" Default="1m" Mode="" Description="How often to check for due newsletters" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Newsletter Max Concurrent" Target="NEWSLETTER_MAX_CONCURRENT" Default="5" Mode="" Description="Maximum concurrent newsletter deliveries" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Newsletter Execution Timeout" Target="NEWSLETTER_EXECUTION_TIMEOUT" Default="5m" Mode="" Description="Maximum time for single newsletter execution" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- RECOMMENDATION ENGINE                      -->
+    <!-- ========================================== -->
+    <Config Name="Recommendations Enabled" Target="RECOMMEND_ENABLED" Default="false" Mode="" Description="Enable recommendation engine (requires 4+ cores, 8GB+ RAM)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Train Interval" Target="RECOMMEND_TRAIN_INTERVAL" Default="24h" Mode="" Description="Model retraining interval" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Train On Startup" Target="RECOMMEND_TRAIN_ON_STARTUP" Default="false" Mode="" Description="Train models on application startup" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Min Interactions" Target="RECOMMEND_MIN_INTERACTIONS" Default="100" Mode="" Description="Minimum interactions before training" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Model Path" Target="RECOMMEND_MODEL_PATH" Default="/data/recommend" Mode="" Description="Directory for trained models" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Algorithms" Target="RECOMMEND_ALGORITHMS" Default="covisit,content" Mode="" Description="Comma-separated algorithms: covisit,content,popularity,ease,als,usercf,itemcf,fpmc,linucb" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Cache TTL" Target="RECOMMEND_CACHE_TTL" Default="5m" Mode="" Description="Recommendation cache TTL" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Max Candidates" Target="RECOMMEND_MAX_CANDIDATES" Default="1000" Mode="" Description="Maximum candidates to score per request" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Recommend Diversity Lambda" Target="RECOMMEND_DIVERSITY_LAMBDA" Default="0.7" Mode="" Description="Relevance vs diversity tradeoff (0-1, 1=pure relevance)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- NATS EVENT PROCESSING                      -->
+    <!-- ========================================== -->
+    <Config Name="NATS Enabled" Target="NATS_ENABLED" Default="true" Mode="" Description="Enable NATS JetStream event processing" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Event Sourcing" Target="NATS_EVENT_SOURCING" Default="true" Mode="" Description="Enable full event sourcing mode (NATS as single source of truth)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS URL" Target="NATS_URL" Default="nats://127.0.0.1:4222" Mode="" Description="NATS server connection URL" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Embedded" Target="NATS_EMBEDDED" Default="true" Mode="" Description="Use embedded NATS server (disable for external cluster)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Store Dir" Target="NATS_STORE_DIR" Default="/data/nats/jetstream" Mode="" Description="JetStream storage directory" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Max Memory" Target="NATS_MAX_MEMORY" Default="1073741824" Mode="" Description="Maximum memory for JetStream (bytes, default 1GB)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Max Store" Target="NATS_MAX_STORE" Default="10737418240" Mode="" Description="Maximum disk storage for JetStream (bytes, default 10GB)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Retention Days" Target="NATS_RETENTION_DAYS" Default="7" Mode="" Description="Event retention period in days" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Batch Size" Target="NATS_BATCH_SIZE" Default="1000" Mode="" Description="Batch size for DuckDB writes" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Flush Interval" Target="NATS_FLUSH_INTERVAL" Default="5s" Mode="" Description="Maximum time between DuckDB flushes" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="NATS Subscribers" Target="NATS_SUBSCRIBERS" Default="4" Mode="" Description="Number of concurrent message processors" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- DATABASE CONFIGURATION                     -->
+    <!-- ========================================== -->
+    <Config Name="DuckDB Path" Target="DUCKDB_PATH" Default="/data/cartographus.duckdb" Mode="" Description="Path to DuckDB database file" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="DuckDB Max Memory" Target="DUCKDB_MAX_MEMORY" Default="2GB" Mode="" Description="Maximum memory for DuckDB (e.g., 2GB, 4GB)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="DuckDB Threads" Target="DUCKDB_THREADS" Default="0" Mode="" Description="Number of DuckDB threads (0 = auto-detect)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- SYNC CONFIGURATION                         -->
+    <!-- ========================================== -->
+    <Config Name="Sync Interval" Target="SYNC_INTERVAL" Default="5m" Mode="" Description="Data synchronization interval" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Sync Lookback" Target="SYNC_LOOKBACK" Default="24h" Mode="" Description="How far back to look for new data" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Sync Batch Size" Target="SYNC_BATCH_SIZE" Default="1000" Mode="" Description="Records per sync batch" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Sync Retry Attempts" Target="SYNC_RETRY_ATTEMPTS" Default="5" Mode="" Description="Number of retry attempts on failure" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- SERVER CONFIGURATION                       -->
+    <!-- ========================================== -->
+    <Config Name="Server Latitude" Target="SERVER_LATITUDE" Default="0.0" Mode="" Description="Server physical location latitude (for visualization)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Server Longitude" Target="SERVER_LONGITUDE" Default="0.0" Mode="" Description="Server physical location longitude (for visualization)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Environment" Target="ENVIRONMENT" Default="production" Mode="" Description="Environment mode: development, staging, production" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="HTTP Timeout" Target="HTTP_TIMEOUT" Default="30s" Mode="" Description="HTTP request timeout" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- API CONFIGURATION                          -->
+    <!-- ========================================== -->
+    <Config Name="Default Page Size" Target="API_DEFAULT_PAGE_SIZE" Default="20" Mode="" Description="Default pagination size" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Max Page Size" Target="API_MAX_PAGE_SIZE" Default="100" Mode="" Description="Maximum pagination size" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- RATE LIMITING                              -->
+    <!-- ========================================== -->
+    <Config Name="Rate Limit Requests" Target="RATE_LIMIT_REQUESTS" Default="100" Mode="" Description="Maximum requests per window" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Rate Limit Window" Target="RATE_LIMIT_WINDOW" Default="1m" Mode="" Description="Rate limit time window" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Disable Rate Limit" Target="DISABLE_RATE_LIMIT" Default="false" Mode="" Description="Disable rate limiting (not recommended)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- CORS CONFIGURATION                         -->
+    <!-- ========================================== -->
+    <Config Name="CORS Origins" Target="CORS_ORIGINS" Default="*" Mode="" Description="Comma-separated allowed CORS origins (use * for all)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Trusted Proxies" Target="TRUSTED_PROXIES" Default="" Mode="" Description="Comma-separated trusted proxy IPs for X-Forwarded-For" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- LOGGING CONFIGURATION                      -->
+    <!-- ========================================== -->
+    <Config Name="Log Level" Target="LOG_LEVEL" Default="info" Mode="" Description="Logging level: trace, debug, info, warn, error" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Log Format" Target="LOG_FORMAT" Default="json" Mode="" Description="Log format: json (production) or console (development)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Log Caller" Target="LOG_CALLER" Default="false" Mode="" Description="Include caller file:line in logs (slight performance overhead)" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- ========================================== -->
+    <!-- USER/GROUP IDS                             -->
+    <!-- ========================================== -->
+    <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID for file permissions" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID for file permissions" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+</Container>

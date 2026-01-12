@@ -1,0 +1,199 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Custom Date Comparison Styles
+ * Styles for the custom date range comparison feature
+ */
+
+/* Container */
+.custom-date-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--secondary-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border);
+}
+
+.custom-date-container.hidden {
+  display: none;
+}
+
+/* Row layout */
+.custom-date-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+/* Date field */
+.custom-date-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 130px;
+}
+
+.custom-date-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+/* Date input */
+.custom-date-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  background: var(--primary-bg);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-date-input:focus {
+  outline: none;
+  border-color: var(--highlight);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+
+.custom-date-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.custom-date-input.input-error {
+  border-color: var(--color-error);
+}
+
+.custom-date-input.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* Date picker icon color fix for dark mode */
+.custom-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+
+/* Separator */
+.custom-date-separator {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+  align-self: flex-end;
+}
+
+/* Apply button */
+.custom-date-apply {
+  padding: 0.5rem 1rem;
+  background: var(--highlight);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.custom-date-apply:hover:not(:disabled) {
+  background: var(--highlight-hover, #6d28d9);
+  transform: translateY(-1px);
+}
+
+.custom-date-apply:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.custom-date-apply:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.custom-date-apply.success {
+  background: var(--color-success);
+}
+
+/* Error message */
+.custom-date-error {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--border-radius);
+  color: var(--color-error);
+  font-size: 0.75rem;
+}
+
+.custom-date-error.hidden {
+  display: none;
+}
+
+/* Hint text */
+.custom-date-hint {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .custom-date-input::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+[data-theme="light"] .custom-date-container {
+  background: var(--secondary-bg);
+}
+
+/* High contrast theme adjustments */
+[data-theme="high-contrast"] .custom-date-container {
+  border-width: 2px;
+}
+
+[data-theme="high-contrast"] .custom-date-input {
+  border-width: 2px;
+}
+
+[data-theme="high-contrast"] .custom-date-apply {
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .custom-date-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .custom-date-field {
+    min-width: 100%;
+  }
+
+  .custom-date-separator {
+    display: none;
+  }
+
+  .custom-date-apply {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .custom-date-apply {
+    transition: none;
+  }
+
+  .custom-date-input {
+    transition: none;
+  }
+}

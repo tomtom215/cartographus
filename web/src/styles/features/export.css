@@ -1,0 +1,614 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Export Manager Styles
+ *
+ * Styles for Tautulli export functionality including:
+ * - Export list view with table
+ * - Create export form
+ * - Field selection
+ * - Progress indicators
+ */
+
+/* Container */
+.export-manager {
+    padding: var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+/* Header */
+.export-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.export-header h3 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    color: var(--color-text-primary);
+}
+
+.export-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Buttons */
+.btn-create-export {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-create-export:hover {
+    background: var(--color-primary-hover);
+}
+
+.btn-back {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-back:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+
+/* Summary */
+.export-summary {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+/* Table Container */
+.export-table-container {
+    overflow-x: auto;
+}
+
+/* Export Table */
+.export-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.export-table th,
+.export-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.export-table th {
+    background: var(--color-bg-tertiary);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.export-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.export-table th.sortable:hover {
+    background: var(--color-bg-hover);
+}
+
+.export-table th.sortable.active {
+    color: var(--color-primary);
+}
+
+.export-table th .sort-arrow {
+    margin-left: var(--spacing-xs);
+    font-size: var(--font-size-xxs);
+}
+
+.export-table tbody tr:hover {
+    background: var(--color-bg-hover);
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xxs);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-badge.complete {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.status-badge.pending {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.status-badge.failed {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+/* Action buttons in table */
+.export-row-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.btn-download,
+.btn-delete {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-download:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.btn-delete:hover {
+    background: var(--color-danger);
+    border-color: var(--color-danger);
+    color: var(--color-text-inverse);
+}
+
+.btn-download:disabled,
+.btn-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Create Export Form */
+.export-create-view {
+    max-width: 600px;
+}
+
+.export-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.form-group label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.form-group select,
+.form-group input {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-alpha);
+}
+
+.form-group .hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+}
+
+/* Field Selection */
+.field-selection {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    background: var(--color-bg-tertiary);
+}
+
+.field-selection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.field-selection-header span {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.btn-select-all {
+    padding: var(--spacing-xxs) var(--spacing-sm);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+}
+
+.btn-select-all:hover {
+    background: var(--color-bg-hover);
+}
+
+.field-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.field-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.field-item:hover {
+    background: var(--color-bg-hover);
+}
+
+.field-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.field-item label {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.field-item .field-type {
+    font-size: var(--font-size-xxs);
+    color: var(--color-text-muted);
+    padding: 1px 4px;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-xs);
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.btn-submit {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-submit:hover {
+    background: var(--color-primary-hover);
+}
+
+.btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-cancel {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-cancel:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+
+/* Loading State */
+.export-manager .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xxl);
+    color: var(--color-text-muted);
+}
+
+.export-manager .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.export-manager .empty-state {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--color-text-muted);
+}
+
+.export-manager .empty-state p {
+    margin: 0 0 var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+/* Error State */
+.export-manager .error-state {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--color-danger);
+}
+
+.export-manager .error-state p {
+    margin: 0 0 var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+.btn-retry {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-retry:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-primary);
+}
+
+/* Pagination */
+.export-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.page-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.page-btn:hover:not([disabled]) {
+    background: var(--color-bg-hover);
+    border-color: var(--color-primary);
+}
+
+.page-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+/* Delete Confirmation Modal */
+.delete-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal, 10000);
+}
+
+.delete-confirm-dialog {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    max-width: 400px;
+    width: 90%;
+}
+
+.delete-confirm-dialog h4 {
+    margin: 0 0 var(--spacing-md);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+}
+
+.delete-confirm-dialog p {
+    margin: 0 0 var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.delete-confirm-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
+
+.btn-confirm-delete {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-danger);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-confirm-delete:hover {
+    background: var(--color-danger-hover);
+}
+
+.btn-cancel-delete {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-cancel-delete:hover {
+    background: var(--color-bg-hover);
+}
+
+/* Dark theme */
+[data-theme="dark"] .export-table th {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .field-selection {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .delete-confirm-dialog {
+    background: var(--color-bg-secondary);
+}
+
+/* High contrast */
+[data-theme="high-contrast"] .export-table th,
+[data-theme="high-contrast"] .export-table td {
+    border-width: 2px;
+}
+
+[data-theme="high-contrast"] .status-badge {
+    border: 1px solid currentColor;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .export-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .export-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .export-summary {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .field-list {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+    }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .btn-create-export,
+    .btn-back,
+    .btn-download,
+    .btn-delete,
+    .btn-submit,
+    .btn-cancel,
+    .btn-retry,
+    .btn-confirm-delete,
+    .btn-cancel-delete,
+    .page-btn,
+    .field-item {
+        transition: none;
+    }
+
+    .export-manager .spinner {
+        animation: none;
+        border-color: var(--color-primary);
+    }
+}

@@ -1,0 +1,82 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Button Components
+ *
+ * Primary, secondary, and specialized button styles.
+ * WCAG 2.1 AAA compliant with 44x44px touch targets.
+ */
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: var(--highlight);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    /* WCAG 2.1 SC 2.5.5: Minimum 44px touch target height */
+    min-height: 44px;
+    box-sizing: border-box;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:active {
+    opacity: 0.8;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: var(--accent);
+    opacity: 1;
+}
+
+.btn-export {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.btn-export:hover {
+    background: var(--highlight);
+    color: white;
+    border-color: var(--highlight);
+    opacity: 1;
+}
+
+.btn-export svg {
+    flex-shrink: 0;
+}
+
+/* Advanced export button styling */
+.btn-export-advanced {
+    font-size: 12px;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--highlight) 30%, var(--accent)) 100%);
+    border-color: var(--highlight);
+}
+
+.btn-export-advanced:hover {
+    background: var(--highlight);
+    border-color: var(--highlight);
+}

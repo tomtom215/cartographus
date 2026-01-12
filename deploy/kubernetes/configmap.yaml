@@ -1,0 +1,51 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cartographus-config
+  namespace: cartographus
+  labels:
+    app.kubernetes.io/name: cartographus
+    app.kubernetes.io/component: config
+data:
+  # Server Configuration
+  HTTP_PORT: "3857"
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+
+  # Authentication (choose one: none, jwt, basic, oidc, plex, multi)
+  AUTH_MODE: "jwt"
+
+  # Database
+  DUCKDB_PATH: "/data/cartographus.duckdb"
+
+  # Cache Configuration
+  CACHE_ENABLED: "true"
+  CACHE_TTL: "5m"
+
+  # Rate Limiting
+  RATE_LIMIT_REQUESTS: "100"
+  RATE_LIMIT_WINDOW: "1m"
+
+  # Optional: Tautulli Integration
+  TAUTULLI_ENABLED: "false"
+  # TAUTULLI_URL: "http://tautulli:8181"
+
+  # Optional: Direct Plex Integration
+  ENABLE_PLEX_SYNC: "false"
+  # PLEX_URL: "http://plex:32400"
+
+  # Optional: Jellyfin Integration
+  ENABLE_JELLYFIN_SYNC: "false"
+  # JELLYFIN_URL: "http://jellyfin:8096"
+
+  # Optional: Emby Integration
+  ENABLE_EMBY_SYNC: "false"
+  # EMBY_URL: "http://emby:8096"
+
+  # Geolocation
+  GEOLOCATION_PROVIDER: "maxmind"
+  # MAXMIND_DB_PATH: "/data/GeoLite2-City.mmdb"

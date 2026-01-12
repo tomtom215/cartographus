@@ -1,0 +1,158 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Empty State Components
+ *
+ * Empty state displays with icons, messages, and CTAs.
+ * Reference: UI/UX Audit
+ */
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    min-height: 200px;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.empty-state-message {
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 400px;
+}
+
+.empty-state-action {
+    margin-top: 16px;
+}
+
+.empty-state-action button {
+    padding: 8px 16px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.empty-state-action button:hover {
+    background: var(--highlight);
+    border-color: var(--highlight);
+}
+
+/* Enhanced Empty State Actions */
+.empty-state-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    justify-content: center;
+}
+
+.empty-state-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.empty-state-btn:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+}
+
+.empty-state-btn-primary {
+    background: var(--highlight);
+    color: var(--text-primary);
+    border-color: var(--highlight);
+}
+
+.empty-state-btn-primary:hover {
+    background: var(--highlight-alt);
+    border-color: var(--highlight-alt);
+}
+
+.empty-state-btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+.empty-state-btn-secondary:hover {
+    background: var(--accent);
+    border-color: var(--highlight);
+}
+
+.empty-state-btn-small {
+    padding: 4px 10px;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+/* Map empty state overlay */
+.map-empty-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--panel-bg);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    max-width: 400px;
+}
+
+/* Light theme (Task 23: use CSS variables) */
+[data-theme="light"] .empty-state-btn-primary {
+    background: var(--highlight);
+    color: var(--secondary-bg);
+}
+
+[data-theme="light"] .empty-state-btn-secondary {
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+[data-theme="light"] .empty-state-btn-secondary:hover {
+    background: var(--accent);
+}
+
+[data-theme="light"] .map-empty-state {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* High contrast theme (Task 23: use CSS variables) */
+[data-theme="high-contrast"] .empty-state-btn-primary {
+    background: var(--highlight);
+    color: var(--primary-bg);
+    border-color: var(--highlight);
+}
+
+[data-theme="high-contrast"] .empty-state-btn-secondary {
+    border-width: 2px;
+}

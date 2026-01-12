@@ -1,0 +1,111 @@
+# Cartographus - Media Server Analytics and Geographic Visualization
+# Copyright 2026 Tom F. (tomtom215)
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# https://github.com/tomtom215/cartographus
+#
+# Docker Compose configuration for Cartographus
+#
+# Usage:
+#   docker compose up -d                    # Start using pre-built image
+#   docker compose up -d --build            # Build from source and start
+#   docker compose down                     # Stop and remove containers
+#   docker compose logs -f cartographus     # View logs
+#
+# For production deployments, copy .env.example to .env and customize values.
+# See docs/CONFIGURATION_REFERENCE.md for all available options.
+
+services:
+  cartographus:
+    # Use pre-built image from GitHub Container Registry (recommended for most users)
+    image: ghcr.io/tomtom215/cartographus:latest
+    # To build from source instead, comment out 'image' above and uncomment below:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    container_name: cartographus
+    restart: unless-stopped
+    ports:
+      # Port 3857 = EPSG:3857 (Web Mercator projection used by MapLibre GL)
+      - "3857:3857"
+    environment:
+      # === Data Source: Tautulli (Optional) ===
+      # Tautulli provides enhanced Plex analytics. Not required if using direct media server connections.
+      # Enable Tautulli integration (required to use Tautulli as a data source)
+      TAUTULLI_ENABLED: ${TAUTULLI_ENABLED:-false}
+      # URL to your Tautulli instance (e.g., http://tautulli:8181 or http://192.168.1.100:8181)
+      TAUTULLI_URL: ${TAUTULLI_URL:-http://tautulli:8181}
+      # Tautulli API key - get from Tautulli Settings -> Web Interface -> API
+      TAUTULLI_API_KEY: ${TAUTULLI_API_KEY:-}
+
+      # === Database Configuration ===
+      # Path to DuckDB database file (persisted in volume)
+      DUCKDB_PATH: /data/cartographus.duckdb
+      # Maximum memory DuckDB can use (increase for large datasets)
+      DUCKDB_MAX_MEMORY: 2GB
+
+      # === Sync Configuration ===
+      # How often to poll Tautulli for new playback data
+      SYNC_INTERVAL: 5m
+      # How far back to sync on initial startup (24h = 1 day, 720h = 30 days)
+      SYNC_LOOKBACK: 24h
+      # Number of records to process per sync batch
+      SYNC_BATCH_SIZE: 1000
+
+      # === Server Configuration ===
+      # HTTP server port (must match the exposed port above)
+      HTTP_PORT: 3857
+      # Bind address (0.0.0.0 = all interfaces)
+      HTTP_HOST: 0.0.0.0
+      # Logging level: debug, info, warn, error
+      LOG_LEVEL: info
+
+      # === API Configuration ===
+      # Default number of items returned per page (default: 20)
+      API_DEFAULT_PAGE_SIZE: 20
+      # Maximum number of items allowed per page (default: 100)
+      API_MAX_PAGE_SIZE: 100
+
+      # === Authentication Configuration ===
+      # Auth mode: 'jwt' (recommended), 'basic' (simpler), or 'none' (dev only)
+      # - jwt: Secure token-based authentication with login UI and session management
+      # - basic: HTTP Basic Authentication (requires HTTPS in production)
+      # - none: No authentication (NEVER use in production!)
+      AUTH_MODE: ${AUTH_MODE:-jwt}
+      # JWT signing secret - MUST be at least 32 characters (required for AUTH_MODE=jwt)
+      # Generate with: openssl rand -base64 48
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET environment variable must be set with at least 32 characters}
+      # Admin username for login (required for AUTH_MODE=jwt or AUTH_MODE=basic)
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?ADMIN_USERNAME environment variable must be set when AUTH_MODE is jwt or basic}
+      # Admin password - MUST be at least 12 characters with uppercase, lowercase, digit, and special char
+      # Required for AUTH_MODE=jwt or AUTH_MODE=basic (NIST SP 800-63B compliant)
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD environment variable must be set when AUTH_MODE is jwt or basic}
+      # How long JWT sessions last (24h = 1 day)
+      SESSION_TIMEOUT: 24h
+
+      # === Security Configuration ===
+      # Maximum requests per window per IP address
+      RATE_LIMIT_REQUESTS: 100
+      # Time window for rate limiting (1m = 1 minute)
+      RATE_LIMIT_WINDOW: 1m
+      # Allowed CORS origins (* = all, comma-separated for production)
+      # Example: CORS_ORIGINS: "https://maps.yourdomain.com,https://www.yourdomain.com"
+      # CORS_ORIGINS: "*"
+      # Trusted proxy IPs (comma-separated) for X-Forwarded-For header validation
+      # Example: TRUSTED_PROXIES: "10.0.0.1,192.168.1.1"
+      # TRUSTED_PROXIES: ""
+    volumes:
+      # Persist database and application data
+      - ./data:/data
+    healthcheck:
+      # Check if the API is ready to serve traffic (database + dependencies)
+      test: ["CMD", "curl", "-f", "http://localhost:3857/api/v1/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - cartographus
+
+networks:
+  cartographus:
+    driver: bridge

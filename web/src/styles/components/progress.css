@@ -1,0 +1,80 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Progress Components
+ *
+ * Global progress bar and loading indicators.
+ * Reference: UI/UX Audit
+ */
+
+/* =================================================================
+   Global Progress Bar
+   Top-of-page loading indicator for data operations
+   ================================================================= */
+
+.global-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: var(--z-modal, 10000);
+    overflow: hidden;
+    transition: opacity 0.2s ease;
+}
+
+.global-progress-bar.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.global-progress-bar .progress-fill {
+    height: 100%;
+    width: 30%;
+    background: linear-gradient(90deg, var(--highlight), var(--highlight-alt));
+    border-radius: 0 2px 2px 0;
+    animation: progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-indeterminate {
+    0% {
+        transform: translateX(-100%);
+        width: 30%;
+    }
+    50% {
+        transform: translateX(100%);
+        width: 60%;
+    }
+    100% {
+        transform: translateX(300%);
+        width: 30%;
+    }
+}
+
+/* Determinate progress state */
+.global-progress-bar.determinate .progress-fill {
+    animation: none;
+    transition: width 0.3s ease;
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .global-progress-bar {
+        transition: none;
+    }
+
+    .global-progress-bar .progress-fill {
+        animation: none;
+        width: 100%;
+        transform: none;
+    }
+
+    .global-progress-bar.determinate .progress-fill {
+        transition: none;
+    }
+}

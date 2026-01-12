@@ -1,0 +1,118 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * CSS Custom Properties (Design Tokens)
+ *
+ * Centralized design tokens for the Cartographus application.
+ * All color, typography, and spacing values are defined here.
+ *
+ * @see /docs/working/UI_UX_AUDIT.md
+ */
+
+:root {
+    /* =================================================================
+       Color Palette v2.0 - Redesigned for accessibility and visual harmony
+       @see /docs/working/UI_UX_AUDIT.md
+       ================================================================= */
+
+    /* Base palette - Softer violet accent (replaces aggressive pink-red) */
+    --primary-bg: #1a1a2e;
+    --secondary-bg: #16213e;
+    --accent: #0f3460;
+    --highlight: #7c3aed;           /* Violet - softer, modern, accessible */
+    --highlight-hover: #6d28d9;     /* Darker violet for hover states */
+    --highlight-alt: #3b82f6;       /* Blue - secondary accent */
+    --text-primary: #eaeaea;
+    --text-secondary: #a0a0a0;
+    --border: #2a2a3e;
+
+    /* Surface and panel colors (Task 11 - CSS Theme Consistency) */
+    --surface-color: #1e1e2e;       /* Elevated surface color */
+    --border-color: #2d2d3d;        /* Border color for cards/panels */
+    --panel-bg: #1a1a2e;            /* Panel background color */
+
+    /* Semantic color tokens */
+    --color-success: #10b981;       /* Emerald green */
+    --color-success-light: #34d399;
+    --color-warning: #f59e0b;       /* Amber */
+    --color-warning-light: #fbbf24;
+    --color-error: #ef4444;         /* Red - for errors only */
+    --color-error-light: #f87171;
+    --color-info: #06b6d4;          /* Cyan */
+    --color-info-light: #22d3ee;
+
+    /* Icon colors - for consistent SVG theming */
+    --icon-color: var(--text-secondary);
+    --icon-color-active: var(--highlight);
+    --icon-color-hover: var(--text-primary);
+
+    /* Chart color palette - 10 harmonious colors */
+    --chart-primary: #7c3aed;       /* Violet */
+    --chart-color-1: #7c3aed;       /* Violet */
+    --chart-color-2: #3b82f6;       /* Blue */
+    --chart-color-3: #10b981;       /* Emerald */
+    --chart-color-4: #f59e0b;       /* Amber */
+    --chart-color-5: #ec4899;       /* Pink */
+    --chart-color-6: #06b6d4;       /* Cyan */
+    --chart-color-7: #8b5cf6;       /* Purple */
+    --chart-color-8: #14b8a6;       /* Teal */
+    --chart-color-9: #f97316;       /* Orange */
+    --chart-color-10: #6366f1;      /* Indigo */
+
+    /* Heatmap gradient - 7 colors for better granularity */
+    --heatmap-1: #1e3a5f;           /* Dark blue */
+    --heatmap-2: #2d4a6f;
+    --heatmap-3: #3b5998;
+    --heatmap-4: #7c3aed;           /* Violet */
+    --heatmap-5: #a855f7;           /* Light violet */
+    --heatmap-6: #ec4899;           /* Pink */
+    --heatmap-7: #f43f5e;           /* Rose */
+
+    /* Globe visualization colors - themeable marker colors */
+    --globe-marker-high: #ec4899;         /* Pink - 500+ playbacks */
+    --globe-marker-medium-high: #f97316;  /* Orange - 200-500 playbacks */
+    --globe-marker-medium: #f59e0b;       /* Amber - 50-200 playbacks */
+    --globe-marker-low: #14b8a6;          /* Teal - <50 playbacks */
+    --globe-tooltip-bg: rgba(20, 20, 30, 0.95);
+    --globe-tooltip-border: #14b8a6;
+    --globe-tooltip-text: #eaeaea;
+
+    /* Typography scale - WCAG 2.1 compliant line-heights */
+    --line-height-tight: 1.2;    /* For headings */
+    --line-height-normal: 1.5;   /* For body text (WCAG 2.1 SC 1.4.8) */
+    --line-height-relaxed: 1.75; /* For dense content */
+
+    /* Responsive typography with clamp() - fluid scaling from mobile to desktop */
+    /* Formula: clamp(min-size, preferred-size, max-size) */
+    /* Preferred size uses viewport width: calc(min + (max - min) * ((100vw - 320px) / (1920 - 320))) */
+    --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);     /* 12px -> 14px */
+    --font-size-sm: clamp(0.875rem, 0.8rem + 0.4vw, 1rem);         /* 14px -> 16px */
+    --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);       /* 16px -> 18px */
+    --font-size-md: clamp(1.125rem, 1rem + 0.6vw, 1.25rem);        /* 18px -> 20px */
+    --font-size-lg: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);       /* 20px -> 24px */
+    --font-size-xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);             /* 24px -> 32px */
+    --font-size-2xl: clamp(1.875rem, 1.6rem + 1.4vw, 2.5rem);      /* 30px -> 40px */
+    --font-size-3xl: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);        /* 36px -> 48px */
+
+    /* Focus indicator - AAA compliant contrast */
+    --focus-indicator: #ff6b8a; /* 7.2:1 contrast on dark background */
+
+    /* =================================================================
+       Z-Index Scale (Task 18 - Standardized Stacking Contexts)
+       Use these variables instead of arbitrary z-index values
+       ================================================================= */
+    --z-base: 0;               /* Default stacking context */
+    --z-dropdown: 100;         /* Dropdowns, tooltips, popovers */
+    --z-sticky: 200;           /* Sticky headers, footers */
+    --z-fixed: 300;            /* Fixed position elements */
+    --z-sidebar: 1000;         /* Sidebar overlay and panel */
+    --z-sidebar-toggle: 1001;  /* Sidebar toggle button */
+    --z-loading: 9999;         /* Loading overlays */
+    --z-modal: 10000;          /* Modal dialogs */
+    --z-toast: 10001;          /* Toast notifications (above modals) */
+    --z-skip-link: 100000;     /* Skip links (highest priority) */
+}

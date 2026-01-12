@@ -1,0 +1,2 @@
+# This directory stores UI screenshots captured by Playwright tests
+# Screenshots are generated during CI/CD builds to track UI/UX evolution
