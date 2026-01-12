@@ -2,8 +2,6 @@ module github.com/tomtom215/cartographus
 
 go 1.24.0
 
-toolchain go1.25.5
-
 require (
 	// Event processing with Watermill and NATS JetStream (Plex standalone support)
 	github.com/ThreeDotsLabs/watermill v1.5.1
