@@ -206,18 +206,8 @@ func TestClient_Start(t *testing.T) {
 
 func TestClient_ReadPump_ConnectionClose(t *testing.T) {
 	hub := NewHub()
-	go hub.Run()
-	time.Sleep(10 * time.Millisecond)
-
-	unregistered := make(chan bool, 1)
-	go func() {
-		select {
-		case <-hub.Unregister:
-			unregistered <- true
-		case <-time.After(5 * time.Second):
-			// Timeout - extended for CI reliability under load
-		}
-	}()
+	// Don't start hub.Run() - we'll be the sole receiver on Unregister channel
+	// This eliminates any race condition and makes the test fully deterministic
 
 	server := setupWebSocketServer(t, func(t *testing.T, conn *websocket.Conn) {
 		conn.Close()
@@ -227,15 +217,18 @@ func TestClient_ReadPump_ConnectionClose(t *testing.T) {
 	conn := dialWebSocket(t, server)
 
 	client := NewClient(hub, conn)
-	hub.Register <- client
-
-	// Allow registration to process (100ms for CI reliability under load)
-	time.Sleep(100 * time.Millisecond)
 
 	go client.readPump()
 
-	// Increased timeout for CI reliability - connection close detection can be slow under load
-	waitForChannel(t, unregistered, 3*time.Second, "Client not unregistered after connection close")
+	// Wait for unregistration - we're the only receiver, so deterministic
+	select {
+	case unregisteredClient := <-hub.Unregister:
+		if unregisteredClient != client {
+			t.Errorf("Wrong client unregistered: got %p, want %p", unregisteredClient, client)
+		}
+	case <-time.After(3 * time.Second):
+		t.Error("Client not unregistered after connection close: timeout after 3s")
+	}
 }
 
 func TestClient_WritePump_ChannelClose(t *testing.T) {
@@ -370,18 +363,8 @@ func TestClient_ReadPump_SetReadDeadlineError(t *testing.T) {
 
 func TestClient_ReadPump_UnexpectedCloseError(t *testing.T) {
 	hub := NewHub()
-	go hub.Run()
-	time.Sleep(10 * time.Millisecond)
-
-	unregistered := make(chan bool, 1)
-	go func() {
-		select {
-		case <-hub.Unregister:
-			unregistered <- true
-		case <-time.After(5 * time.Second):
-			// Timeout - must be longer than waitForChannel timeout
-		}
-	}()
+	// Don't start hub.Run() - we'll be the sole receiver on Unregister channel
+	// This eliminates any race condition and makes the test fully deterministic
 
 	server := setupWebSocketServer(t, func(t *testing.T, conn *websocket.Conn) {
 		time.Sleep(10 * time.Millisecond)
@@ -393,15 +376,18 @@ func TestClient_ReadPump_UnexpectedCloseError(t *testing.T) {
 	conn := dialWebSocket(t, server)
 
 	client := NewClient(hub, conn)
-	hub.Register <- client
-
-	// Allow registration to process (100ms for CI reliability under load)
-	time.Sleep(100 * time.Millisecond)
 
 	go client.readPump()
 
-	waitForChannel(t, unregistered, 3*time.Second, "Client not unregistered after abnormal close")
-	time.Sleep(100 * time.Millisecond)
+	// Wait for unregistration - we're the only receiver, so deterministic
+	select {
+	case unregisteredClient := <-hub.Unregister:
+		if unregisteredClient != client {
+			t.Errorf("Wrong client unregistered: got %p, want %p", unregisteredClient, client)
+		}
+	case <-time.After(3 * time.Second):
+		t.Error("Client not unregistered after abnormal close: timeout after 3s")
+	}
 }
 
 func TestClient_WritePump_WriteJSONError(t *testing.T) {
