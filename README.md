@@ -13,6 +13,22 @@ Built for self-hosters who want the same depth of analytics that streaming servi
 
 ---
 
+## Development and Quality Assurance
+
+This project was developed with AI-assisted engineering using [Claude](https://www.anthropic.com/claude), Anthropic's AI assistant. To ensure production-grade reliability and maintainability, the codebase is backed by a comprehensive testing and quality assurance infrastructure:
+
+- **10,000+ unit tests** covering all backend components, API handlers, and database operations
+- **Integration tests** validating cross-system interactions and data flows
+- **75 end-to-end test suites** (1,300+ individual tests) using Playwright for full-stack validation
+- **Automated CI pipeline** with linting, static analysis, security scanning, and multi-platform builds
+- **29 Architecture Decision Records** documenting design rationale and technical trade-offs
+
+All contributions undergo the same rigorous validation regardless of their origin.
+
+**Pre-Release Notice**: Cartographus is currently in active pre-release development. The API surface, configuration options, and database schema may change between versions. Production deployments should expect frequent updates and should review the [CHANGELOG](CHANGELOG.md) before upgrading.
+
+---
+
 <!-- TODO: Add screenshots here -->
 <!-- ![Map View](docs/screenshots/map-view.png) -->
 <!-- ![Analytics Dashboard](docs/screenshots/analytics.png) -->
