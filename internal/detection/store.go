@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
+	"github.com/tomtom215/cartographus/internal/logging"
 )
 
 // DuckDBStore implements AlertStore, RuleStore, TrustStore, and EventHistory
@@ -273,6 +274,12 @@ func (s *DuckDBStore) InitSchema(ctx context.Context) error {
 	// Insert default rules if not exist
 	if err := s.insertDefaultRules(ctx); err != nil {
 		return fmt.Errorf("failed to insert default rules: %w", err)
+	}
+
+	// Force a checkpoint after creating tables to flush the WAL.
+	// This prevents DuckDB WAL replay issues on restart.
+	if _, err := s.db.ExecContext(ctx, "CHECKPOINT"); err != nil {
+		logging.Warn().Err(err).Msg("Failed to checkpoint after detection schema initialization")
 	}
 
 	return nil
