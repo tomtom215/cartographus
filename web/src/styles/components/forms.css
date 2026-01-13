@@ -585,6 +585,7 @@ select.filter-active {
 }
 
 .filter-history-btn {
+    position: relative;         /* Required for tooltip positioning */
     display: inline-flex;
     align-items: center;
     gap: 4px;

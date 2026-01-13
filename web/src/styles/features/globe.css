@@ -13,12 +13,11 @@
 /* Globe container */
 #globe {
     width: 100%;
-    height: 50vh;
-    min-height: 400px;
-    max-height: 100vh; /* Prevent canvas from exceeding viewport in headless environments */
+    flex: 1;            /* Fill available space in flex parent */
+    min-height: 300px;  /* Reduced minimum for mobile compatibility */
     position: relative;
     background: var(--primary-bg);
-    overflow: hidden; /* Constrain deck.gl canvas to container bounds */
+    overflow: hidden;   /* Constrain deck.gl canvas to container bounds */
 }
 
 /* Ensure MapLibre controls inside globe are clickable

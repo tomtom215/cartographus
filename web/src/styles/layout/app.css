@@ -16,9 +16,12 @@
     width: 100vw;
 }
 
-/* Main content area - takes remaining width */
+/* Main content area - takes remaining width and contains dashboard views */
 #main-content {
     flex: 1;
-    overflow: auto;
+    display: flex;              /* Enable flex for dashboard containers */
+    flex-direction: column;     /* Stack dashboard views vertically */
+    min-width: 0;               /* Allow shrinking in flex context */
+    overflow: hidden;           /* Child containers handle their own overflow */
     transition: margin-left 0.3s ease;
 }
