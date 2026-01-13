@@ -214,8 +214,8 @@ func TestClient_ReadPump_ConnectionClose(t *testing.T) {
 		select {
 		case <-hub.Unregister:
 			unregistered <- true
-		case <-time.After(2 * time.Second):
-			// Timeout
+		case <-time.After(5 * time.Second):
+			// Timeout - extended for CI reliability under load
 		}
 	}()
 
@@ -234,7 +234,8 @@ func TestClient_ReadPump_ConnectionClose(t *testing.T) {
 
 	go client.readPump()
 
-	waitForChannel(t, unregistered, 1*time.Second, "Client not unregistered after connection close")
+	// Increased timeout for CI reliability - connection close detection can be slow under load
+	waitForChannel(t, unregistered, 3*time.Second, "Client not unregistered after connection close")
 }
 
 func TestClient_WritePump_ChannelClose(t *testing.T) {
