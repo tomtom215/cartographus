@@ -50,18 +50,18 @@ func (c *DiscordChannel) MaxContentLength() int {
 // Validate checks if the Discord webhook configuration is valid.
 func (c *DiscordChannel) Validate(config *models.ChannelConfig) error {
 	if config == nil {
-		return fmt.Errorf("Discord configuration is required")
+		return fmt.Errorf("discord configuration is required")
 	}
 	if config.DiscordWebhookURL == "" {
-		return fmt.Errorf("Discord webhook URL is required")
+		return fmt.Errorf("discord webhook URL is required")
 	}
 	if err := ValidateWebhookURL(config.DiscordWebhookURL); err != nil {
-		return fmt.Errorf("invalid Discord webhook URL: %w", err)
+		return fmt.Errorf("invalid discord webhook URL: %w", err)
 	}
 	// Validate it looks like a Discord webhook
 	if !strings.Contains(config.DiscordWebhookURL, "discord.com/api/webhooks/") &&
 		!strings.Contains(config.DiscordWebhookURL, "discordapp.com/api/webhooks/") {
-		return fmt.Errorf("URL does not appear to be a Discord webhook URL")
+		return fmt.Errorf("URL does not appear to be a discord webhook URL")
 	}
 	return nil
 }
@@ -148,7 +148,7 @@ func (c *DiscordChannel) Send(ctx context.Context, params *SendParams) (*Deliver
 		result.IsTransient = isTransientHTTPError(result.ErrorCode)
 		return result, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	result.ResponseCode = resp.StatusCode
 

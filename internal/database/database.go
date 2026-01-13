@@ -55,7 +55,6 @@ type DB struct {
 	ipLocks sync.Map
 
 	// Connection recovery fields
-	reconnectMu       sync.Mutex
 	serverLat         float64
 	serverLon         float64
 	maxReconnectTries int

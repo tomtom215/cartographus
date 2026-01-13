@@ -211,7 +211,9 @@ func TestImporter_ImportClearsExistingData(t *testing.T) {
 		Provider: "old_provider",
 		IPs:      []string{"10.0.0.1"},
 	}
-	lookup.AddServer(initialServer)
+	if err := lookup.AddServer(initialServer); err != nil {
+		t.Fatalf("AddServer() error = %v", err)
+	}
 
 	if lookup.Count() != 1 {
 		t.Fatalf("expected 1 IP before import, got %d", lookup.Count())
@@ -254,7 +256,9 @@ func TestImporter_MergeFromReader(t *testing.T) {
 		Country:  "Initial",
 		IPs:      []string{"10.0.0.1"},
 	}
-	lookup.AddServer(initialServer)
+	if err := lookup.AddServer(initialServer); err != nil {
+		t.Fatalf("AddServer() error = %v", err)
+	}
 
 	// Merge new data (should NOT clear existing)
 	jsonData := `{

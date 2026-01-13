@@ -340,8 +340,12 @@ func TestStore_ChecksumValidation(t *testing.T) {
 		t.Fatalf("open file: %v", err)
 	}
 	// Write garbage at offset to corrupt data while keeping metadata intact
-	f.Seek(100, 0)
-	f.Write([]byte{0xFF, 0xFF, 0xFF, 0xFF})
+	if _, err := f.Seek(100, 0); err != nil {
+		t.Fatalf("seek file: %v", err)
+	}
+	if _, err := f.Write([]byte{0xFF, 0xFF, 0xFF, 0xFF}); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
 	f.Close()
 
 	// Load should fail due to checksum mismatch or decompression error
@@ -366,7 +370,9 @@ func TestStore_ConcurrentAccess(t *testing.T) {
 		go func(v int) {
 			data := EASEModelState{L2Regularization: float64(v)}
 			meta := ModelMetadata{Version: v}
-			store.Save(ctx, "ease", v, data, meta)
+			if err := store.Save(ctx, "ease", v, data, meta); err != nil {
+				t.Errorf("Save() error = %v", err)
+			}
 			done <- true
 		}(i + 1)
 	}

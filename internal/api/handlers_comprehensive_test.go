@@ -6,6 +6,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -62,7 +63,7 @@ func setupTestHandler(t *testing.T) *Handler {
 
 	// Create WebSocket hub
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	// Create sync manager with mock client
 	mockClient := &MockTautulliClient{}

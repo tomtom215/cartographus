@@ -298,7 +298,7 @@ func (db *DB) GetUserMappingStats(ctx context.Context) (*models.UserMappingStats
 	if err != nil {
 		return nil, fmt.Errorf("failed to get counts by server: %w", err)
 	}
-	defer rows2.Close()
+	defer func() { _ = rows2.Close() }()
 	for rows2.Next() {
 		var serverID string
 		var count int

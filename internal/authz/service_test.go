@@ -835,7 +835,7 @@ func TestGetUserRoleInfo(t *testing.T) {
 			t.Errorf("GetUserRoleInfo() error = %v", err)
 		}
 		if role == nil {
-			t.Error("GetUserRoleInfo() = nil, want role")
+			t.Fatal("GetUserRoleInfo() = nil, want role")
 		}
 		if role.Role != models.RoleEditor {
 			t.Errorf("GetUserRoleInfo().Role = %v, want %v", role.Role, models.RoleEditor)

@@ -43,7 +43,7 @@ func (s *DuckDBStore) countByColumn(ctx context.Context, column string) (map[str
 	if err != nil {
 		return nil, fmt.Errorf("failed to get %s counts: %w", column, err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var key string
@@ -307,7 +307,7 @@ func (s *DuckDBStore) Query(ctx context.Context, filter QueryFilter) ([]Event, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to query audit events: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []Event
 	for rows.Next() {

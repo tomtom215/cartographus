@@ -136,7 +136,7 @@ func TestOnSyncCompleted_EdgeCases(t *testing.T) {
 		c := cache.New(5 * time.Minute)
 		c.Set("test", "value")
 		wsHub := ws.NewHub()
-		go wsHub.Run()
+		go wsHub.RunWithContext(context.Background())
 		handler := &Handler{cache: c, wsHub: wsHub, db: nil}
 
 		handler.OnSyncCompleted(10, 100)
@@ -148,7 +148,7 @@ func TestOnSyncCompleted_EdgeCases(t *testing.T) {
 	t.Run("concurrent calls", func(t *testing.T) {
 		c := cache.New(5 * time.Minute)
 		wsHub := ws.NewHub()
-		go wsHub.Run()
+		go wsHub.RunWithContext(context.Background())
 		handler := &Handler{cache: c, wsHub: wsHub}
 
 		var wg sync.WaitGroup
@@ -353,7 +353,7 @@ func TestHandler_FullLifecycle(t *testing.T) {
 		Security: config.SecurityConfig{CORSOrigins: []string{"*"}},
 	}
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := NewHandler(nil, nil, nil, cfg, nil, wsHub)
 	handler.SetBackupManager(&mockBackupManager{})
@@ -376,7 +376,7 @@ func TestConcurrentRequests_MixedOperations(t *testing.T) {
 		Security: config.SecurityConfig{CORSOrigins: []string{"*"}},
 	}
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := NewHandler(nil, nil, nil, cfg, nil, wsHub)
 

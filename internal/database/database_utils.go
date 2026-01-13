@@ -35,7 +35,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/tomtom215/cartographus/internal/logging"
@@ -73,43 +72,6 @@ func (db *DB) ensureContext(ctx context.Context) (context.Context, context.Cance
 	}
 
 	return ctx, func() {}
-}
-
-// logQueryPlan logs the execution plan for a query using EXPLAIN ANALYZE
-func (db *DB) logQueryPlan(ctx context.Context, query string, args ...interface{}) {
-	if os.Getenv("LOG_QUERY_PLANS") != "true" {
-		return
-	}
-
-	explainQuery := "EXPLAIN ANALYZE " + query
-
-	rows, err := db.conn.QueryContext(ctx, explainQuery, args...)
-	if err != nil {
-		logging.Warn().Err(err).Msg("Failed to get query plan")
-		return
-	}
-	defer rows.Close()
-
-	var planLines []string
-	for rows.Next() {
-		var plan string
-		if err := rows.Scan(&plan); err != nil {
-			logging.Warn().Err(err).Msg("Failed to scan query plan")
-			continue
-		}
-		planLines = append(planLines, plan)
-	}
-
-	if err := rows.Err(); err != nil {
-		logging.Warn().Err(err).Msg("Error iterating query plan")
-	}
-
-	// Log the complete plan as a debug message with structured fields
-	logging.Debug().
-		Str("query", query).
-		Interface("args", args).
-		Str("plan", strings.Join(planLines, "\n")).
-		Msg("Query plan (EXPLAIN ANALYZE)")
 }
 
 // Checkpoint forces a WAL checkpoint

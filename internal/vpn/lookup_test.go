@@ -52,7 +52,9 @@ func TestLookup_LookupIP_Found(t *testing.T) {
 		IPs:        []string{"203.0.113.50"},
 	}
 
-	lookup.AddServer(server)
+	if err := lookup.AddServer(server); err != nil {
+		t.Fatalf("AddServer() error = %v", err)
+	}
 
 	result := lookup.LookupIP("203.0.113.50")
 	if !result.IsVPN {
@@ -84,7 +86,7 @@ func TestLookup_LookupIP_NotFound(t *testing.T) {
 		IPs:      []string{"192.0.2.1"},
 	}
 
-	lookup.AddServer(server)
+	_ = lookup.AddServer(server)
 
 	// Lookup a different IP
 	result := lookup.LookupIP("192.0.2.99")
@@ -118,7 +120,7 @@ func TestLookup_LookupIP_IPv6(t *testing.T) {
 		IPs:      []string{"2001:db8::1", "2001:db8::2"},
 	}
 
-	lookup.AddServer(server)
+	_ = lookup.AddServer(server)
 
 	result := lookup.LookupIP("2001:db8::1")
 	if !result.IsVPN {
@@ -143,7 +145,7 @@ func TestLookup_ContainsIP(t *testing.T) {
 		IPs:      []string{"198.51.100.10"},
 	}
 
-	lookup.AddServer(server)
+	_ = lookup.AddServer(server)
 
 	if !lookup.ContainsIP("198.51.100.10") {
 		t.Error("expected ContainsIP to return true for known IP")
@@ -210,7 +212,7 @@ func TestLookup_Clear(t *testing.T) {
 		Provider: "nordvpn",
 		IPs:      []string{"192.0.2.1", "192.0.2.2"},
 	}
-	lookup.AddServer(server)
+	_ = lookup.AddServer(server)
 
 	provider := &Provider{Name: "nordvpn", DisplayName: "NordVPN"}
 	lookup.AddProvider(provider)
@@ -242,8 +244,8 @@ func TestLookup_GetStats(t *testing.T) {
 		IPs:      []string{"2001:db8::1"},
 	}
 
-	lookup.AddServer(server1)
-	lookup.AddServer(server2)
+	_ = lookup.AddServer(server1)
+	_ = lookup.AddServer(server2)
 
 	lookup.AddProvider(&Provider{Name: "nordvpn", IPCount: 2})
 	lookup.AddProvider(&Provider{Name: "expressvpn", IPCount: 1})
@@ -463,7 +465,7 @@ func TestLookup_LookupIP_Hostname(t *testing.T) {
 		Hostname: "server.example.com",
 		IPs:      []string{"192.0.2.1"},
 	}
-	lookup.AddServer(server)
+	_ = lookup.AddServer(server)
 
 	result := lookup.LookupIP("192.0.2.1")
 	if !result.IsVPN {

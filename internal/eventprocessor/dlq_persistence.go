@@ -233,7 +233,7 @@ func (s *DuckDBDLQStore) List(ctx context.Context) ([]*DLQEntry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to list DLQ entries: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var entries []*DLQEntry
 	for rows.Next() {

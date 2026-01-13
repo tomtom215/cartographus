@@ -19,7 +19,9 @@ func setupTestEnv(t *testing.T, envVars map[string]string) func() {
 	t.Helper()
 	os.Clearenv()
 	for k, v := range envVars {
-		os.Setenv(k, v)
+		if err := os.Setenv(k, v); err != nil {
+			t.Fatalf("failed to set env var %s: %v", k, err)
+		}
 	}
 	return func() {
 		os.Clearenv()
@@ -527,7 +529,7 @@ func TestGetDurationEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			if tt.value != "" {
-				os.Setenv(tt.key, tt.value)
+				_ = os.Setenv(tt.key, tt.value)
 			}
 
 			got := getDurationEnv(tt.key, tt.defaultValue)
@@ -731,7 +733,7 @@ func TestGetSliceEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			if tt.value != "" {
-				os.Setenv(tt.key, tt.value)
+				_ = os.Setenv(tt.key, tt.value)
 			}
 
 			got := getSliceEnv(tt.key, tt.defaultValue)
@@ -794,7 +796,7 @@ func TestGetEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			if tt.value != "" {
-				os.Setenv(tt.key, tt.value)
+				_ = os.Setenv(tt.key, tt.value)
 			}
 
 			got := getEnv(tt.key, tt.defaultValue)
@@ -889,7 +891,7 @@ func TestGetBoolEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			if tt.value != "" {
-				os.Setenv(tt.key, tt.value)
+				_ = os.Setenv(tt.key, tt.value)
 			}
 
 			got := getBoolEnv(tt.key, tt.defaultValue)
@@ -963,7 +965,7 @@ func TestGetFloatEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			if tt.value != "" {
-				os.Setenv(tt.key, tt.value)
+				_ = os.Setenv(tt.key, tt.value)
 			}
 
 			got := getFloatEnv(tt.key, tt.defaultValue)
@@ -1204,7 +1206,7 @@ func TestLoad_PlexConfiguration(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			for k, v := range tt.envVars {
-				os.Setenv(k, v)
+				_ = os.Setenv(k, v)
 			}
 
 			cfg, err := Load()
@@ -1275,7 +1277,7 @@ func TestLoad_ConfigValues(t *testing.T) {
 	}
 
 	for k, v := range envVars {
-		os.Setenv(k, v)
+		_ = os.Setenv(k, v)
 	}
 
 	cfg, err := Load()
@@ -1305,7 +1307,7 @@ func TestLoad_DefaultValues(t *testing.T) {
 	}
 
 	for k, v := range envVars {
-		os.Setenv(k, v)
+		_ = os.Setenv(k, v)
 	}
 
 	cfg, err := Load()
@@ -1401,7 +1403,7 @@ func TestGetInt64Env(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			if tt.value != "" {
-				os.Setenv(tt.key, tt.value)
+				_ = os.Setenv(tt.key, tt.value)
 			}
 
 			got := getInt64Env(tt.key, tt.defaultValue)
@@ -1688,7 +1690,7 @@ func TestLoad_NATSConfiguration(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()
 			for k, v := range tt.envVars {
-				os.Setenv(k, v)
+				_ = os.Setenv(k, v)
 			}
 
 			cfg, err := Load()
@@ -1734,7 +1736,7 @@ func TestLoad_NATSConfigValues(t *testing.T) {
 	}
 
 	for k, v := range envVars {
-		os.Setenv(k, v)
+		_ = os.Setenv(k, v)
 	}
 
 	cfg, err := Load()
@@ -1772,7 +1774,7 @@ func TestLoad_NATSDefaultValues(t *testing.T) {
 	}
 
 	for k, v := range envVars {
-		os.Setenv(k, v)
+		_ = os.Setenv(k, v)
 	}
 
 	cfg, err := Load()

@@ -34,13 +34,13 @@ func TestManager_TriggerSync(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	err := manager.TriggerSync()
 	if err != nil {
@@ -70,8 +70,8 @@ func TestManager_SyncData_FirstSync(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{}
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	mockDB := &mockDB{}
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// First sync should use lookback period
 	err := manager.TriggerSync()
@@ -112,8 +112,8 @@ func TestManager_SyncData_SubsequentSync(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{}
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	mockDB := &mockDB{}
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// First sync
 	err := manager.TriggerSync()
@@ -203,7 +203,7 @@ func TestManager_SyncDataSince_MultipleBatches(t *testing.T) {
 	}
 
 	recordsInserted := 0
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -225,7 +225,7 @@ func TestManager_SyncDataSince_MultipleBatches(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	err := manager.TriggerSync()
 	if err != nil {
@@ -254,8 +254,8 @@ func TestManager_SyncDataSince_TautulliError(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{}
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	mockDB := &mockDB{}
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	err := manager.TriggerSync()
 	if err == nil {
@@ -318,7 +318,7 @@ func TestManager_SyncDataSince_ProcessingError_ContinuesWithOthers(t *testing.T)
 	}
 
 	recordsInserted := 0
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -340,7 +340,7 @@ func TestManager_SyncDataSince_ProcessingError_ContinuesWithOthers(t *testing.T)
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Should not return error, should log and continue
 	err := manager.TriggerSync()
@@ -391,7 +391,7 @@ func TestManager_SyncDataSince_CallbackInvoked(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -412,7 +412,7 @@ func TestManager_SyncDataSince_CallbackInvoked(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	callbackCalled := false
 	var callbackRecords int
@@ -584,13 +584,13 @@ func TestManager_ConcurrentTriggerSync(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Trigger multiple syncs concurrently
 	const numConcurrent = 10

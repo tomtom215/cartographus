@@ -155,7 +155,7 @@ func (h *Handler) parsePlaybacksParams(r *http.Request) (*playbacksParams, error
 
 	// Validate limit against dynamic config
 	if limit > maxPageSize {
-		return nil, fmt.Errorf("Limit must be between 1 and %d", maxPageSize)
+		return nil, fmt.Errorf("limit must be between 1 and %d", maxPageSize)
 	}
 
 	// Decode cursor if provided
@@ -371,7 +371,7 @@ func (h *Handler) parseLocationsFilter(r *http.Request) (database.LocationStatsF
 
 	// Validate limit against dynamic config
 	if limit > maxPageSize {
-		return database.LocationStatsFilter{}, fmt.Errorf("Limit must be between 1 and %d", maxPageSize)
+		return database.LocationStatsFilter{}, fmt.Errorf("limit must be between 1 and %d", maxPageSize)
 	}
 
 	// Validate days when explicitly provided
@@ -397,7 +397,7 @@ func (h *Handler) validateDaysParam(r *http.Request, days int) error {
 	}
 
 	if days < 1 || days > 3650 {
-		return fmt.Errorf("Days must be between 1 and 3650")
+		return fmt.Errorf("days must be between 1 and 3650")
 	}
 	return nil
 }

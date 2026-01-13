@@ -83,7 +83,7 @@ func (db *DB) GetContentFlowAnalytics(ctx context.Context, filter LocationStatsF
 	if err != nil {
 		return nil, fmt.Errorf("query content flow: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	// Build nodes and links from query results
 	nodes := make(map[string]*models.SankeyNode)
@@ -292,7 +292,7 @@ func (db *DB) GetUserContentOverlapAnalytics(ctx context.Context, filter Locatio
 	if err != nil {
 		return nil, fmt.Errorf("query user overlap: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	userSet := make(map[string]bool)
 	pairs := []models.UserOverlapPair{}
@@ -450,7 +450,7 @@ func (db *DB) GetUserProfileAnalytics(ctx context.Context, filter LocationStatsF
 	if err != nil {
 		return nil, fmt.Errorf("query user profiles: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	profiles := []models.UserProfileScore{}
 	avgScores := make([]float64, 6)
@@ -566,7 +566,7 @@ func (db *DB) GetLibraryUtilizationAnalytics(ctx context.Context, filter Locatio
 	if err != nil {
 		return nil, fmt.Errorf("query library utilization: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	// Build hierarchical tree
 	libraryNodes := make(map[string]*models.TreemapNode)
@@ -727,7 +727,7 @@ func (db *DB) GetCalendarHeatmapAnalytics(ctx context.Context, filter LocationSt
 	if err != nil {
 		return nil, fmt.Errorf("query calendar heatmap: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	days := []models.CalendarDayActivity{}
 	var totalWatchTime int64
@@ -847,7 +847,7 @@ func (db *DB) GetBumpChartAnalytics(ctx context.Context, filter LocationStatsFil
 	if err != nil {
 		return nil, fmt.Errorf("query bump chart: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	periodMap := make(map[string][]models.RankingEntry)
 	periods := []string{}

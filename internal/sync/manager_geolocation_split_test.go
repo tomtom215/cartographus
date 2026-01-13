@@ -21,7 +21,7 @@ func TestManager_FetchAndCacheGeolocation_TautulliSuccess(t *testing.T) {
 	cfg := newTestConfig()
 
 	geoCached := false
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		upsertGeolocation: func(geo *models.Geolocation) error {
 			geoCached = true
 			if geo.IPAddress != "203.0.113.1" {
@@ -52,7 +52,7 @@ func TestManager_FetchAndCacheGeolocation_TautulliSuccess(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	geo, err := manager.fetchAndCacheGeolocation(context.Background(), "203.0.113.1")
 	if err != nil {
@@ -74,7 +74,7 @@ func TestManager_FetchAndCacheGeolocation_TautulliRetry(t *testing.T) {
 	cfg := newTestConfig()
 
 	attemptCount := 0
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		upsertGeolocation: func(geo *models.Geolocation) error {
 			return nil
 		},
@@ -99,7 +99,7 @@ func TestManager_FetchAndCacheGeolocation_TautulliRetry(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	_, err := manager.fetchAndCacheGeolocation(context.Background(), "8.8.8.8")
 	if err != nil {
@@ -116,7 +116,7 @@ func TestManager_FetchAndCacheGeolocation_DatabaseError(t *testing.T) {
 
 	cfg := newTestConfig()
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		upsertGeolocation: func(geo *models.Geolocation) error {
 			return errors.New("database write failed")
 		},
@@ -137,7 +137,7 @@ func TestManager_FetchAndCacheGeolocation_DatabaseError(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Use a public IP address (not private like 10.0.0.1) to test the database caching error path
 	// Private IPs are now handled specially and don't reach the caching step

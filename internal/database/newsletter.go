@@ -1462,7 +1462,7 @@ func (db *DB) GetNewsletterStats(ctx context.Context) (*models.NewsletterStatsRe
 	if err != nil {
 		return nil, fmt.Errorf("failed to count by channel: %w", err)
 	}
-	defer channelRows.Close()
+	defer func() { _ = channelRows.Close() }()
 
 	for channelRows.Next() {
 		var channel string

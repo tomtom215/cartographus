@@ -14,17 +14,17 @@ import (
 	"github.com/dgraph-io/badger/v4"
 	"github.com/tomtom215/cartographus/internal/api"
 	"github.com/tomtom215/cartographus/internal/config"
-	tautulli_import "github.com/tomtom215/cartographus/internal/import"
+	tautulliimport "github.com/tomtom215/cartographus/internal/import"
 	"github.com/tomtom215/cartographus/internal/logging"
 	"github.com/tomtom215/cartographus/internal/supervisor"
 	"github.com/tomtom215/cartographus/internal/supervisor/services"
 )
 
-// importerAdapter wraps tautulli_import.Importer to implement services.ImporterInterface.
+// importerAdapter wraps tautulliimport.Importer to implement services.ImporterInterface.
 // This adapter is necessary because the Importer returns *ImportStats while the
 // interface expects interface{} for flexibility.
 type importerAdapter struct {
-	importer *tautulli_import.Importer
+	importer *tautulliimport.Importer
 }
 
 // Import implements services.ImporterInterface.
@@ -44,8 +44,8 @@ func (a *importerAdapter) Stop() error {
 
 // ImportComponents holds import-related components for lifecycle management.
 type ImportComponents struct {
-	importer *tautulli_import.Importer
-	progress tautulli_import.ProgressTracker
+	importer *tautulliimport.Importer
+	progress tautulliimport.ProgressTracker
 	service  *services.ImportService
 	handlers *api.ImportHandlers
 }
@@ -78,29 +78,29 @@ func InitImport(cfg *config.Config, natsComponents *NATSComponents, tree *superv
 	// Create progress tracker
 	// Use BadgerDB if WAL is enabled for persistent progress across restarts
 	// Otherwise fall back to in-memory progress
-	var progress tautulli_import.ProgressTracker
+	var progress tautulliimport.ProgressTracker
 	if badgerDB := natsComponents.BadgerDB(); badgerDB != nil {
 		if db, ok := badgerDB.(*badger.DB); ok {
-			progress = tautulli_import.NewBadgerProgress(db)
+			progress = tautulliimport.NewBadgerProgress(db)
 			components.progress = progress
 			logging.Info().Msg("Import progress tracker created (BadgerDB - persistent)")
 		} else {
-			progress = tautulli_import.NewInMemoryProgress()
+			progress = tautulliimport.NewInMemoryProgress()
 			components.progress = progress
 			logging.Warn().Msg("Import progress tracker created (in-memory - BadgerDB type assertion failed)")
 		}
 	} else {
-		progress = tautulli_import.NewInMemoryProgress()
+		progress = tautulliimport.NewInMemoryProgress()
 		components.progress = progress
 		logging.Info().Msg("Import progress tracker created (in-memory - WAL not enabled)")
 	}
 
 	// Get event publisher from NATS components
-	// The publisher implements tautulli_import.EventPublisher interface
+	// The publisher implements tautulliimport.EventPublisher interface
 	publisher := natsComponents.publisher
 
 	// Create the importer
-	importer := tautulli_import.NewImporter(&cfg.Import, publisher, progress)
+	importer := tautulliimport.NewImporter(&cfg.Import, publisher, progress)
 	components.importer = importer
 	logging.Info().
 		Str("db_path", cfg.Import.DBPath).
@@ -137,7 +137,7 @@ func InitImport(cfg *config.Config, natsComponents *NATSComponents, tree *superv
 }
 
 // Importer returns the underlying importer instance.
-func (c *ImportComponents) Importer() *tautulli_import.Importer {
+func (c *ImportComponents) Importer() *tautulliimport.Importer {
 	if c == nil {
 		return nil
 	}
@@ -145,7 +145,7 @@ func (c *ImportComponents) Importer() *tautulli_import.Importer {
 }
 
 // Progress returns the progress tracker.
-func (c *ImportComponents) Progress() tautulli_import.ProgressTracker {
+func (c *ImportComponents) Progress() tautulliimport.ProgressTracker {
 	if c == nil {
 		return nil
 	}

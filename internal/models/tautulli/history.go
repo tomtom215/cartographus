@@ -187,7 +187,7 @@ type TautulliHistoryRecord struct {
 	GrandparentRatingKey  *int     `json:"grandparent_rating_key"`  // Numeric ID (nil when null)
 	MediaIndex            *int     `json:"media_index"`             // Episode number (nil for movies)
 	ParentMediaIndex      *int     `json:"parent_media_index"`      // Season number (nil for movies)
-	Guid                  string   `json:"guid"`                    // External IDs (IMDB, TVDB, etc.)
+	GUID                  string   `json:"guid"`                    // External IDs (IMDB, TVDB, etc.)
 	OriginalTitle         *string  `json:"original_title"`          // Original non-localized title (nullable)
 	FullTitle             string   `json:"full_title"`              // Formatted full title
 	OriginallyAvailableAt *string  `json:"originally_available_at"` // Release date (nullable)
@@ -294,6 +294,6 @@ type TautulliHistoryRecord struct {
 	GrandparentArt   string `json:"grandparent_art"`
 
 	// GUID for external ID matching
-	ParentGuid      string `json:"parent_guid"`
-	GrandparentGuid string `json:"grandparent_guid"`
+	ParentGUID      string `json:"parent_guid"`
+	GrandparentGUID string `json:"grandparent_guid"`
 }

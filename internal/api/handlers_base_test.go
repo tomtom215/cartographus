@@ -6,6 +6,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -40,7 +41,7 @@ func TestNewHandler(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	mockClient := &MockTautulliClient{}
 
@@ -80,7 +81,7 @@ func TestNewHandler_WithoutPlexOAuth(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := NewHandler(nil, nil, nil, cfg, nil, wsHub)
 
@@ -267,7 +268,7 @@ func TestOnSyncCompleted_WithWSHub(t *testing.T) {
 	c.Set("analytics", "cached_data")
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		cache:     c,

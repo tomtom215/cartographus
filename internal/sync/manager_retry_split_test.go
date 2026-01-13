@@ -90,7 +90,7 @@ func TestManager_RetryWithBackoff_Success(t *testing.T) {
 func BenchmarkManager_ProcessHistoryRecord(b *testing.B) {
 	cfg := newTestConfig()
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -111,7 +111,7 @@ func BenchmarkManager_ProcessHistoryRecord(b *testing.B) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("bench-session"),

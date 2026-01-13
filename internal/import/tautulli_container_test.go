@@ -5,7 +5,7 @@
 
 //go:build integration
 
-package tautulli_import
+package tautulliimport
 
 import (
 	"context"

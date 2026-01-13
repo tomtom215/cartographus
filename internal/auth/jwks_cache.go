@@ -98,7 +98,7 @@ func (c *JWKSCache) refreshKeys(ctx context.Context) (map[string]*rsa.PublicKey,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("JWKS fetch failed with status %d", resp.StatusCode)

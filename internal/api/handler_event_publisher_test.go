@@ -378,7 +378,7 @@ func TestPlexWebhook_WithEventPublisher(t *testing.T) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background()) //nolint:errcheck // Test only
 
 	pub := &mockWebhookEventPublisher{}
 
@@ -443,7 +443,7 @@ func TestPlexWebhook_NoPublish_NonMediaEvents(t *testing.T) {
 			}
 
 			wsHub := ws.NewHub()
-			go wsHub.Run()
+			go wsHub.RunWithContext(context.Background())
 
 			pub := &mockWebhookEventPublisher{}
 
@@ -512,7 +512,7 @@ func TestPlexWebhook_MediaEvents_AllPublish(t *testing.T) {
 			}
 
 			wsHub := ws.NewHub()
-			go wsHub.Run()
+			go wsHub.RunWithContext(context.Background())
 
 			pub := &mockWebhookEventPublisher{}
 

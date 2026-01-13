@@ -130,7 +130,7 @@ func (n *DiscordNotifier) Send(ctx context.Context, alert *Alert) error {
 	n.mu.Unlock()
 
 	if resp.StatusCode >= 400 {
-		return fmt.Errorf("Discord webhook returned status %d", resp.StatusCode)
+		return fmt.Errorf("discord webhook returned status %d", resp.StatusCode)
 	}
 
 	return nil

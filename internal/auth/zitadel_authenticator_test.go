@@ -10,6 +10,7 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -194,7 +195,7 @@ func TestZitadelOIDCAuthenticator_Authenticate_NoToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	// No Authorization header, no cookie
 
-	_, err := auth.Authenticate(nil, req)
+	_, err := auth.Authenticate(context.Background(), req)
 
 	if !errors.Is(err, ErrNoCredentials) {
 		t.Errorf("expected ErrNoCredentials, got %v", err)

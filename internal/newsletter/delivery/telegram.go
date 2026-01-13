@@ -52,18 +52,18 @@ func (c *TelegramChannel) MaxContentLength() int {
 // Validate checks if the Telegram configuration is valid.
 func (c *TelegramChannel) Validate(config *models.ChannelConfig) error {
 	if config == nil {
-		return fmt.Errorf("Telegram configuration is required")
+		return fmt.Errorf("telegram configuration is required")
 	}
 	if config.TelegramBotToken == "" {
-		return fmt.Errorf("Telegram bot token is required")
+		return fmt.Errorf("telegram bot token is required")
 	}
 	if config.TelegramChatID == "" {
-		return fmt.Errorf("Telegram chat ID is required")
+		return fmt.Errorf("telegram chat ID is required")
 	}
 	// Validate bot token format (numbers:alphanumeric)
 	parts := strings.Split(config.TelegramBotToken, ":")
 	if len(parts) != 2 || len(parts[0]) == 0 || len(parts[1]) == 0 {
-		return fmt.Errorf("invalid Telegram bot token format")
+		return fmt.Errorf("invalid telegram bot token format")
 	}
 	return nil
 }
@@ -134,7 +134,7 @@ func (c *TelegramChannel) Send(ctx context.Context, params *SendParams) (*Delive
 		result.IsTransient = isTransientHTTPError(result.ErrorCode)
 		return result, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	result.ResponseCode = resp.StatusCode
 

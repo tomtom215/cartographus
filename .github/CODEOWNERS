@@ -1,0 +1,54 @@
+# CODEOWNERS for Cartographus
+# These owners will be requested for review when someone opens a pull request.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @tomtom215
+
+# Backend (Go)
+/cmd/ @tomtom215
+/internal/ @tomtom215
+*.go @tomtom215
+go.mod @tomtom215
+go.sum @tomtom215
+
+# API handlers and routing
+/internal/api/ @tomtom215
+/docs/API-REFERENCE.md @tomtom215
+
+# Database schema and migrations
+/internal/database/ @tomtom215
+
+# Authentication and Authorization
+/internal/auth/ @tomtom215
+/internal/authz/ @tomtom215
+
+# Frontend (TypeScript)
+/web/ @tomtom215
+*.ts @tomtom215
+*.tsx @tomtom215
+*.css @tomtom215
+package.json @tomtom215
+package-lock.json @tomtom215
+
+# Infrastructure and DevOps
+/.github/ @tomtom215
+/deploy/ @tomtom215
+/scripts/ @tomtom215
+Dockerfile @tomtom215
+docker-compose*.yml @tomtom215
+
+# Documentation
+/docs/ @tomtom215
+*.md @tomtom215
+CLAUDE.md @tomtom215
+
+# Tests
+/tests/ @tomtom215
+*_test.go @tomtom215
+*.spec.ts @tomtom215
+
+# Configuration
+/config/ @tomtom215
+*.yml @tomtom215
+*.yaml @tomtom215

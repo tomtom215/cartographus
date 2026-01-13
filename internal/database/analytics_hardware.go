@@ -141,7 +141,7 @@ func (db *DB) GetHardwareTranscodeStats(ctx context.Context, filter LocationStat
 	if err != nil {
 		return nil, fmt.Errorf("failed to query decoder stats: %w", err)
 	}
-	defer decoderRows.Close()
+	defer func() { _ = decoderRows.Close() }()
 
 	for decoderRows.Next() {
 		var codec, title string
@@ -181,7 +181,7 @@ func (db *DB) GetHardwareTranscodeStats(ctx context.Context, filter LocationStat
 	if err != nil {
 		return nil, fmt.Errorf("failed to query encoder stats: %w", err)
 	}
-	defer encoderRows.Close()
+	defer func() { _ = encoderRows.Close() }()
 
 	for encoderRows.Next() {
 		var codec, title string

@@ -379,9 +379,7 @@ func TestPlexClient_GetHistoryAll(t *testing.T) {
 		client := NewPlexClient(server.URL, "test-token")
 		history, err := client.GetHistoryAll(context.Background(), "", nil)
 		assertError(t, err, "GetHistoryAll() with 403 response")
-		if history == nil || len(history) == 0 {
-			// Expected: empty or nil on error
-		} else {
+		if len(history) != 0 {
 			t.Errorf("history should be empty on error, got %d items", len(history))
 		}
 	})
@@ -449,9 +447,7 @@ func TestPlexClient_GetTranscodeSessions(t *testing.T) {
 		client := NewPlexClient(server.URL, "test-token")
 		sessions, err := client.GetTranscodeSessions(context.Background())
 		assertError(t, err, "GetTranscodeSessions() with 500 response")
-		if sessions == nil || len(sessions) == 0 {
-			// Expected: empty or nil on error
-		} else {
+		if len(sessions) != 0 {
 			t.Errorf("sessions should be empty on error, got %d items", len(sessions))
 		}
 	})

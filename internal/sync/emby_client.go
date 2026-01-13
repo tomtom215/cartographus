@@ -101,11 +101,7 @@ func (c *EmbyClient) GetSessions(ctx context.Context) ([]models.EmbySession, err
 	if err != nil {
 		return nil, fmt.Errorf("emby sessions request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail - main operation succeeded
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
@@ -152,11 +148,7 @@ func (c *EmbyClient) GetSystemInfo(ctx context.Context) (*EmbySystemInfo, error)
 	if err != nil {
 		return nil, fmt.Errorf("emby system info request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
@@ -182,11 +174,7 @@ func (c *EmbyClient) GetUsers(ctx context.Context) ([]EmbyUser, error) {
 	if err != nil {
 		return nil, fmt.Errorf("emby users request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
@@ -212,11 +200,7 @@ func (c *EmbyClient) Ping(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("emby ping failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("emby ping returned status %d", resp.StatusCode)
@@ -239,11 +223,7 @@ func (c *EmbyClient) StopSession(ctx context.Context, sessionID string) error {
 	if err != nil {
 		return fmt.Errorf("emby stop session request failed: %w", err)
 	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			// Log but don't fail
-		}
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Emby returns 204 No Content on success
 	if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {
@@ -412,10 +392,10 @@ func EmbySessionToPlaybackEvent(session *models.EmbySession, _ string) *models.P
 	if item.ProviderIDs != nil {
 		if imdb, ok := item.ProviderIDs["Imdb"]; ok {
 			guid := "imdb://" + imdb
-			event.Guid = &guid
+			event.GUID = &guid
 		} else if tmdb, ok := item.ProviderIDs["Tmdb"]; ok {
 			guid := "tmdb://" + tmdb
-			event.Guid = &guid
+			event.GUID = &guid
 		}
 	}
 

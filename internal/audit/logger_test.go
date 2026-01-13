@@ -268,7 +268,9 @@ func TestMemoryStore_Query(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		if err := store.Save(ctx, &e); err != nil {
+			t.Fatalf("Save() error = %v", err)
+		}
 	}
 
 	// Query by type
@@ -317,7 +319,9 @@ func TestMemoryStore_TimeRangeQuery(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		if err := store.Save(ctx, &e); err != nil {
+			t.Fatalf("Save() error = %v", err)
+		}
 	}
 
 	// Query last 90 minutes
@@ -348,7 +352,7 @@ func TestMemoryStore_Delete(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		_ = store.Save(ctx, &e)
 	}
 
 	// Delete events older than 36 hours
@@ -376,7 +380,7 @@ func TestMemoryStore_Count(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		_ = store.Save(ctx, &e)
 	}
 
 	// Count all
@@ -404,7 +408,7 @@ func TestMemoryStore_GetStats(t *testing.T) {
 	}
 
 	for _, e := range events {
-		store.Save(ctx, &e)
+		_ = store.Save(ctx, &e)
 	}
 
 	stats, err := store.GetStats(ctx)

@@ -23,7 +23,9 @@ func BenchmarkCreateBackup(b *testing.B) {
 	for i := range content {
 		content[i] = byte(i % 256)
 	}
-	os.WriteFile(dbPath, content, 0644)
+	if err := os.WriteFile(dbPath, content, 0644); err != nil {
+		b.Fatalf("failed to write test db: %v", err)
+	}
 
 	mockDB := &MockDatabase{path: dbPath}
 
@@ -48,7 +50,7 @@ func BenchmarkCreateBackup(b *testing.B) {
 			b.Fatalf("backup failed: %v", err)
 		}
 		// Clean up
-		os.Remove(backup.FilePath)
+		_ = os.Remove(backup.FilePath)
 	}
 }
 
@@ -63,7 +65,9 @@ func BenchmarkCalculateChecksum(b *testing.B) {
 	for i := range content {
 		content[i] = byte(i % 256)
 	}
-	os.WriteFile(filePath, content, 0644)
+	if err := os.WriteFile(filePath, content, 0644); err != nil {
+		b.Fatalf("failed to write test file: %v", err)
+	}
 
 	manager := &Manager{}
 

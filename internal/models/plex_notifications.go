@@ -51,7 +51,7 @@ type PlexPlayingNotification struct {
 
 	// Content identification
 	Key  string `json:"key,omitempty"`  // Metadata key path
-	Guid string `json:"guid,omitempty"` // External GUID (imdb://, tvdb://, etc.)
+	GUID string `json:"guid,omitempty"` // External GUID (imdb://, tvdb://, etc.)
 	URL  string `json:"url,omitempty"`  // Content URL
 
 	// Transcode session (CRITICAL: Real-time transcode monitoring)

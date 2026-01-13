@@ -104,7 +104,7 @@ func TestInsertPlaybackEvent(t *testing.T) {
 				if err != nil {
 					t.Fatalf("Failed to query inserted event: %v", err)
 				}
-				defer result.Close()
+				defer func() { _ = result.Close() }()
 
 				if !result.Next() {
 					t.Error("Event was not inserted")
@@ -204,7 +204,7 @@ func TestInsertGeolocation(t *testing.T) {
 				if err != nil {
 					t.Fatalf("Failed to query inserted geolocation: %v", err)
 				}
-				defer result.Close()
+				defer func() { _ = result.Close() }()
 
 				if !result.Next() {
 					t.Error("Geolocation was not inserted")

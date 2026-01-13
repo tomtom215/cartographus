@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // https://github.com/tomtom215/cartographus
 
-//nolint:revive // package name with underscore is intentional for clarity
-package tautulli_import
+package tautulliimport
 
 import (
 	"context"

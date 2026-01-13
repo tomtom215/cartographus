@@ -30,7 +30,7 @@ func TestFlowHandlers_PlexLogin(t *testing.T) {
 			"expires_at": time.Now().Add(5 * time.Minute).Format(time.RFC3339),
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer pinServer.Close()
 
@@ -98,7 +98,7 @@ func TestFlowHandlers_PlexPoll_NotAuthorized(t *testing.T) {
 			"expires_at": time.Now().Add(5 * time.Minute).Format(time.RFC3339),
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer pinServer.Close()
 
@@ -199,7 +199,7 @@ func TestFlowHandlers_PlexCallback_Success(t *testing.T) {
 				"expires_at": time.Now().Add(5 * time.Minute).Format(time.RFC3339),
 			}
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(resp)
+			_ = json.NewEncoder(w).Encode(resp)
 			return
 		}
 		if r.URL.Path == "/user" {
@@ -218,7 +218,7 @@ func TestFlowHandlers_PlexCallback_Success(t *testing.T) {
 				},
 			}
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(resp)
+			_ = json.NewEncoder(w).Encode(resp)
 			return
 		}
 		http.NotFound(w, r)
@@ -392,7 +392,7 @@ func TestFlowHandlers_PlexCallback_PINNotAuthorized(t *testing.T) {
 			"expires_at": time.Now().Add(5 * time.Minute).Format(time.RFC3339),
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}))
 	defer pinCheckServer.Close()
 
@@ -440,7 +440,7 @@ func TestFlowHandlers_PlexCallback_UserInfoFailure(t *testing.T) {
 				"expires_at": time.Now().Add(5 * time.Minute).Format(time.RFC3339),
 			}
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(resp)
+			_ = json.NewEncoder(w).Encode(resp)
 			return
 		}
 		if r.URL.Path == "/user" {
@@ -492,7 +492,7 @@ func TestFlowHandlers_PlexCallback_DefaultRedirect(t *testing.T) {
 				"expires_at": time.Now().Add(5 * time.Minute).Format(time.RFC3339),
 			}
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(resp)
+			_ = json.NewEncoder(w).Encode(resp)
 			return
 		}
 		if r.URL.Path == "/user" {
@@ -506,7 +506,7 @@ func TestFlowHandlers_PlexCallback_DefaultRedirect(t *testing.T) {
 				},
 			}
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(resp)
+			_ = json.NewEncoder(w).Encode(resp)
 			return
 		}
 		http.NotFound(w, r)

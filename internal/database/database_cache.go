@@ -37,43 +37,11 @@ Cache Invalidation:
 package database
 
 import (
-	"context"
-	"database/sql"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/tomtom215/cartographus/internal/metrics"
 )
-
-// prepareOnce prepares a SQL statement and caches it for reuse
-func (db *DB) prepareOnce(ctx context.Context, query string) (*sql.Stmt, error) {
-	// Check cache first (read lock)
-	db.stmtCacheMu.RLock()
-	if stmt, ok := db.stmtCache[query]; ok {
-		db.stmtCacheMu.RUnlock()
-		return stmt, nil
-	}
-	db.stmtCacheMu.RUnlock()
-
-	// Not in cache, prepare statement (write lock)
-	db.stmtCacheMu.Lock()
-	defer db.stmtCacheMu.Unlock()
-
-	// Double-check in case another goroutine prepared it
-	if stmt, ok := db.stmtCache[query]; ok {
-		return stmt, nil
-	}
-
-	//nolint:sqlclosecheck // Statement is cached and closed in DB.Close()
-	stmt, err := db.conn.PrepareContext(ctx, query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to prepare statement: %w", err)
-	}
-
-	db.stmtCache[query] = stmt
-	return stmt, nil
-}
 
 // getTileCached retrieves a vector tile from cache if valid
 func (db *DB) getTileCached(cacheKey string) ([]byte, bool) {

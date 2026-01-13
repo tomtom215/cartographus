@@ -329,7 +329,7 @@ func TestJWKSCache_Integration(t *testing.T) {
 		}
 
 		if key == nil {
-			t.Error("Key should not be nil")
+			t.Fatal("Key should not be nil")
 		}
 
 		// Verify it matches the server's public key

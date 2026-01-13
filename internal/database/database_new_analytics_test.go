@@ -198,11 +198,15 @@ func TestGetAudioAnalytics(t *testing.T) {
 
 		e1 := createTestEvent(now, 0)
 		e1.UserID, e1.Username, e1.AudioCodec = 1, "user1", &codec1
-		db.InsertPlaybackEvent(e1)
+		if err := db.InsertPlaybackEvent(e1); err != nil {
+			t.Fatalf("InsertPlaybackEvent(e1) failed: %v", err)
+		}
 
 		e2 := createTestEvent(now, 1)
 		e2.UserID, e2.Username, e2.IPAddress, e2.AudioCodec = 2, "user2", "192.168.1.2", &codec2
-		db.InsertPlaybackEvent(e2)
+		if err := db.InsertPlaybackEvent(e2); err != nil {
+			t.Fatalf("InsertPlaybackEvent(e2) failed: %v", err)
+		}
 
 		analytics, err := db.GetAudioAnalytics(context.Background(), LocationStatsFilter{Users: []string{"user1"}})
 		if err != nil {
@@ -578,7 +582,7 @@ func TestEnsureContext(t *testing.T) {
 	defer db.Close()
 
 	t.Run("nil context gets timeout", func(t *testing.T) {
-		ctx, cancel := db.ensureContext(nil)
+		ctx, cancel := db.ensureContext(nil) //nolint:staticcheck // SA1012: intentionally testing nil context handling
 		defer cancel()
 
 		deadline, hasDeadline := ctx.Deadline()

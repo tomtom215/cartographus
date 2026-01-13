@@ -1,0 +1,54 @@
+# Reusable workflow for Go linting
+name: Lint
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: 'Go version to use'
+        required: false
+        type: string
+        default: '1.24.0'
+
+jobs:
+  lint:
+    name: Go Lint
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: true
+
+      - name: Set Go environment
+        run: |
+          echo "GOTOOLCHAIN=local" >> $GITHUB_ENV
+          echo "CGO_ENABLED=1" >> $GITHUB_ENV
+
+      - name: Run go vet
+        run: go vet -tags "wal,nats" ./...
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.6.2
+          args: --timeout=5m --build-tags "wal,nats"
+          skip-cache: false
+
+      - name: Check Go mod tidy
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum || (echo "go.mod or go.sum is dirty. Run 'go mod tidy' and commit." && exit 1)
+
+      - name: Check gofmt
+        run: |
+          GOFMT_OUTPUT=$(gofmt -l .)
+          if [ -n "$GOFMT_OUTPUT" ]; then
+            echo "The following files need formatting:"
+            echo "$GOFMT_OUTPUT"
+            exit 1
+          fi

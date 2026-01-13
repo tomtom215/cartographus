@@ -1,0 +1,152 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in Cartographus
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form below.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched for existing issues that might be related
+          required: true
+        - label: I am using the latest version of Cartographus
+          required: true
+        - label: I have checked the [troubleshooting guide](https://github.com/tomtom215/cartographus/blob/main/docs/TROUBLESHOOTING.md)
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe the bug here...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe expected behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe actual behavior...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - Backend (Go server)
+        - Frontend (Web UI)
+        - Map Visualization
+        - Charts/Analytics
+        - Authentication
+        - API
+        - Database
+        - WebSocket
+        - Docker/Deployment
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Cartographus Version
+      description: What version are you running?
+      placeholder: e.g., v1.0.0 or commit SHA
+    validations:
+      required: true
+
+  - type: dropdown
+    id: media-server
+    attributes:
+      label: Media Server Integration
+      description: Which media server(s) are you using?
+      multiple: true
+      options:
+        - Tautulli
+        - Plex (direct)
+        - Jellyfin
+        - Emby
+        - None/Not applicable
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment Method
+      description: How is Cartographus deployed?
+      options:
+        - Docker
+        - Docker Compose
+        - Binary (Linux)
+        - Binary (macOS)
+        - Source build
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: |
+        Please provide relevant environment details:
+        - OS and version
+        - Browser (if frontend issue)
+        - Docker version (if applicable)
+        - Database size (approximate)
+      placeholder: |
+        - OS: Ubuntu 22.04
+        - Browser: Chrome 120
+        - Docker: 24.0.7
+        - Database: ~500MB, 50k records
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: |
+        Please include any relevant log output.
+        Tip: Use LOG_LEVEL=debug for more detailed logs.
+      render: shell
+      placeholder: |
+        Paste logs here...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or files that might help
+      placeholder: Any additional information...

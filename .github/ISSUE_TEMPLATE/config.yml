@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/tomtom215/cartographus/tree/main/docs
+    about: Check out the documentation for guides and references
+  - name: Discussions
+    url: https://github.com/tomtom215/cartographus/discussions
+    about: Ask questions and discuss features with the community
+  - name: Troubleshooting Guide
+    url: https://github.com/tomtom215/cartographus/blob/main/docs/TROUBLESHOOTING.md
+    about: Common issues and solutions
+  - name: Architecture Decision Records
+    url: https://github.com/tomtom215/cartographus/tree/main/docs/adr
+    about: Understand design decisions and technical rationale

@@ -7,6 +7,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -39,7 +40,7 @@ func setupWebhookTestHandler(t *testing.T, webhooksEnabled bool, webhookSecret s
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	return &Handler{
 		cache:     cache.New(5 * time.Minute),
@@ -459,7 +460,7 @@ func BenchmarkPlexWebhook(b *testing.B) {
 	}
 
 	wsHub := ws.NewHub()
-	go wsHub.Run()
+	go wsHub.RunWithContext(context.Background())
 
 	handler := &Handler{
 		cache:     cache.New(5 * time.Minute),

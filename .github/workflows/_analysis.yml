@@ -1,0 +1,106 @@
+# Reusable workflow for security analysis
+name: Security Analysis
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: 'Go version to use'
+        required: false
+        type: string
+        default: '1.24.0'
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: true
+
+      - name: Set Go environment
+        run: |
+          echo "GOTOOLCHAIN=local" >> $GITHUB_ENV
+          echo "CGO_ENABLED=1" >> $GITHUB_ENV
+
+      - name: Initialize CodeQL for Go
+        uses: github/codeql-action/init@v4
+        with:
+          languages: go
+          build-mode: manual
+
+      - name: Build Go code
+        run: go build -tags "wal,nats" ./...
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:go"
+
+  codeql-js:
+    name: CodeQL JS Analysis
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL for JavaScript
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:javascript-typescript"
+
+  gosec:
+    name: Go Security Scan
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          # Excluded rules:
+          # G101: False positives on salt/info constant strings (not credentials)
+          # G104: Errors unhandled - most are intentional cleanup paths with nolint
+          # G115: Integer overflow - all instances are bounded by constraints
+          # G201/G202: SQL formatting - all use parameterized queries with safe column names
+          # G203: HTML injection - intentional for trusted template content
+          # G304: File paths from trusted config/internal sources
+          # G404: math/rand for non-security (shuffling, seeding, test data)
+          # G407: False positive - GCM nonce is randomly generated
+          # G602: Slice access - arrays have validated lengths
+          args: '-tags "wal,nats" -exclude-generated -exclude=G101,G104,G115,G201,G202,G203,G304,G404,G407,G602 ./...'
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, MPL-2.0, LGPL-2.1, LGPL-3.0, Unlicense, CC0-1.0

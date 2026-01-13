@@ -8,7 +8,7 @@ package database
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,8 +21,7 @@ import (
 func (db *DB) SeedMockData(ctx context.Context) error {
 	logging.Info().Msg("Seeding database with mock data for screenshots...")
 
-	// Seed random number generator for consistent but varied data
-	rand.Seed(time.Now().UnixNano())
+	// rand/v2 auto-seeds from system entropy, no explicit seeding needed
 
 	// Define mock data parameters
 	const (
@@ -148,16 +147,16 @@ func (db *DB) SeedMockData(ctx context.Context) error {
 
 	for i := 0; i < numPlaybacks; i++ {
 		// Random distribution across time
-		dayOffset := rand.Intn(daysOfHistory)
-		hourOffset := rand.Intn(24)
-		minuteOffset := rand.Intn(60)
+		dayOffset := rand.IntN(daysOfHistory)
+		hourOffset := rand.IntN(24)
+		minuteOffset := rand.IntN(60)
 		timestamp := startDate.AddDate(0, 0, dayOffset).Add(time.Hour * time.Duration(hourOffset)).Add(time.Minute * time.Duration(minuteOffset))
 
 		// Random user and title
-		user := users[rand.Intn(len(users))]
-		title := titles[rand.Intn(len(titles))]
-		platform := platforms[rand.Intn(len(platforms))]
-		player := players[rand.Intn(len(players))]
+		user := users[rand.IntN(len(users))]
+		title := titles[rand.IntN(len(titles))]
+		platform := platforms[rand.IntN(len(platforms))]
+		player := players[rand.IntN(len(players))]
 
 		// Determine media type from title
 		mediaType := "movie"
@@ -171,7 +170,7 @@ func (db *DB) SeedMockData(ctx context.Context) error {
 		intPtr := func(n int) *int { return &n }
 
 		// Random watch duration (30 minutes to 3 hours)
-		durationMinutes := 30 + rand.Intn(150)
+		durationMinutes := 30 + rand.IntN(150)
 		stoppedTime := timestamp.Add(time.Duration(durationMinutes) * time.Minute)
 
 		event := &models.PlaybackEvent{
@@ -181,7 +180,7 @@ func (db *DB) SeedMockData(ctx context.Context) error {
 			StoppedAt:        timePtr(stoppedTime),
 			UserID:           indexOf(users, user),
 			Username:         user,
-			IPAddress:        fmt.Sprintf("192.168.%d.%d", rand.Intn(len(locations))/256, rand.Intn(len(locations))%256),
+			IPAddress:        fmt.Sprintf("192.168.%d.%d", rand.IntN(len(locations))/256, rand.IntN(len(locations))%256),
 			MediaType:        mediaType,
 			Title:            title,
 			ParentTitle:      strPtr(""),
@@ -189,8 +188,8 @@ func (db *DB) SeedMockData(ctx context.Context) error {
 			Platform:         platform,
 			Player:           player,
 			LocationType:     "lan",
-			PercentComplete:  85 + rand.Intn(15), // 85-100%
-			PausedCounter:    rand.Intn(5),
+			PercentComplete:  85 + rand.IntN(15), // 85-100%
+			PausedCounter:    rand.IntN(5),
 			PlayDuration:     intPtr(durationMinutes), // CRITICAL: Required for analytics queries
 			CreatedAt:        time.Now(),
 		}

@@ -213,7 +213,7 @@ type PlaybackEvent struct {
 	GrandparentRatingKey  *string `json:"grandparent_rating_key,omitempty"`
 	MediaIndex            *int    `json:"media_index,omitempty"`             // Episode number (for binge detection)
 	ParentMediaIndex      *int    `json:"parent_media_index,omitempty"`      // Season number (for binge detection)
-	Guid                  *string `json:"guid,omitempty"`                    // External IDs (IMDB, TVDB, TMDB)
+	GUID                  *string `json:"guid,omitempty"`                    // External IDs (IMDB, TVDB, TMDB)
 	OriginalTitle         *string `json:"original_title,omitempty"`          // Original non-localized title
 	FullTitle             *string `json:"full_title,omitempty"`              // Formatted full title
 	OriginallyAvailableAt *string `json:"originally_available_at,omitempty"` // Release date
@@ -323,8 +323,8 @@ type PlaybackEvent struct {
 	GrandparentArt   *string `json:"grandparent_art,omitempty"`
 
 	// Additional GUID fields for external ID matching
-	ParentGuid      *string `json:"parent_guid,omitempty"`
-	GrandparentGuid *string `json:"grandparent_guid,omitempty"`
+	ParentGUID      *string `json:"parent_guid,omitempty"`
+	GrandparentGUID *string `json:"grandparent_guid,omitempty"`
 
 	CreatedAt time.Time `json:"created_at"`
 }

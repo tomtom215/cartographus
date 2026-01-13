@@ -47,7 +47,7 @@ type TautulliMetadataData struct {
 	AddedAt               int64               `json:"added_at"`
 	UpdatedAt             int64               `json:"updated_at"`
 	LastViewedAt          int64               `json:"last_viewed_at"`
-	Guid                  string              `json:"guid"`
+	GUID                  string              `json:"guid"`
 	Guids                 []string            `json:"guids"`
 	Directors             []string            `json:"directors"`
 	Writers               []string            `json:"writers"`
@@ -114,7 +114,7 @@ type TautulliChildrenMetadataChild struct {
 	AddedAt              int64  `json:"added_at,omitempty"`
 	UpdatedAt            int64  `json:"updated_at,omitempty"`
 	LastViewedAt         int64  `json:"last_viewed_at,omitempty"`
-	Guid                 string `json:"guid,omitempty"`
-	ParentGuid           string `json:"parent_guid,omitempty"`
-	GrandparentGuid      string `json:"grandparent_guid,omitempty"`
+	GUID                 string `json:"guid,omitempty"`
+	ParentGUID           string `json:"parent_guid,omitempty"`
+	GrandparentGUID      string `json:"grandparent_guid,omitempty"`
 }

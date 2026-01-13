@@ -386,7 +386,7 @@ func (db *DB) GetPeriodStats(ctx context.Context, start, end time.Time) (*models
 	if err != nil {
 		return nil, fmt.Errorf("failed to query platform stats: %w", err)
 	}
-	defer platformRows.Close()
+	defer func() { _ = platformRows.Close() }()
 
 	totalPlatformWatches := 0
 	var platforms []models.PlatformStat
@@ -435,7 +435,7 @@ func (db *DB) GetPeriodStats(ctx context.Context, start, end time.Time) (*models
 	if err != nil {
 		return nil, fmt.Errorf("failed to query user stats: %w", err)
 	}
-	defer userRows.Close()
+	defer func() { _ = userRows.Close() }()
 
 	var users []models.UserStat
 	for userRows.Next() {

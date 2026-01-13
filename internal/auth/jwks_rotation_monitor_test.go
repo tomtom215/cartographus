@@ -105,7 +105,7 @@ func TestJWKSCacheWithRotationMonitor_GetKey(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(jwks)
+		_ = json.NewEncoder(w).Encode(jwks)
 	}))
 	defer server.Close()
 
@@ -174,7 +174,7 @@ func TestJWKSCacheWithRotationMonitor_KeyRotation(t *testing.T) {
 		defer mu.Unlock()
 		jwks := createTestJWKS(currentKeys)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(jwks)
+		_ = json.NewEncoder(w).Encode(jwks)
 	}))
 	defer server.Close()
 
@@ -278,7 +278,7 @@ func TestJWKSCacheWithRotationMonitor_GracefulDegradation(t *testing.T) {
 		// First request succeeds, subsequent requests fail
 		if count == 1 {
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(jwks)
+			_ = json.NewEncoder(w).Encode(jwks)
 		} else {
 			w.WriteHeader(http.StatusServiceUnavailable)
 		}
@@ -319,7 +319,7 @@ func TestJWKSCacheWithRotationMonitor_ConcurrentAccess(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(jwks)
+		_ = json.NewEncoder(w).Encode(jwks)
 	}))
 	defer server.Close()
 
@@ -358,7 +358,7 @@ func TestJWKSCacheWithRotationMonitor_SetURI(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(jwks)
+		_ = json.NewEncoder(w).Encode(jwks)
 	}))
 	defer server.Close()
 
@@ -397,7 +397,7 @@ func TestJWKSCacheWithRotationMonitor_KeyIDs(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(jwks)
+		_ = json.NewEncoder(w).Encode(jwks)
 	}))
 	defer server.Close()
 

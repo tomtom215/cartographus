@@ -129,7 +129,9 @@ func TestConcurrentStreamsDetector_UserLimits(t *testing.T) {
 	detector := NewConcurrentStreamsDetector(mock)
 
 	// Set higher limit for user 1
-	detector.SetUserLimit(1, 5)
+	if err := detector.SetUserLimit(1, 5); err != nil {
+		t.Fatalf("SetUserLimit() error = %v", err)
+	}
 
 	event := &DetectionEvent{
 		UserID:     1,
@@ -406,7 +408,9 @@ func TestGeoRestrictionDetector_Check(t *testing.T) {
 
 			if len(tt.blockedCountries) > 0 || len(tt.allowedCountries) > 0 {
 				configBytes, _ := jsonMarshal(config)
-				detector.Configure(configBytes)
+				if err := detector.Configure(configBytes); err != nil {
+					t.Fatalf("Configure() error = %v", err)
+				}
 			}
 
 			event := &DetectionEvent{

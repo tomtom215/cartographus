@@ -337,7 +337,7 @@ func TestUserLocationTracker_BasicOperations(t *testing.T) {
 	// Record second location
 	prev = tracker.RecordLocation("user1", 34.0522, -118.2437, time.Now(), nil)
 	if prev == nil {
-		t.Error("Second location should have previous")
+		t.Fatal("Second location should have previous")
 	}
 	if prev.Lat != 40.7128 {
 		t.Errorf("Previous lat = %f, want 40.7128", prev.Lat)

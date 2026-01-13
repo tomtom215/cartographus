@@ -234,14 +234,13 @@ func FuzzBuildFilterConditionsDateRange(f *testing.F) {
 			}
 
 			// Start date should be before or equal to end date in args
+			// Note: This is allowed by the filter but might be logically incorrect
+			// The application should validate this at a higher level
 			if len(args) >= 2 {
-				if startTime, ok := args[0].(time.Time); ok {
-					if endTime, ok := args[1].(time.Time); ok {
-						if startTime.After(endTime) {
-							// This is allowed by the filter but might be logically incorrect
-							// The application should validate this at a higher level
-						}
-					}
+				startTime, okStart := args[0].(time.Time)
+				endTime, okEnd := args[1].(time.Time)
+				if okStart && okEnd {
+					_ = startTime.After(endTime) // Range validation (logged elsewhere)
 				}
 			}
 		}

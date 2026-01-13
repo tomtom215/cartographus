@@ -164,7 +164,7 @@ func (c *WebhookChannel) Send(ctx context.Context, params *SendParams) (*Deliver
 		result.IsTransient = isTransientHTTPError(result.ErrorCode)
 		return result, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	result.ResponseCode = resp.StatusCode
 

@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // https://github.com/tomtom215/cartographus
 
-//nolint:revive // package name with underscore is intentional for clarity
-package tautulli_import
+package tautulliimport
 
 import (
 	"context"
@@ -50,7 +49,7 @@ type TautulliRecord struct {
 	SectionID        *int    // session_history_metadata.section_id
 	LibraryName      *string // session_history_metadata.library_name
 	ContentRating    *string // session_history_metadata.content_rating
-	Guid             *string // session_history_metadata.guid
+	GUID             *string // session_history_metadata.guid
 	Directors        *string // session_history_metadata.directors
 	Writers          *string // session_history_metadata.writers
 	Actors           *string // session_history_metadata.actors
@@ -310,7 +309,7 @@ func (r *SQLiteReader) ReadBatch(ctx context.Context, sinceID int64, limit int) 
 	if err != nil {
 		return nil, fmt.Errorf("query records: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var records []TautulliRecord
 	for rows.Next() {
@@ -353,7 +352,7 @@ func (r *SQLiteReader) ReadBatch(ctx context.Context, sinceID int64, limit int) 
 			&rec.SectionID,
 			&rec.LibraryName,
 			&rec.ContentRating,
-			&rec.Guid,
+			&rec.GUID,
 			&rec.Directors,
 			&rec.Writers,
 			&rec.Actors,
@@ -450,7 +449,7 @@ func (r *SQLiteReader) GetMediaTypeStats(ctx context.Context) (map[string]int, e
 	if err != nil {
 		return nil, fmt.Errorf("get media type stats: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	stats := make(map[string]int)
 	for rows.Next() {

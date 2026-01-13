@@ -245,7 +245,7 @@ func TestManagerCreation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create mock database file
 	dbPath := filepath.Join(tempDir, "test.duckdb")
@@ -293,7 +293,7 @@ func TestCreateBackup(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create mock database file
 	dbPath := filepath.Join(tempDir, "test.duckdb")
@@ -370,7 +370,7 @@ func TestListBackups(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create mock database file
 	dbPath := filepath.Join(tempDir, "test.duckdb")
@@ -469,7 +469,7 @@ func TestValidateBackup(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create mock database file
 	dbPath := filepath.Join(tempDir, "test.duckdb")
@@ -532,7 +532,7 @@ func TestDeleteBackup(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create mock database file
 	dbPath := filepath.Join(tempDir, "test.duckdb")
@@ -604,7 +604,7 @@ func TestGetStats(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create mock database file
 	dbPath := filepath.Join(tempDir, "test.duckdb")
@@ -668,7 +668,7 @@ func TestRetentionPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create mock database file
 	dbPath := filepath.Join(tempDir, "test.duckdb")
@@ -802,10 +802,12 @@ func TestCalculateNextBackupTime(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	mockDB := &MockDatabase{path: filepath.Join(tempDir, "test.duckdb")}
-	os.WriteFile(mockDB.path, []byte("test"), 0644)
+	if err := os.WriteFile(mockDB.path, []byte("test"), 0644); err != nil {
+		t.Fatalf("failed to write mock db: %v", err)
+	}
 
 	cfg := &Config{
 		Enabled:   true,

@@ -564,7 +564,7 @@ func TestEmbySessionToPlaybackEventMovie(t *testing.T) {
 	checkStringEqual(t, "IPAddress", event.IPAddress, "192.168.1.200")
 	checkStringPtrEqual(t, "TranscodeDecision", event.TranscodeDecision, "direct play")
 	checkStringPtrEqual(t, "RatingKey", event.RatingKey, "emby-item-12345")
-	checkStringPtrEqual(t, "Guid", event.Guid, "imdb://tt0133093")
+	checkStringPtrEqual(t, "Guid", event.GUID, "imdb://tt0133093")
 	checkIntPtrEqual(t, "VideoHeight", event.VideoHeight, 2160)
 	checkIntPtrEqual(t, "VideoWidth", event.VideoWidth, 3840)
 	checkStringPtrEqual(t, "VideoFullResolution", event.VideoFullResolution, "4K")
@@ -766,7 +766,7 @@ func TestEmbySessionToPlaybackEventGuidFromTMDB(t *testing.T) {
 	}
 
 	event := EmbySessionToPlaybackEvent(session, "server-1")
-	checkStringPtrEqual(t, "Guid", event.Guid, "tmdb://12345")
+	checkStringPtrEqual(t, "Guid", event.GUID, "tmdb://12345")
 }
 
 // ============================================================================

@@ -57,7 +57,7 @@ func NewOIDCAuthenticator(ctx context.Context, config *OIDCConfig) (*OIDCAuthent
 	if err != nil {
 		return nil, fmt.Errorf("OIDC discovery failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, readErr := io.ReadAll(resp.Body)
