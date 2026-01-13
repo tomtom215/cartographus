@@ -74,7 +74,6 @@ func (db *DB) ensureContext(ctx context.Context) (context.Context, context.Cance
 	return ctx, func() {}
 }
 
-
 // Checkpoint forces a WAL checkpoint
 func (db *DB) Checkpoint(ctx context.Context) error {
 	ctx, cancel := db.ensureContext(ctx)

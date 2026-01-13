@@ -55,7 +55,7 @@ type DB struct {
 	ipLocks sync.Map
 
 	// Connection recovery fields
-	serverLat float64
+	serverLat         float64
 	serverLon         float64
 	maxReconnectTries int
 	reconnectDelay    time.Duration
