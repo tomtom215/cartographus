@@ -1,5 +1,6 @@
 # golangci-lint configuration for Cartographus
-# https://golangci-lint.run/usage/configuration/
+# https://golangci-lint.run/docs/configuration/
+# v2 configuration format (requires golangci-lint v2.x)
 
 version: "2"
 
@@ -10,16 +11,46 @@ run:
     - nats
 
 linters:
-  disable-all: true
+  # v2 replacement for 'disable-all: true'
+  default: none
   enable:
     - errcheck
     - govet
     - ineffassign
     - staticcheck
     - unused
+
+  settings:
+    errcheck:
+      # Exclude specific functions where error checking is not meaningful
+      exclude-functions:
+        - (io.Writer).Write
+        - (net/http.ResponseWriter).Write
+        # Common Close patterns - defer Close() errors are typically ignored
+        - (io.Closer).Close
+        - (*os.File).Close
+        - (io.ReadCloser).Close
+        - (*net/http.Response).Body.Close
+        # SQL rows Close
+        - (*database/sql.Rows).Close
+        # OS operations in cleanup/setup code
+        - os.Remove
+        - os.RemoveAll
+        - os.Setenv
+        - os.Unsetenv
+    staticcheck:
+      # Disable style suggestions (QF = quickfix suggestions)
+      checks:
+        - "all"
+        - "-QF*"
+
   exclusions:
-    # Exclude errcheck for test files
+    # v2 replacement for 'issues.exclude-dirs'
+    paths:
+      - vendor
+      - docs
     rules:
+      # Exclude errcheck for test files
       - linters:
           - errcheck
         path: _test\.go$
@@ -41,38 +72,8 @@ linters:
           - errcheck
         text: "Body\\.Close"
 
-linters-settings:
-  errcheck:
-    # Exclude specific functions where error checking is not meaningful
-    exclude-functions:
-      - (io.Writer).Write
-      - (net/http.ResponseWriter).Write
-      # Common Close patterns - defer Close() errors are typically ignored
-      - (io.Closer).Close
-      - (*os.File).Close
-      - (io.ReadCloser).Close
-      - (*net/http.Response).Body.Close
-      # SQL rows Close
-      - (*database/sql.Rows).Close
-      # OS operations in cleanup/setup code
-      - os.Remove
-      - os.RemoveAll
-      - os.Setenv
-      - os.Unsetenv
-  staticcheck:
-    # Disable style suggestions (QF = quickfix suggestions)
-    checks:
-      - "all"
-      - "-QF*"
-
 issues:
   # Maximum issues count per one linter
   max-issues-per-linter: 100
-
   # Maximum count of issues with the same text
   max-same-issues: 20
-
-  # Exclude directories
-  exclude-dirs:
-    - vendor
-    - docs
