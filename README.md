@@ -21,6 +21,7 @@ This project was developed with AI-assisted engineering using [Claude](https://w
 - **Integration tests** validating cross-system interactions and data flows
 - **75 end-to-end test suites** (1,300+ individual tests) using Playwright for full-stack validation
 - **Automated CI pipeline** with linting, static analysis, security scanning, and multi-platform builds
+- **29 Architecture Decision Records** documenting design rationale and technical trade-offs
 
 All contributions undergo the same rigorous validation regardless of their origin.
 
