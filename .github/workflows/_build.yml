@@ -41,7 +41,7 @@ jobs:
           # Native builds on macOS runners (CGO cross-compile to Darwin not supported)
           - goos: darwin
             goarch: amd64
-            runner: macos-13
+            runner: macos-15-intel
             cross_compile: false
           - goos: darwin
             goarch: arm64
