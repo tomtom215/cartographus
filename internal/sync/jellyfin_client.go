@@ -391,10 +391,10 @@ func SessionToPlaybackEvent(session *models.JellyfinSession, _ string) *models.P
 	if item.ProviderIDs != nil {
 		if imdb, ok := item.ProviderIDs["Imdb"]; ok {
 			guid := "imdb://" + imdb
-			event.Guid = &guid
+			event.GUID = &guid
 		} else if tmdb, ok := item.ProviderIDs["Tmdb"]; ok {
 			guid := "tmdb://" + tmdb
-			event.Guid = &guid
+			event.GUID = &guid
 		}
 	}
 

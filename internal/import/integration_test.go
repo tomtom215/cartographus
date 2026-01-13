@@ -5,8 +5,7 @@
 
 //go:build nats
 
-//nolint:revive // package name with underscore is intentional for clarity
-package tautulli_import
+package tautulliimport
 
 import (
 	"context"

@@ -501,7 +501,7 @@ func verifyPlexEventMetadata(t *testing.T, event *models.PlaybackEvent) {
 	checkIntPtrEqual(t, "MediaIndex", event.MediaIndex, 1)
 	checkIntPtrEqual(t, "ParentMediaIndex", event.ParentMediaIndex, 1)
 	checkIntPtrEqual(t, "Year", event.Year, 2008)
-	checkStringPtrEqual(t, "Guid", event.Guid, "plex://show/12345/episode/1")
+	checkStringPtrEqual(t, "Guid", event.GUID, "plex://show/12345/episode/1")
 	checkStringPtrEqual(t, "OriginallyAvailableAt", event.OriginallyAvailableAt, "2008-01-20")
 }
 
@@ -514,7 +514,7 @@ func verifyPlexEventMissingFields(t *testing.T, event *models.PlaybackEvent) {
 // TestSyncPlexHistoricalFiltersOldRecords tests date filtering
 func TestSyncPlexHistoricalFiltersOldRecords(t *testing.T) {
 	insertedRecords := make([]*models.PlaybackEvent, 0)
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		insertPlaybackEvent: func(event *models.PlaybackEvent) error {
 			insertedRecords = append(insertedRecords, event)
 			return nil
@@ -538,7 +538,7 @@ func TestSyncPlexHistoricalFiltersOldRecords(t *testing.T) {
 
 	cfg := createPlexSyncConfig(30)
 	plexClient := NewPlexClient(server.URL, "test-token")
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 	manager.plexClient = plexClient
 
 	err := manager.syncPlexHistorical(context.Background())
@@ -601,13 +601,13 @@ func TestStartPlexServices(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := createPlexServicesConfig(tt)
-			mockDb := &mockDB{
+			mockDB := &mockDB{
 				sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 					return false, nil
 				},
 			}
 
-			manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+			manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
@@ -648,7 +648,7 @@ func createPlexServicesConfig(tt struct {
 
 // TestSyncPlexRecentHandlesErrors tests error handling in recent sync
 func TestSyncPlexRecentHandlesErrors(t *testing.T) {
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		insertPlaybackEvent: func(event *models.PlaybackEvent) error {
 			return errors.New("constraint violation: UNIQUE")
 		},
@@ -677,7 +677,7 @@ func TestSyncPlexRecentHandlesErrors(t *testing.T) {
 	}
 
 	plexClient := NewPlexClient(server.URL, "test-token")
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 	manager.plexClient = plexClient
 
 	// Should not return error even when inserts fail with constraint violation

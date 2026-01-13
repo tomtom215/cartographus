@@ -242,8 +242,8 @@ func (s *Service) Reload(ctx context.Context) error {
 	return s.store.LoadIntoLookup(ctx, s.lookup)
 }
 
-// EnrichGeolocation adds VPN information to a geolocation result.
-// This method is designed to be called during the geolocation enrichment pipeline.
+// EnrichedGeolocation represents a geolocation result enriched with VPN information.
+// This type is designed to be used during the geolocation enrichment pipeline.
 type EnrichedGeolocation struct {
 	IPAddress   string    `json:"ip_address"`
 	Latitude    float64   `json:"latitude"`

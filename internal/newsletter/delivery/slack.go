@@ -108,7 +108,7 @@ type SlackAttachment struct {
 	Text       string `json:"text,omitempty"`
 	Footer     string `json:"footer,omitempty"`
 	FooterIcon string `json:"footer_icon,omitempty"`
-	Ts         int64  `json:"ts,omitempty"`
+	TS         int64  `json:"ts,omitempty"`
 }
 
 // Send delivers the newsletter via Slack webhook.

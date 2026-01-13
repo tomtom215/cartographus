@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // https://github.com/tomtom215/cartographus
 
-// Package tautulli_import provides direct Tautulli SQLite database import functionality.
+// Package tautulliimport provides direct Tautulli SQLite database import functionality.
 //
 // This package enables importing playback history directly from Tautulli's SQLite
 // database files or backups, without requiring a live Tautulli API connection.
@@ -69,7 +69,7 @@
 //	    BatchSize: 1000,
 //	}
 //
-//	importer, err := tautulli_import.NewImporter(cfg, publisher, progress)
+//	importer, err := tautulliimport.NewImporter(cfg, publisher, progress)
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
@@ -79,6 +79,4 @@
 //	    log.Printf("Import failed: %v", err)
 //	}
 //	log.Printf("Imported %d records", stats.Imported)
-//
-//nolint:revive // package name with underscore is intentional for clarity
-package tautulli_import
+package tautulliimport

@@ -174,7 +174,7 @@ func TestEnrichEventWithMetadata(t *testing.T) {
 		ContentRating:         "PG-13",
 		Duration:              intPtr(7200), // 2 hours in seconds
 		Year:                  intPtr(2023),
-		Guid:                  "plex://movie/12345",
+		GUID:                  "plex://movie/12345",
 		OriginalTitle:         stringPtr("Original Title"),
 		FullTitle:             "Full Title - Extended",
 		OriginallyAvailableAt: stringPtr("2023-05-15"),
@@ -202,7 +202,7 @@ func TestEnrichEventWithMetadata(t *testing.T) {
 	checkIntPtrEqual(t, "Year", event.Year, 2023)
 
 	// Verify metadata enrichment fields
-	checkStringPtrEqual(t, "Guid", event.Guid, "plex://movie/12345")
+	checkStringPtrEqual(t, "GUID", event.GUID, "plex://movie/12345")
 	checkStringPtrEqual(t, "OriginalTitle", event.OriginalTitle, "Original Title")
 	checkStringPtrEqual(t, "FullTitle", event.FullTitle, "Full Title - Extended")
 	checkStringPtrEqual(t, "OriginallyAvailableAt", event.OriginallyAvailableAt, "2023-05-15")
@@ -378,7 +378,7 @@ func TestMapEnrichmentFields(t *testing.T) {
 		GrandparentRatingKey:  intPtr(456),
 		MediaIndex:            intPtr(5),
 		ParentMediaIndex:      intPtr(2),
-		Guid:                  "plex://movie/12345",
+		GUID:                  "plex://movie/12345",
 		OriginalTitle:         stringPtr("Original Title"),
 		FullTitle:             "Full Title",
 		OriginallyAvailableAt: stringPtr("2023-05-15"),
@@ -1091,15 +1091,15 @@ func TestMapExtendedGUIDFields(t *testing.T) {
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey:      stringPtr("guid123"),
 		Started:         time.Now().Unix(),
-		ParentGuid:      "plex://season/12345",
-		GrandparentGuid: "plex://show/67890",
+		ParentGUID:      "plex://season/12345",
+		GrandparentGUID: "plex://show/67890",
 	}
 
 	event := m.buildCoreEvent(record)
 	m.mapExtendedGUIDFields(record, event)
 
-	checkStringPtrEqual(t, "ParentGuid", event.ParentGuid, "plex://season/12345")
-	checkStringPtrEqual(t, "GrandparentGuid", event.GrandparentGuid, "plex://show/67890")
+	checkStringPtrEqual(t, "ParentGUID", event.ParentGUID, "plex://season/12345")
+	checkStringPtrEqual(t, "GrandparentGUID", event.GrandparentGUID, "plex://show/67890")
 }
 
 // TestEnrichEventWithExtendedData tests the complete extended data enrichment
@@ -1151,8 +1151,8 @@ func TestEnrichEventWithExtendedData(t *testing.T) {
 		ParentThumb:      "/library/metadata/parent/thumb",
 		GrandparentThumb: "/library/metadata/grandparent/thumb",
 		// GUID fields
-		ParentGuid:      "plex://season/parent",
-		GrandparentGuid: "plex://show/grandparent",
+		ParentGUID:      "plex://season/parent",
+		GrandparentGUID: "plex://show/grandparent",
 	}
 
 	event := m.buildCoreEvent(record)
@@ -1193,8 +1193,8 @@ func TestEnrichEventWithExtendedData(t *testing.T) {
 	checkStringPtrEqual(t, "ParentThumb", event.ParentThumb, "/library/metadata/parent/thumb")
 
 	// Verify GUID fields
-	checkStringPtrEqual(t, "ParentGuid", event.ParentGuid, "plex://season/parent")
-	checkStringPtrEqual(t, "GrandparentGuid", event.GrandparentGuid, "plex://show/grandparent")
+	checkStringPtrEqual(t, "ParentGUID", event.ParentGUID, "plex://season/parent")
+	checkStringPtrEqual(t, "GrandparentGUID", event.GrandparentGUID, "plex://show/grandparent")
 }
 
 // ========================================

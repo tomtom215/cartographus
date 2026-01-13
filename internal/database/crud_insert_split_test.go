@@ -133,7 +133,7 @@ func TestInsertPlaybackEvent_MetadataEnrichmentFields(t *testing.T) {
 		GrandparentRatingKey:  &grandparentRatingKey,
 		MediaIndex:            &mediaIndex,
 		ParentMediaIndex:      &parentMediaIndex,
-		Guid:                  &guid,
+		GUID:                  &guid,
 		OriginalTitle:         &originalTitle,
 		FullTitle:             &fullTitle,
 		OriginallyAvailableAt: &originallyAvailableAt,
@@ -171,14 +171,14 @@ func TestInsertPlaybackEvent_MetadataEnrichmentFields(t *testing.T) {
 	var (
 		dbRatingKey, dbParentRatingKey, dbGrandparentRatingKey                 *string
 		dbMediaIndex, dbParentMediaIndex, dbWatchedStatus                      *int
-		dbGuid, dbOriginalTitle, dbFullTitle, dbOriginallyAvailableAt, dbThumb *string
+		dbGUID, dbOriginalTitle, dbFullTitle, dbOriginallyAvailableAt, dbThumb *string
 		dbDirectors, dbWriters, dbActors, dbGenres                             *string
 	)
 
 	err = db.conn.QueryRow(query, event.SessionKey).Scan(
 		&dbRatingKey, &dbParentRatingKey, &dbGrandparentRatingKey,
 		&dbMediaIndex, &dbParentMediaIndex,
-		&dbGuid, &dbOriginalTitle, &dbFullTitle, &dbOriginallyAvailableAt,
+		&dbGUID, &dbOriginalTitle, &dbFullTitle, &dbOriginallyAvailableAt,
 		&dbWatchedStatus, &dbThumb,
 		&dbDirectors, &dbWriters, &dbActors, &dbGenres,
 	)
@@ -202,8 +202,8 @@ func TestInsertPlaybackEvent_MetadataEnrichmentFields(t *testing.T) {
 	if dbParentMediaIndex == nil || *dbParentMediaIndex != parentMediaIndex {
 		t.Errorf("Expected parent_media_index %d, got %v", parentMediaIndex, dbParentMediaIndex)
 	}
-	if dbGuid == nil || *dbGuid != guid {
-		t.Errorf("Expected guid %s, got %v", guid, dbGuid)
+	if dbGUID == nil || *dbGUID != guid {
+		t.Errorf("Expected guid %s, got %v", guid, dbGUID)
 	}
 	if dbOriginalTitle == nil || *dbOriginalTitle != originalTitle {
 		t.Errorf("Expected original_title %s, got %v", originalTitle, dbOriginalTitle)

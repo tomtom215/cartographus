@@ -21,13 +21,13 @@ func TestManager_ProcessHistoryRecord_SessionExists(t *testing.T) {
 	t.Parallel() // Safe - isolated mock with no shared state
 
 	cfg := newTestConfig()
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return true, nil // Session already exists
 		},
 	}
 
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("existing-session"),
@@ -63,13 +63,13 @@ func TestManager_ProcessHistoryRecord_InvalidIPAddress(t *testing.T) {
 
 			cfg := newTestConfig()
 
-			mockDb := &mockDB{
+			mockDB := &mockDB{
 				sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 					return false, nil
 				},
 			}
 
-			manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+			manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 			record := &tautulli.TautulliHistoryRecord{
 				SessionKey: stringPtr("test-session"),
@@ -103,7 +103,7 @@ func TestManager_ProcessHistoryRecord_GeolocationCached(t *testing.T) {
 		Country:   "United States",
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -128,7 +128,7 @@ func TestManager_ProcessHistoryRecord_GeolocationCached(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("test-session-1"),
@@ -157,7 +157,7 @@ func TestManager_ProcessHistoryRecord_FetchGeolocation(t *testing.T) {
 	// Private IPs (10.0.0.0/8, etc.) are now handled specially and don't trigger GeoIP lookup
 	testIP := "198.51.100.1"
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -199,7 +199,7 @@ func TestManager_ProcessHistoryRecord_FetchGeolocation(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("test-session-2"),
@@ -227,7 +227,7 @@ func TestManager_ProcessHistoryRecord_GeolocationFailure_UsesFallback(t *testing
 	cfg := newTestConfig()
 	geoCached := false
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -256,7 +256,7 @@ func TestManager_ProcessHistoryRecord_GeolocationFailure_UsesFallback(t *testing
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("test-session-fail"),
@@ -287,7 +287,7 @@ func TestManager_ProcessHistoryRecord_CompleteFields(t *testing.T) {
 	cfg := newTestConfig()
 	var capturedEvent *models.PlaybackEvent
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -309,7 +309,7 @@ func TestManager_ProcessHistoryRecord_CompleteFields(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 	stoppedTime := time.Now().Unix()
 	record := &tautulli.TautulliHistoryRecord{
@@ -419,7 +419,7 @@ func TestManager_ProcessHistoryRecord_NAValues(t *testing.T) {
 
 	var capturedEvent *models.PlaybackEvent
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -441,7 +441,7 @@ func TestManager_ProcessHistoryRecord_NAValues(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey:        stringPtr("na-values-session"),
@@ -499,7 +499,7 @@ func TestManager_ProcessHistoryRecord_DatabaseInsertError(t *testing.T) {
 
 	cfg := newTestConfig()
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -520,7 +520,7 @@ func TestManager_ProcessHistoryRecord_DatabaseInsertError(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("test-session"),
@@ -547,13 +547,13 @@ func TestManager_ProcessHistoryRecord_SessionKeyExistsError(t *testing.T) {
 
 	cfg := newTestConfig()
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, errors.New("database query failed")
 		},
 	}
 
-	manager := NewManager(mockDb, nil, &mockTautulliClient{}, cfg, nil)
+	manager := NewManager(mockDB, nil, &mockTautulliClient{}, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("test-session"),
@@ -576,7 +576,7 @@ func TestManager_ProcessHistoryRecord_GetGeolocationError(t *testing.T) {
 
 	cfg := newTestConfig()
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -592,7 +592,7 @@ func TestManager_ProcessHistoryRecord_GetGeolocationError(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	record := &tautulli.TautulliHistoryRecord{
 		SessionKey: stringPtr("test-session"),

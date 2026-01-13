@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
-	tautulli_import "github.com/tomtom215/cartographus/internal/import"
+	tautulliimport "github.com/tomtom215/cartographus/internal/import"
 )
 
 // --- Mock Implementations ---
@@ -27,7 +27,7 @@ import (
 type mockImportController struct {
 	mu          sync.Mutex
 	running     bool
-	stats       *tautulli_import.ImportStats
+	stats       *tautulliimport.ImportStats
 	importErr   error
 	stopErr     error
 	importDelay time.Duration
@@ -35,11 +35,11 @@ type mockImportController struct {
 
 func newMockImportController() *mockImportController {
 	return &mockImportController{
-		stats: &tautulli_import.ImportStats{},
+		stats: &tautulliimport.ImportStats{},
 	}
 }
 
-func (m *mockImportController) Import(ctx context.Context) (*tautulli_import.ImportStats, error) {
+func (m *mockImportController) Import(ctx context.Context) (*tautulliimport.ImportStats, error) {
 	m.mu.Lock()
 	m.running = true
 	m.mu.Unlock()
@@ -65,11 +65,11 @@ func (m *mockImportController) Import(ctx context.Context) (*tautulli_import.Imp
 	return m.stats, nil
 }
 
-func (m *mockImportController) GetStats() *tautulli_import.ImportStats {
+func (m *mockImportController) GetStats() *tautulliimport.ImportStats {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.stats == nil {
-		return &tautulli_import.ImportStats{}
+		return &tautulliimport.ImportStats{}
 	}
 	statsCopy := *m.stats
 	return &statsCopy
@@ -100,21 +100,21 @@ func (m *mockImportController) setRunning(running bool) {
 	m.running = running
 }
 
-func (m *mockImportController) setStats(stats *tautulli_import.ImportStats) {
+func (m *mockImportController) setStats(stats *tautulliimport.ImportStats) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if stats != nil {
 		statsCopy := *stats
 		m.stats = &statsCopy
 	} else {
-		m.stats = &tautulli_import.ImportStats{}
+		m.stats = &tautulliimport.ImportStats{}
 	}
 }
 
 // mockProgressController is a test double for ProgressController.
 type mockProgressController struct {
 	mu       sync.Mutex
-	stats    *tautulli_import.ImportStats
+	stats    *tautulliimport.ImportStats
 	loadErr  error
 	clearErr error
 }
@@ -123,7 +123,7 @@ func newMockProgressController() *mockProgressController {
 	return &mockProgressController{}
 }
 
-func (m *mockProgressController) Load(_ context.Context) (*tautulli_import.ImportStats, error) {
+func (m *mockProgressController) Load(_ context.Context) (*tautulliimport.ImportStats, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -148,7 +148,7 @@ func (m *mockProgressController) Clear(_ context.Context) error {
 	return nil
 }
 
-func (m *mockProgressController) setStats(stats *tautulli_import.ImportStats) {
+func (m *mockProgressController) setStats(stats *tautulliimport.ImportStats) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if stats != nil {
@@ -163,7 +163,7 @@ func (m *mockProgressController) setStats(stats *tautulli_import.ImportStats) {
 
 func TestHandleStartImport_Success(t *testing.T) {
 	importer := newMockImportController()
-	importer.setStats(&tautulli_import.ImportStats{
+	importer.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		StartTime:    time.Now(),
 	})
@@ -199,7 +199,7 @@ func TestHandleStartImport_Success(t *testing.T) {
 func TestHandleStartImport_AlreadyRunning(t *testing.T) {
 	importer := newMockImportController()
 	importer.setRunning(true)
-	importer.setStats(&tautulli_import.ImportStats{
+	importer.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		Processed:    50,
 		StartTime:    time.Now(),
@@ -257,12 +257,12 @@ func TestHandleStartImport_InvalidRequest(t *testing.T) {
 
 func TestHandleStartImport_Resume(t *testing.T) {
 	importer := newMockImportController()
-	importer.setStats(&tautulli_import.ImportStats{
+	importer.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		StartTime:    time.Now(),
 	})
 	progress := newMockProgressController()
-	progress.setStats(&tautulli_import.ImportStats{
+	progress.setStats(&tautulliimport.ImportStats{
 		TotalRecords:    100,
 		Processed:       50,
 		LastProcessedID: 50,
@@ -293,7 +293,7 @@ func TestHandleStartImport_Resume(t *testing.T) {
 
 func TestHandleStartImport_DryRun(t *testing.T) {
 	importer := newMockImportController()
-	importer.setStats(&tautulli_import.ImportStats{
+	importer.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		DryRun:       true,
 		StartTime:    time.Now(),
@@ -320,7 +320,7 @@ func TestHandleStartImport_DryRun(t *testing.T) {
 func TestHandleGetImportStatus_Running(t *testing.T) {
 	importer := newMockImportController()
 	importer.setRunning(true)
-	importer.setStats(&tautulli_import.ImportStats{
+	importer.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		Processed:    50,
 		Imported:     48,
@@ -370,7 +370,7 @@ func TestHandleGetImportStatus_Completed(t *testing.T) {
 	importer.setRunning(false)
 	startTime := time.Now().Add(-time.Hour)
 	endTime := startTime.Add(10 * time.Minute)
-	importer.setStats(&tautulli_import.ImportStats{
+	importer.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		Processed:    100,
 		Imported:     100,
@@ -435,10 +435,10 @@ func TestHandleGetImportStatus_LoadsSavedProgress(t *testing.T) {
 	importer := newMockImportController()
 	importer.setRunning(false)
 	// No current stats
-	importer.setStats(&tautulli_import.ImportStats{})
+	importer.setStats(&tautulliimport.ImportStats{})
 
 	progress := newMockProgressController()
-	progress.setStats(&tautulli_import.ImportStats{
+	progress.setStats(&tautulliimport.ImportStats{
 		TotalRecords:    200,
 		Processed:       150,
 		Imported:        148,
@@ -475,7 +475,7 @@ func TestHandleGetImportStatus_LoadsSavedProgress(t *testing.T) {
 func TestHandleStopImport_Success(t *testing.T) {
 	importer := newMockImportController()
 	importer.setRunning(true)
-	importer.setStats(&tautulli_import.ImportStats{
+	importer.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		Processed:    50,
 		StartTime:    time.Now(),
@@ -545,7 +545,7 @@ func TestHandleClearProgress_Success(t *testing.T) {
 	importer := newMockImportController()
 	importer.setRunning(false)
 	progress := newMockProgressController()
-	progress.setStats(&tautulli_import.ImportStats{
+	progress.setStats(&tautulliimport.ImportStats{
 		TotalRecords: 100,
 		Processed:    100,
 	})
