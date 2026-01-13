@@ -148,7 +148,7 @@ export class InsightsManager {
             id: 'peak-time',
             type: 'time',
             priority: 'high',
-            icon: '&#128337;', // Clock
+            icon: '🕐', // Clock
             title: 'Peak Viewing Time',
             description: `Most streaming happens during ${timeDescription}${peakDay ? ` on ${peakDay}s` : ''}.`,
             metric: `${peakHour}:00`,
@@ -182,7 +182,7 @@ export class InsightsManager {
             id: 'engagement',
             type: 'engagement',
             priority: 'high',
-            icon: '&#128200;', // Chart increasing
+            icon: '📈', // Chart increasing
             title: 'User Engagement',
             description: `Engagement is ${engagementLevel} with ${avgPlaybacksPerUser} avg playbacks per user.`,
             metric: `${totalPlaybacks.toLocaleString()} total`,
@@ -200,7 +200,7 @@ export class InsightsManager {
                 id: 'trending',
                 type: 'trend',
                 priority: 'medium',
-                icon: '&#128293;', // Fire
+                icon: '🔥', // Fire
                 title: 'Content Trending',
                 description: 'Not enough data to determine trends yet.',
                 trend: 'neutral',
@@ -234,7 +234,7 @@ export class InsightsManager {
             id: 'trending',
             type: 'trend',
             priority: 'high',
-            icon: '&#128293;', // Fire
+            icon: '🔥', // Fire
             title: 'Activity Trend',
             description,
             trend,
@@ -253,7 +253,7 @@ export class InsightsManager {
                 id: 'geographic',
                 type: 'geographic',
                 priority: 'low',
-                icon: '&#127758;', // Globe
+                icon: '🌎', // Globe
                 title: 'Global Reach',
                 description: 'No geographic data available yet.',
                 trend: 'neutral',
@@ -267,7 +267,7 @@ export class InsightsManager {
             id: 'geographic',
             type: 'geographic',
             priority: 'medium',
-            icon: '&#127758;', // Globe
+            icon: '🌎', // Globe
             title: 'Top Region',
             description: `${topPercent}% of streams come from ${topCountry.country}, spanning ${countries.length} countries total.`,
             metric: topCountry.country,
@@ -295,7 +295,7 @@ export class InsightsManager {
             id: 'user-activity',
             type: 'engagement',
             priority: 'medium',
-            icon: '&#128101;', // People
+            icon: '👥', // People
             title: 'User Activity',
             description: `${uniqueUsers} users are ${activityLevel} with ${recentActivity} streams in the last 24 hours.`,
             metric: `${recentActivity} today`,
@@ -418,7 +418,7 @@ export class InsightsManager {
      */
     private renderInsight(insight: Insight): string {
         const trendClass = insight.trend === 'up' ? 'trend-up' : insight.trend === 'down' ? 'trend-down' : '';
-        const trendIcon = insight.trend === 'up' ? '&#8593;' : insight.trend === 'down' ? '&#8595;' : '';
+        const trendIcon = insight.trend === 'up' ? '↑' : insight.trend === 'down' ? '↓' : '';
 
         return `
             <div class="insight-item insight-${escapeHtml(insight.type)} ${trendClass}"

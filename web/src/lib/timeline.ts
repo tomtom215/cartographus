@@ -33,8 +33,8 @@ export class TimelineManager {
 
     async loadData(filter: LocationFilter): Promise<void> {
         try {
-            // API has a max limit of 1000, use that instead of 10000
-            const playbacks = await this.api.getPlaybacks(filter, 1000, 0);
+            // API has a max limit of 100 per request
+            const playbacks = await this.api.getPlaybacks(filter, 100, 0);
 
             this.playbacks = playbacks.sort((a, b) => {
                 const dateA = new Date(a.started_at).getTime();

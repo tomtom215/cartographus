@@ -214,6 +214,105 @@
     color: var(--text-primary);
 }
 
+.insights-count {
+    background: var(--highlight);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.insights-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.insight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px;
+    background: var(--accent);
+    border-radius: 6px;
+    border-left: 3px solid var(--border);
+    transition: border-color 0.2s ease;
+}
+
+.insight-item:hover {
+    border-left-color: var(--highlight);
+}
+
+.insight-item.trend-up {
+    border-left-color: var(--color-success);
+}
+
+.insight-item.trend-down {
+    border-left-color: var(--color-error);
+}
+
+.insight-icon {
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.insight-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.insight-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.insight-description {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.insight-metric {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--highlight);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.trend-indicator {
+    font-size: 10px;
+}
+
+.insights-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.insights-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
 /* =================================================================
    Table View Toggle
    Alternative table view for chart data
