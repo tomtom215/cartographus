@@ -29,14 +29,49 @@ jobs:
           echo "GOTOOLCHAIN=local" >> $GITHUB_ENV
           echo "CGO_ENABLED=1" >> $GITHUB_ENV
 
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+
       - name: Install DuckDB extensions
         run: |
           mkdir -p ~/.duckdb/extensions
           ./scripts/setup-duckdb-extensions.sh
 
-      - name: Run tests with race detection
+      - name: Run tests with gotestsum
         run: |
-          go test -tags "wal,nats" -v -race -coverprofile=coverage.out -covermode=atomic ./...
+          mkdir -p test-results
+          gotestsum \
+            --format pkgname-and-test-fails \
+            --junitfile test-results/junit.xml \
+            --jsonfile test-results/test-output.json \
+            --rerun-fails=2 \
+            --rerun-fails-max-failures=10 \
+            --packages="./..." \
+            -- \
+            -tags "wal,nats" \
+            -race \
+            -coverprofile=coverage.out \
+            -covermode=atomic \
+            -timeout=10m
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7
+
+      - name: Publish test report
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          report_paths: 'test-results/junit.xml'
+          check_name: 'Go Test Results'
+          fail_on_failure: true
+          require_tests: true
+          detailed_summary: true
+          include_passed: false
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
@@ -55,3 +90,10 @@ jobs:
           if (( $(echo "$COVERAGE < 70" | bc -l) )); then
             echo "::warning::Coverage is below 70%: ${COVERAGE}%"
           fi
+
+      - name: Generate coverage badge data
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "COVERAGE_PCT=${COVERAGE}" >> $GITHUB_ENV
+          echo "Coverage: ${COVERAGE}%"
