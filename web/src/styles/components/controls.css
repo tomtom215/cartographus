@@ -54,3 +54,10 @@
     background: var(--highlight-hover);
     border-color: var(--highlight-hover);
 }
+
+/* Accessibility: Focus visible states for keyboard navigation */
+#theme-toggle:focus-visible,
+#colorblind-toggle:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}

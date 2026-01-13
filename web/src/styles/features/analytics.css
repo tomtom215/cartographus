@@ -54,9 +54,12 @@
 
 /* Dashboard Views */
 .dashboard-view {
+    flex: 1;                    /* Fill available space in #main-content */
+    display: flex;              /* Enable flex for child content */
+    flex-direction: column;     /* Stack children vertically */
+    min-height: 0;              /* Allow shrinking in flex context */
     padding: 20px;
     overflow-y: auto;
-    height: 100%;
 }
 
 .dashboard-view h2 {
@@ -247,14 +250,19 @@
     border-radius: 2px;
 }
 
-/* Analytics Pages */
+/* Analytics Pages - default hidden, shown when active */
 .analytics-page {
+    display: none;              /* Default: hidden */
     padding: 30px 20px;
     /* E2E FIX: Use slideIn animation instead of fadeIn to avoid opacity:0 causing
        Playwright to detect charts as hidden. The opacity animation was problematic
        because CSS opacity is multiplicative - children cannot override parent opacity.
        Transform-only animation provides visual smoothness without visibility issues. */
     animation: slideIn 0.3s ease;
+}
+
+.analytics-page.active {
+    display: block;             /* Active: visible */
 }
 
 @keyframes slideIn {

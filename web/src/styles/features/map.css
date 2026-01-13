@@ -20,11 +20,10 @@
 
 #map {
     width: 100%;
-    height: 50vh;
-    min-height: 400px;
-    max-height: 100vh; /* Prevent canvas from exceeding viewport in headless environments */
+    flex: 1;            /* Fill available space in flex parent */
+    min-height: 300px;  /* Reduced minimum for mobile compatibility */
     position: relative; /* Required for absolute positioning of child controls */
-    overflow: hidden; /* Constrain MapLibre canvas to container bounds */
+    overflow: hidden;   /* Constrain MapLibre canvas to container bounds */
 }
 
 /* Ensure MapLibre canvas stays within bounds */
@@ -243,8 +242,8 @@
     position: absolute;
     bottom: 100px;
     right: 10px;
-    width: 40px;
-    height: 40px;
+    width: 44px;     /* WCAG 2.5.5: Minimum 44px touch target */
+    height: 44px;    /* WCAG 2.5.5: Minimum 44px touch target */
     padding: 0;
     display: flex;
     align-items: center;
@@ -546,8 +545,7 @@
     .fullscreen-toggle-btn {
         bottom: 80px;
         right: 10px;
-        width: 44px;
-        height: 44px;
+        /* Touch target size already 44px from base style */
     }
 
     #view-toggle-control {
