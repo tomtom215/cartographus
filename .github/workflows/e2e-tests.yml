@@ -1,24 +1,38 @@
-# Reusable workflow for E2E tests
-name: E2E Tests
+# Standalone E2E test workflow - on-demand only
+# These tests were originally designed for self-hosted runners with more resources.
+# Run manually when needed until infrastructure is stabilized.
+name: E2E Tests (On-Demand)
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
+      runner:
+        description: 'Runner type'
+        required: false
+        type: choice
+        options:
+          - ubuntu-latest
+          - self-hosted
+        default: ubuntu-latest
       go-version:
-        description: 'Go version to use'
+        description: 'Go version'
         required: false
         type: string
         default: '1.24.0'
       node-version:
-        description: 'Node.js version to use'
+        description: 'Node.js version'
         required: false
         type: string
         default: '20'
 
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     name: Playwright E2E Tests
-    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
     timeout-minutes: 30
     steps:
       - name: Checkout code
@@ -74,7 +88,7 @@ jobs:
           LOG_LEVEL: info
           DB_PATH: /tmp/cartographus-data/cartographus.duckdb
         run: |
-          # Create data directory with proper permissions (avoid /data which needs root)
+          # Create data directory with proper permissions
           mkdir -p /tmp/cartographus-data
 
           # Start server in background
@@ -90,6 +104,12 @@ jobs:
             echo "Waiting for server... ($i/30)"
             sleep 1
           done
+
+          # Check if server started successfully
+          if ! curl -s http://localhost:3857/api/v1/health > /dev/null 2>&1; then
+            echo "Server failed to start"
+            exit 1
+          fi
 
           # Run tests
           npm run test:e2e
