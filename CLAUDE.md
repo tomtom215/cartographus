@@ -2,7 +2,7 @@
 
 This document provides guidance for AI assistants working on the Cartographus codebase.
 
-**Last Updated**: 2026-01-11
+**Last Updated**: 2026-01-13
 **Project**: Cartographus - Media Server Analytics and Geographic Visualization Platform
 **Repository**: https://github.com/tomtom215/cartographus
 
@@ -68,13 +68,55 @@ Without these tags, NATS and WAL features won't compile.
 
 ---
 
+## CI/CD Tooling
+
+### golangci-lint (v2.x REQUIRED)
+
+This project uses **golangci-lint v2.6.2** with v2 config format. Do NOT use v1.x versions.
+
+```bash
+# Correct - uses config from .golangci.yml
+golangci-lint run --timeout=5m --build-tags "wal,nats" ./...
+
+# The config file uses v2 format with:
+# - version: "2"
+# - linters.exclusions.rules (NOT issues.exclude-rules)
+```
+
+**IMPORTANT**: The `.golangci.yml` file has `version: "2"` at the top. This is REQUIRED for v2.x. Do not remove it or convert to v1 format.
+
+### gosec Security Scanner
+
+gosec runs with exclusions for known false positives:
+
+```bash
+gosec -tags "wal,nats" -exclude-generated \
+  -exclude=G101,G104,G115,G201,G202,G203,G304,G404,G407,G602 ./...
+```
+
+| Rule | Reason for Exclusion |
+|------|---------------------|
+| G101 | False positives on salt/info constant strings |
+| G104 | Intentional error ignoring in cleanup paths |
+| G115 | Integer conversions bounded by constraints |
+| G201/G202 | SQL uses parameterized queries with safe column names |
+| G203 | Intentional HTML for trusted template content |
+| G304 | File paths from trusted config/internal sources |
+| G404 | math/rand for non-security (shuffling, seeding, test data) |
+| G407 | GCM nonce is randomly generated, not hardcoded |
+| G602 | Array access with validated lengths |
+
+---
+
 ## Quick Reference
 
 | Task | Command |
 |------|---------|
 | Build | `source scripts/session-setup.sh && go build -tags "wal,nats" -o cartographus ./cmd/server` |
 | Test | `go test -tags "wal,nats" -v -race ./...` |
-| Lint | `go vet -tags "wal,nats" ./...` |
+| Lint (vet) | `go vet -tags "wal,nats" ./...` |
+| Lint (full) | `golangci-lint run --timeout=5m --build-tags "wal,nats" ./...` |
+| Format | `gofmt -s -w .` |
 | Frontend Build | `cd web && npm run build` |
 | E2E Tests | `cd web && npm run test:e2e` |
 | Route Count | `grep -c "r\.\(Get\|Post\|Put\|Delete\|Patch\)" internal/api/chi_router.go` (expect ~302) |
@@ -108,6 +150,7 @@ Cartographus is a self-hosted media server analytics platform that visualizes pl
 | Logging | zerolog | 1.34.0 |
 | Supervision | Suture | 4.0.6 |
 | Validation | go-playground/validator | 10.30.1 |
+| Linter | golangci-lint | 2.6.2 (v2 config format) |
 | Frontend | TypeScript | 5.9.3 |
 | Maps | MapLibre GL JS | 5.15.0 |
 | Charts | ECharts | 6.0.0 |
@@ -292,16 +335,16 @@ All new code MUST have tests:
 make pre-commit
 
 # Option B: Manual
-./scripts/sync-templates.sh --check     # Verify templates in sync
-gofmt -s -w .                           # Format Go code
-go mod tidy                             # Clean dependencies
-go vet -tags "wal,nats" ./...           # Lint Go
-go test -tags "wal,nats" -v -race ./... # Test
-cd web && npm run build && cd ..        # Build frontend
-grep -c "r\.\(Get\|Post\|Put\|Delete\|Patch\)" internal/api/chi_router.go  # Verify ~302
+./scripts/sync-templates.sh --check                              # Verify templates in sync
+gofmt -s -w .                                                    # Format Go code
+go mod tidy                                                      # Clean dependencies
+go vet -tags "wal,nats" ./...                                    # Basic lint
+golangci-lint run --timeout=5m --build-tags "wal,nats" ./...     # Full lint (v2.x)
+go test -tags "wal,nats" -v -race ./...                          # Test
+cd web && npm run build && cd ..                                 # Build frontend
 ```
 
-**Commit Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`, `ci`
+**Commit Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`, `ci`, `style`
 
 ---
 
@@ -412,6 +455,8 @@ curl -s http://localhost:3857/api/v1/stats | python3 -m json.tool
 | `undefined: duckdb` | CGO disabled | Use `CGO_ENABLED=1` |
 | `NATS support not compiled` | Missing tags | Use `-tags "wal,nats"` |
 | Templates out of sync | E2E failures | `./scripts/sync-templates.sh --sync` |
+| `additional properties 'version' not allowed` | golangci-lint v1.x used with v2 config | Use golangci-lint v2.6.2+ (config requires v2) |
+| `linters.exclusions: additional properties...` | golangci-lint v1.x config format | Do NOT convert to v1 format; use v2.x linter |
 
 ---
 
