@@ -26,7 +26,7 @@ func TestFetchAndCacheGeolocation_ValidNullIsland(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		upsertGeolocation: func(geo *models.Geolocation) error {
 			// Verify that (0,0) coordinates with valid country are accepted
 			if geo.Latitude != 0.0 || geo.Longitude != 0.0 {
@@ -60,7 +60,7 @@ func TestFetchAndCacheGeolocation_ValidNullIsland(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	geo, err := manager.fetchAndCacheGeolocation(context.Background(), "192.168.1.1")
 	if err != nil {
@@ -94,7 +94,7 @@ func TestFetchAndCacheGeolocation_EmptyCountryTriggersFallback(t *testing.T) {
 	}
 
 	geoCached := false
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		upsertGeolocation: func(geo *models.Geolocation) error {
 			// With multi-provider, fallback to ip-api.com succeeds and caches the result
 			geoCached = true
@@ -121,7 +121,7 @@ func TestFetchAndCacheGeolocation_EmptyCountryTriggersFallback(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Use public IP (TEST-NET-3) - private IPs get handled specially and skip the fetch path
 	// The ip-api.com fallback should succeed for this public IP
@@ -164,7 +164,7 @@ func TestFetchAndCacheGeolocation_NormalCoordinatesStillWork(t *testing.T) {
 	expectedLat := 37.7749
 	expectedLon := -122.4194
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		upsertGeolocation: func(geo *models.Geolocation) error {
 			if geo.Latitude != expectedLat || geo.Longitude != expectedLon {
 				t.Errorf("Expected (%.4f, %.4f), got (%.4f, %.4f)",
@@ -198,7 +198,7 @@ func TestFetchAndCacheGeolocation_NormalCoordinatesStillWork(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	geo, err := manager.fetchAndCacheGeolocation(context.Background(), "192.168.1.1")
 	if err != nil {

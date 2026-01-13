@@ -13,17 +13,17 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
-	tautulli_import "github.com/tomtom215/cartographus/internal/import"
+	tautulliimport "github.com/tomtom215/cartographus/internal/import"
 )
 
 // ImportController defines the interface for managing Tautulli imports.
 // This interface is implemented by the import service.
 type ImportController interface {
 	// Import starts an import operation.
-	Import(ctx context.Context) (*tautulli_import.ImportStats, error)
+	Import(ctx context.Context) (*tautulliimport.ImportStats, error)
 
 	// GetStats returns current import statistics.
-	GetStats() *tautulli_import.ImportStats
+	GetStats() *tautulliimport.ImportStats
 
 	// IsRunning returns whether an import is in progress.
 	IsRunning() bool
@@ -35,7 +35,7 @@ type ImportController interface {
 // ProgressController defines the interface for import progress tracking.
 type ProgressController interface {
 	// Load retrieves saved progress.
-	Load(ctx context.Context) (*tautulli_import.ImportStats, error)
+	Load(ctx context.Context) (*tautulliimport.ImportStats, error)
 
 	// Clear removes saved progress.
 	Clear(ctx context.Context) error
@@ -72,7 +72,7 @@ type ImportResponse struct {
 	Success bool                             `json:"success"`
 	Message string                           `json:"message,omitempty"`
 	Error   string                           `json:"error,omitempty"`
-	Stats   *tautulli_import.ProgressSummary `json:"stats,omitempty"`
+	Stats   *tautulliimport.ProgressSummary `json:"stats,omitempty"`
 }
 
 // HandleStartImport handles POST /api/v1/import/tautulli
@@ -275,7 +275,7 @@ func (h *ImportHandlers) HandleValidateDatabase(w http.ResponseWriter, r *http.R
 	}
 
 	// Try to open and validate the database
-	reader, err := tautulli_import.NewSQLiteReader(req.DBPath)
+	reader, err := tautulliimport.NewSQLiteReader(req.DBPath)
 	if err != nil {
 		h.writeJSON(w, http.StatusBadRequest, map[string]interface{}{
 			"success": false,

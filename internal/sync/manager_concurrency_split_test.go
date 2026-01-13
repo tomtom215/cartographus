@@ -31,13 +31,13 @@ func TestManager_ConcurrentStartCalls(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Try to start multiple times concurrently
 	const numConcurrent = 5
@@ -98,13 +98,13 @@ func TestManager_StopDuringSync(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Start manager
 	err := manager.Start(context.Background())
@@ -165,7 +165,7 @@ func TestManager_RaceConditions(t *testing.T) {
 		},
 	}
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -184,7 +184,7 @@ func TestManager_RaceConditions(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Start manager
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)

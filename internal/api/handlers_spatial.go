@@ -30,7 +30,7 @@ type TileCoordinates struct {
 	Z, X, Y int
 }
 
-// GeoJSON type definitions (extracted from inline definitions)
+// GeoJSONGeometry represents a GeoJSON geometry object with type and coordinates.
 type GeoJSONGeometry struct {
 	Type        string    `json:"type"`
 	Coordinates []float64 `json:"coordinates"`

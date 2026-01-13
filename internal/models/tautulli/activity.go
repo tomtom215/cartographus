@@ -252,7 +252,7 @@ type TautulliActivitySession struct {
 	FileSize int64  `json:"file_size"`
 
 	// GUID for external ID matching
-	Guid            string `json:"guid"`
-	ParentGuid      string `json:"parent_guid"`
-	GrandparentGuid string `json:"grandparent_guid"`
+	GUID            string `json:"guid"`
+	ParentGUID      string `json:"parent_guid"`
+	GrandparentGUID string `json:"grandparent_guid"`
 }

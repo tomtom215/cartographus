@@ -76,7 +76,7 @@ func (m *Manager) enrichEventWithMetadata(event *models.PlaybackEvent, record *t
 	m.mapLibraryFields(record, event)
 
 	// Map metadata enrichment fields (added in v1.8)
-	mapStringField(record.Guid, &event.Guid)
+	mapStringField(record.GUID, &event.GUID)
 	mapStringPtrField(record.OriginalTitle, &event.OriginalTitle) // OriginalTitle is now nullable
 	mapStringField(record.FullTitle, &event.FullTitle)
 	mapStringPtrField(record.OriginallyAvailableAt, &event.OriginallyAvailableAt) // OriginallyAvailableAt is now nullable
@@ -192,7 +192,7 @@ func (m *Manager) mapEnrichmentFields(record *tautulli.TautulliHistoryRecord, ev
 	mapIntPtrToStringField(record.GrandparentRatingKey, &event.GrandparentRatingKey)
 	mapSignedIntPtrField(record.MediaIndex, &event.MediaIndex)
 	mapSignedIntPtrField(record.ParentMediaIndex, &event.ParentMediaIndex)
-	mapStringField(record.Guid, &event.Guid)
+	mapStringField(record.GUID, &event.GUID)
 	mapStringPtrField(record.OriginalTitle, &event.OriginalTitle) // OriginalTitle is now nullable
 	mapStringField(record.FullTitle, &event.FullTitle)
 	mapStringPtrField(record.OriginallyAvailableAt, &event.OriginallyAvailableAt) // OriginallyAvailableAt is now nullable
@@ -326,8 +326,8 @@ func (m *Manager) mapThumbnailFields(record *tautulli.TautulliHistoryRecord, eve
 
 // mapExtendedGUIDFields adds extended GUID fields for external ID matching (v1.43 - API Coverage Audit)
 func (m *Manager) mapExtendedGUIDFields(record *tautulli.TautulliHistoryRecord, event *models.PlaybackEvent) {
-	mapStringField(record.ParentGuid, &event.ParentGuid)
-	mapStringField(record.GrandparentGuid, &event.GrandparentGuid)
+	mapStringField(record.ParentGUID, &event.ParentGUID)
+	mapStringField(record.GrandparentGUID, &event.GrandparentGUID)
 }
 
 // enrichEventWithExtendedData enriches the event with all extended fields (v1.43 - API Coverage Audit)
@@ -607,7 +607,7 @@ func (m *Manager) convertPlexToPlaybackEvent(record *PlexMetadata) *models.Playb
 		ParentMediaIndex: fields.parentMediaIndex,
 
 		// Extended metadata
-		Guid:                  fields.guid,
+		GUID:                  fields.guid,
 		OriginalTitle:         fields.originalTitle,
 		OriginallyAvailableAt: fields.originallyAvailableAt,
 		Thumb:                 fields.thumb,

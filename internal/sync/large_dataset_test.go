@@ -32,7 +32,7 @@ func TestLargeDataset_100kRecords(t *testing.T) {
 	insertedEvents := make([]*models.PlaybackEvent, 0, targetRecords)
 
 	// Mock database that tracks inserts
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil // All new records
 		},
@@ -107,7 +107,7 @@ func TestLargeDataset_100kRecords(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Measure memory before sync
 	runtime.GC()
@@ -180,7 +180,7 @@ func TestLargeDataset_MemoryEfficiency_BatchProcessing(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			processedCount := 0
 
-			mockDb := &mockDB{
+			mockDB := &mockDB{
 				sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 					return false, nil
 				},
@@ -248,7 +248,7 @@ func TestLargeDataset_MemoryEfficiency_BatchProcessing(t *testing.T) {
 				},
 			}
 
-			manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+			manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 			// Measure memory
 			runtime.GC()
@@ -294,7 +294,7 @@ func TestLargeDataset_ErrorHandling_PartialBatch(t *testing.T) {
 
 	processedCount := 0
 
-	mockDb := &mockDB{
+	mockDB := &mockDB{
 		sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 			return false, nil
 		},
@@ -366,7 +366,7 @@ func TestLargeDataset_ErrorHandling_PartialBatch(t *testing.T) {
 		},
 	}
 
-	manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+	manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 	// Measure memory before
 	runtime.GC()
@@ -426,7 +426,7 @@ func BenchmarkLargeDataset_Throughput(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			mockDb := &mockDB{
+			mockDB := &mockDB{
 				sessionKeyExists: func(ctx context.Context, sessionKey string) (bool, error) {
 					return false, nil
 				},
@@ -493,7 +493,7 @@ func BenchmarkLargeDataset_Throughput(b *testing.B) {
 				},
 			}
 
-			manager := NewManager(mockDb, nil, mockClient, cfg, nil)
+			manager := NewManager(mockDB, nil, mockClient, cfg, nil)
 
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {

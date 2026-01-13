@@ -162,7 +162,7 @@ func (db *DB) InsertPlaybackEvent(event *models.PlaybackEvent) error {
 		// Metadata enrichment fields
 		event.RatingKey, event.ParentRatingKey, event.GrandparentRatingKey,
 		event.MediaIndex, event.ParentMediaIndex,
-		event.Guid, event.OriginalTitle, event.FullTitle, event.OriginallyAvailableAt,
+		event.GUID, event.OriginalTitle, event.FullTitle, event.OriginallyAvailableAt,
 		event.WatchedStatus, event.Thumb,
 		// Cast and crew
 		event.Directors, event.Writers, event.Actors, event.Genres,
@@ -190,7 +190,7 @@ func (db *DB) InsertPlaybackEvent(event *models.PlaybackEvent) error {
 		// Thumbnails and art
 		event.ParentThumb, event.GrandparentThumb, event.Art, event.GrandparentArt,
 		// Additional GUIDs
-		event.ParentGuid, event.GrandparentGuid,
+		event.ParentGUID, event.GrandparentGUID,
 		// Timestamp
 		event.CreatedAt,
 	)
@@ -410,7 +410,7 @@ func (db *DB) InsertPlaybackEventsBatch(ctx context.Context, events []*models.Pl
 			// Metadata enrichment fields
 			event.RatingKey, event.ParentRatingKey, event.GrandparentRatingKey,
 			event.MediaIndex, event.ParentMediaIndex,
-			event.Guid, event.OriginalTitle, event.FullTitle, event.OriginallyAvailableAt,
+			event.GUID, event.OriginalTitle, event.FullTitle, event.OriginallyAvailableAt,
 			event.WatchedStatus, event.Thumb,
 			// Cast and crew
 			event.Directors, event.Writers, event.Actors, event.Genres,
@@ -438,7 +438,7 @@ func (db *DB) InsertPlaybackEventsBatch(ctx context.Context, events []*models.Pl
 			// Thumbnails and art
 			event.ParentThumb, event.GrandparentThumb, event.Art, event.GrandparentArt,
 			// Additional GUIDs
-			event.ParentGuid, event.GrandparentGuid,
+			event.ParentGUID, event.GrandparentGUID,
 			// Timestamp
 			event.CreatedAt,
 		)
