@@ -21,19 +21,32 @@ on:
 
 jobs:
   binary:
-    name: Build Binary
-    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+    name: Build Binary (${{ matrix.goos }}-${{ matrix.goarch }})
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
         include:
+          # Native AMD64 build on Linux
           - goos: linux
             goarch: amd64
+            runner: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+            cross_compile: false
+          # Cross-compile ARM64 on Linux (requires aarch64 toolchain)
           - goos: linux
             goarch: arm64
+            runner: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+            cross_compile: true
+            cc: aarch64-linux-gnu-gcc
+            cxx: aarch64-linux-gnu-g++
+          # Native builds on macOS runners (CGO cross-compile to Darwin not supported)
           - goos: darwin
             goarch: amd64
+            runner: macos-13
+            cross_compile: false
           - goos: darwin
             goarch: arm64
+            runner: macos-latest
+            cross_compile: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -44,6 +57,12 @@ jobs:
           go-version: ${{ inputs.go-version }}
           cache: true
 
+      - name: Install cross-compiler (Linux ARM64)
+        if: matrix.cross_compile && matrix.goos == 'linux' && matrix.goarch == 'arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
       - name: Set Go environment
         run: |
           echo "GOTOOLCHAIN=local" >> $GITHUB_ENV
@@ -53,6 +72,8 @@ jobs:
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
+          CC: ${{ matrix.cc || '' }}
+          CXX: ${{ matrix.cxx || '' }}
         run: |
           OUTPUT_NAME="cartographus-${{ matrix.goos }}-${{ matrix.goarch }}"
           if [ "${{ matrix.goos }}" = "windows" ]; then
