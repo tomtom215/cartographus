@@ -29,12 +29,12 @@ jobs:
           # Native AMD64 build on Linux
           - goos: linux
             goarch: amd64
-            runner: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+            runner: ubuntu-latest
             cross_compile: false
           # Cross-compile ARM64 on Linux (requires aarch64 toolchain)
           - goos: linux
             goarch: arm64
-            runner: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+            runner: ubuntu-latest
             cross_compile: true
             cc: aarch64-linux-gnu-gcc
             cxx: aarch64-linux-gnu-g++
@@ -90,7 +90,7 @@ jobs:
 
   docker:
     name: Build Docker Image
-    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'self-hosted' }}
+    runs-on: ubuntu-latest
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}
     steps:
