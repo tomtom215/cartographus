@@ -69,9 +69,9 @@ type ImportRequest struct {
 
 // ImportResponse represents the response from import operations.
 type ImportResponse struct {
-	Success bool                             `json:"success"`
-	Message string                           `json:"message,omitempty"`
-	Error   string                           `json:"error,omitempty"`
+	Success bool                            `json:"success"`
+	Message string                          `json:"message,omitempty"`
+	Error   string                          `json:"error,omitempty"`
 	Stats   *tautulliimport.ProgressSummary `json:"stats,omitempty"`
 }
 
