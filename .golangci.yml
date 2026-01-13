@@ -1,7 +1,6 @@
 # golangci-lint configuration for Cartographus
 # https://golangci-lint.run/usage/configuration/
-
-version: "2"
+# Note: This config uses v1 format for compatibility with golangci-lint v1.x
 
 run:
   timeout: 5m
@@ -17,29 +16,6 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-  exclusions:
-    # Exclude errcheck for test files
-    rules:
-      - linters:
-          - errcheck
-        path: _test\.go$
-      # Ignore SA9003 empty branch in test/fuzz files (often intentional)
-      - linters:
-          - staticcheck
-        path: (_test|_fuzz)\.go$
-        text: SA9003
-      # Ignore QF* style suggestions
-      - linters:
-          - staticcheck
-        text: "^QF"
-      # Ignore unchecked Close() in defer statements (common Go pattern)
-      - linters:
-          - errcheck
-        text: "Close"
-      # Ignore unchecked Body.Close (common HTTP pattern)
-      - linters:
-          - errcheck
-        text: "Body\\.Close"
 
 linters-settings:
   errcheck:
@@ -76,3 +52,27 @@ issues:
   exclude-dirs:
     - vendor
     - docs
+
+  # Exclude rules (v1 format)
+  exclude-rules:
+    # Exclude errcheck for test files
+    - linters:
+        - errcheck
+      path: _test\.go$
+    # Ignore SA9003 empty branch in test/fuzz files (often intentional)
+    - linters:
+        - staticcheck
+      path: (_test|_fuzz)\.go$
+      text: SA9003
+    # Ignore QF* style suggestions
+    - linters:
+        - staticcheck
+      text: "^QF"
+    # Ignore unchecked Close() in defer statements (common Go pattern)
+    - linters:
+        - errcheck
+      text: "Close"
+    # Ignore unchecked Body.Close (common HTTP pattern)
+    - linters:
+        - errcheck
+      text: "Body\\.Close"
