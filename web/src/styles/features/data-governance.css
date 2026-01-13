@@ -1828,7 +1828,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal, 10000);
 }
 
 .modal-content {
@@ -1971,6 +1971,191 @@
 
 .btn-delete:hover {
   background: rgba(239, 68, 68, 0.2);
+}
+
+/* =================================================================
+   Backup Dialog Overlay and Modal
+   ================================================================= */
+.backup-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal, 10000);
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.backup-dialog-overlay[aria-hidden="false"],
+.backup-dialog-overlay.open {
+    display: flex;
+}
+
+.backup-dialog-content {
+    background: var(--secondary-bg, #16213e);
+    border: 1px solid var(--border, #2a2a3e);
+    border-radius: 12px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.backup-dialog-title {
+    margin: 0 0 20px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary, #eaeaea);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border, #2a2a3e);
+}
+
+.backup-dialog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.backup-dialog-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.backup-dialog-form .form-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #a0a0a0);
+    font-weight: 500;
+}
+
+.backup-dialog-form .form-input,
+.backup-dialog-form select,
+.backup-dialog-form textarea {
+    padding: 10px 12px;
+    background: var(--accent, #0f3460);
+    border: 1px solid var(--border, #2a2a3e);
+    border-radius: 6px;
+    color: var(--text-primary, #eaeaea);
+    font-size: 0.875rem;
+    min-height: 44px; /* WCAG 2.5.5 touch target */
+}
+
+.backup-dialog-form .form-input:focus,
+.backup-dialog-form select:focus,
+.backup-dialog-form textarea:focus {
+    outline: 2px solid var(--highlight, #7c3aed);
+    outline-offset: 2px;
+}
+
+.backup-dialog-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.backup-dialog-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border, #2a2a3e);
+}
+
+.backup-dialog-actions button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 44px; /* WCAG 2.5.5 touch target */
+}
+
+.backup-dialog-actions .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border, #2a2a3e);
+    color: var(--text-secondary, #a0a0a0);
+}
+
+.backup-dialog-actions .btn-cancel:hover {
+    background: var(--accent, #0f3460);
+    color: var(--text-primary, #eaeaea);
+}
+
+.backup-dialog-actions .btn-primary {
+    background: var(--highlight, #7c3aed);
+    border: 1px solid var(--highlight, #7c3aed);
+    color: white;
+}
+
+.backup-dialog-actions .btn-primary:hover {
+    background: var(--highlight-hover, #6d28d9);
+    border-color: var(--highlight-hover, #6d28d9);
+}
+
+.backup-dialog-actions .btn-danger {
+    background: var(--color-error, #ef4444);
+    border: 1px solid var(--color-error, #ef4444);
+    color: white;
+}
+
+.backup-dialog-actions .btn-danger:hover {
+    background: var(--color-error-light, #f87171);
+    border-color: var(--color-error-light, #f87171);
+}
+
+/* Restore Dialog Warning */
+.backup-dialog-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--color-error, #ef4444);
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+.backup-dialog-warning .warning-icon {
+    flex-shrink: 0;
+    color: var(--color-error, #ef4444);
+}
+
+.backup-dialog-warning .warning-text {
+    font-size: 0.875rem;
+    color: var(--color-error, #ef4444);
+    line-height: 1.5;
+}
+
+/* Restore Dialog specific */
+.restore-dialog .backup-info {
+    padding: 12px 16px;
+    background: var(--accent, #0f3460);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.restore-dialog .backup-info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.875rem;
+}
+
+.restore-dialog .backup-info-item .info-label {
+    color: var(--text-secondary, #a0a0a0);
+}
+
+.restore-dialog .backup-info-item .info-value {
+    color: var(--text-primary, #eaeaea);
+    font-weight: 500;
 }
 
 /* =================================================================

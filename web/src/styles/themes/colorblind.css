@@ -15,6 +15,11 @@
     --highlight-hover: #005fa3;
     --highlight-alt: #ee7733;       /* Orange - distinguishable from blue */
 
+    /* Icon colors - maintain consistency with theme */
+    --icon-color: #a0a0a0;
+    --icon-color-active: #0077bb;
+    --icon-color-hover: #eaeaea;
+
     --color-success: #009988;       /* Teal - safe alternative to green */
     --color-success-light: #33bbaa;
     --color-warning: #ee7733;       /* Orange - safe for color blindness */
