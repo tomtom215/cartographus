@@ -8,8 +8,8 @@ Built for self-hosters who want the same depth of analytics that streaming servi
 
 [![Build Status](https://github.com/tomtom215/cartographus/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/tomtom215/cartographus/actions/workflows/build-and-test.yml)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![GHCR](https://ghcr-badge.egpl.dev/tomtom215/cartographus/latest_tag?trim=major&label=GHCR)](https://github.com/tomtom215/cartographus/pkgs/container/cartographus)
-[![Go Version](https://img.shields.io/github/go-mod-go-version/tomtom215/cartographus?label=Go)](https://github.com/tomtom215/cartographus/blob/main/go.mod)
+[![GHCR](https://img.shields.io/badge/GHCR-ghcr.io%2Ftomtom215%2Fcartographus-blue?logo=github)](https://github.com/tomtom215/cartographus/pkgs/container/cartographus)
+[![Go Version](https://img.shields.io/badge/Go-1.24-00ADD8?logo=go&logoColor=white)](https://github.com/tomtom215/cartographus/blob/main/go.mod)
 
 ---
 
