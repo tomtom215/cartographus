@@ -34,7 +34,7 @@ jobs:
           echo "CGO_ENABLED=1" >> $GITHUB_ENV
 
       - name: Initialize CodeQL for Go
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: go
           build-mode: manual
@@ -43,7 +43,7 @@ jobs:
         run: go build -tags "wal,nats" ./...
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:go"
 
@@ -59,13 +59,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Initialize CodeQL for JavaScript
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript-typescript
           build-mode: none
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:javascript-typescript"
 
