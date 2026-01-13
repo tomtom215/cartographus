@@ -23,7 +23,7 @@
     right: 0;
     height: 3px;
     background: var(--border);
-    z-index: var(--z-modal, 10000);
+    z-index: var(--z-toast, 10001);  /* Above modals so progress is always visible */
     overflow: hidden;
     transition: opacity 0.2s ease;
 }

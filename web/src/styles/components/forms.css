@@ -152,6 +152,21 @@ select {
     transition: all 0.15s ease;
     font-size: 14px;
     line-height: 1;
+    /* WCAG 2.5.5: Expand touch target with pseudo-element */
+    position: relative;
+}
+
+/* Expanded touch target for accessibility (44x44px minimum) */
+.filter-badge-remove::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
 }
 
 .filter-badge-remove:hover {
@@ -216,7 +231,7 @@ select {
     font-size: 12px;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
-    min-height: 36px;
+    min-height: 44px;           /* WCAG 2.5.5: Minimum 44px touch target */
 }
 
 .quick-date-btn:hover {
