@@ -79,6 +79,13 @@ func (s *CheckpointStore) CreateTable(ctx context.Context) error {
 		}
 	}
 
+	// Force a checkpoint after creating the table to flush the WAL.
+	// This prevents a DuckDB bug where WAL replay of CREATE TABLE statements
+	// with TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP fails.
+	if _, err := s.db.ExecContext(ctx, "CHECKPOINT"); err != nil {
+		logging.Warn().Err(err).Msg("Failed to checkpoint after replay_checkpoints table creation")
+	}
+
 	logging.Info().Msg("Replay checkpoints table created/verified")
 	return nil
 }

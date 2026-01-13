@@ -185,7 +185,11 @@ func (db *DB) Conn() *sql.DB {
 	return db.conn
 }
 
-// Close closes the database connection and all prepared statements
+// Close closes the database connection and all prepared statements.
+// It performs a CHECKPOINT before closing to flush the WAL to the main database file.
+// This prevents WAL replay issues on next startup caused by a DuckDB bug where
+// replaying CREATE TABLE statements with TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+// can fail with "GetDefaultDatabase with no default database set" errors.
 func (db *DB) Close() error {
 	db.stmtCacheMu.Lock()
 	for _, stmt := range db.stmtCache {
@@ -197,6 +201,15 @@ func (db *DB) Close() error {
 	db.stmtCacheMu.Unlock()
 
 	if db.conn != nil {
+		// Force a checkpoint to flush WAL before closing.
+		// This prevents WAL replay issues on next startup.
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		if err := db.Checkpoint(ctx); err != nil {
+			// Log warning but don't fail - best effort checkpoint
+			logging.Warn().Err(err).Msg("Failed to checkpoint database before close")
+		}
+		cancel()
+
 		return db.conn.Close()
 	}
 	return nil
@@ -235,5 +248,21 @@ func (db *DB) initialize() error {
 	}
 
 	// Create indexes
-	return db.createIndexes()
+	if err := db.createIndexes(); err != nil {
+		return err
+	}
+
+	// Force a checkpoint after schema initialization to flush the WAL.
+	// This prevents a DuckDB bug where WAL replay of CREATE TABLE statements
+	// with TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP fails with
+	// "GetDefaultDatabase with no default database set" errors.
+	// By checkpointing here, we ensure the WAL is flushed before normal operations.
+	checkpointCtx, checkpointCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer checkpointCancel()
+	if err := db.Checkpoint(checkpointCtx); err != nil {
+		// Log warning but don't fail initialization - the issue only affects restart
+		logging.Warn().Err(err).Msg("Failed to checkpoint after schema initialization")
+	}
+
+	return nil
 }
