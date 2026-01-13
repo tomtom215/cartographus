@@ -31,6 +31,35 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 // ============================================================================
+// Security Utilities
+// ============================================================================
+
+/**
+ * Sanitizes a user-provided path to ensure it stays within the base directory.
+ * Returns the safe absolute path if valid, or null if the path would escape the base.
+ *
+ * This function is a security barrier that prevents path traversal attacks.
+ *
+ * @param baseDir - The base directory that the path must stay within
+ * @param userPath - The user-provided path (potentially malicious)
+ * @returns The safe absolute path, or null if validation fails
+ */
+function sanitizePath(baseDir: string, userPath: string): string | null {
+  // Resolve both paths to absolute form
+  const resolvedBase = path.resolve(baseDir);
+  const resolvedFull = path.resolve(path.join(baseDir, userPath));
+
+  // Ensure the resolved path is within the base directory
+  // Check both: exact match (baseDir itself) and prefix match (files within baseDir)
+  if (resolvedFull === resolvedBase || resolvedFull.startsWith(resolvedBase + path.sep)) {
+    return resolvedFull;
+  }
+
+  // Path escapes base directory - reject it
+  return null;
+}
+
+// ============================================================================
 // Types
 // ============================================================================
 
@@ -1902,24 +1931,24 @@ export function createMockApp(options: { logRequests?: boolean } = {}): express.
     }));
 
     // SPA fallback - serve index.html for all non-API, non-file routes
-    // lgtm[js/missing-rate-limiting] - This is a test mock server, rate limiting not needed
-    // codeql[js/missing-rate-limiting]: Test mock server, rate limiting unnecessary
+    // Note: This is a TEST mock server with rate limiting intentionally omitted
     app.get('/{*path}', (req, res) => {
-      // Don't serve index.html for files that exist
-      const filePath = path.join(distPath!, req.path);
+      // Sanitize the user-provided path to prevent path traversal attacks
+      const safePath = sanitizePath(distPath!, req.path);
 
-      // Prevent path traversal attacks by verifying resolved path is within distPath
-      const resolvedPath = path.resolve(filePath);
-      const resolvedDistPath = path.resolve(distPath!);
-      if (!resolvedPath.startsWith(resolvedDistPath + path.sep) && resolvedPath !== resolvedDistPath) {
+      // If sanitization fails (path escapes distPath), reject the request
+      if (safePath === null) {
         res.status(403).send('Forbidden');
         return;
       }
 
-      if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isFile()) {
-        res.sendFile(resolvedPath);
+      // safePath is now guaranteed to be within distPath
+      if (fs.existsSync(safePath) && fs.statSync(safePath).isFile()) {
+        res.sendFile(safePath);
       } else {
-        res.sendFile(path.join(resolvedDistPath, 'index.html'));
+        // Serve index.html for SPA routing
+        const indexPath = path.join(path.resolve(distPath!), 'index.html');
+        res.sendFile(indexPath);
       }
     });
   } else {
