@@ -8,6 +8,17 @@ This document provides guidance for AI assistants working on the Cartographus co
 
 ---
 
+## ⚠️ PROJECT EXPECTATIONS
+
+This project has **extremely strict quality requirements**:
+
+- **100% production-grade** - Every change must be deterministic, testable, and follow best practices
+- **Zero tolerance for skipped issues** - If you find ANY bug, lint error, formatting issue, or problem during your work, you MUST fix it immediately - no exceptions, no "I'll leave this for later"
+- **Verify everything locally** - Never assume code works; run the tests and linters
+- **No shortcuts** - If something needs investigation, investigate it properly
+
+---
+
 ## !!! STOP - READ THIS FIRST !!!
 
 ```
@@ -297,23 +308,57 @@ Enable datasketches: `DUCKDB_DATASKETCHES_ENABLED=true`
 
 ## AI Assistant Guidelines
 
+### ⚠️ CRITICAL: Quality Standards
+
+This project maintains **extremely strict requirements** and **high expectations**:
+
+1. **Production-grade code only** - All fixes must be deterministic, testable, and observable
+2. **Best practices always** - No shortcuts, no "good enough", no technical debt
+3. **Fix ALL issues found** - If you discover a bug or issue during your work, FIX IT immediately, even if:
+   - It's not part of the current task
+   - It's unrelated to your changes
+   - It seems minor or cosmetic
+   - Someone else introduced it
+4. **Verify locally before committing** - Run the full lint/test suite, not just the changed code
+5. **No assumptions** - If unsure, investigate and verify rather than guess
+
+### 🚨 MANDATORY: Session Setup
+
+**BEFORE ANY Go commands, you MUST run:**
+
+```bash
+source scripts/session-setup.sh
+```
+
+This is NON-NEGOTIABLE. Without it:
+- All `go build`, `go test`, `go vet`, `golangci-lint` commands will fail
+- You will waste time debugging network errors
+- Your changes cannot be properly validated
+
+**Run it FIRST. Run it EVERY session. No exceptions.**
+
 ### DO
 
-- Run `source scripts/session-setup.sh` at session start
+- Run `source scripts/session-setup.sh` FIRST, before any other commands
 - Read files before modifying them
 - Use `-tags "wal,nats"` for all Go commands
 - Use parameterized queries (`?` placeholders)
 - Add tests for new features
 - Update CHANGELOG.md for new features
 - Run pre-commit checks before committing
+- Fix any issues you encounter, regardless of scope
+- Verify changes work locally before pushing
 
 ### DON'T
 
+- Skip the session setup script (this will cause failures)
 - Disable CGO (DuckDB requires it)
 - Use SQLite syntax (this is DuckDB)
-- Skip the session setup script
 - Omit build tags from Go commands
 - Ignore errors or skip tests
+- Leave discovered bugs unfixed
+- Make assumptions without verification
+- Push code without local validation
 - Support ARMv7 (DuckDB limitation)
 
 ### TDD Requirements
