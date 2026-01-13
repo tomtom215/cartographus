@@ -1,0 +1,199 @@
+/*
+ * Cartographus - Media Server Analytics and Geographic Visualization
+ * Copyright 2026 Tom F. (tomtom215)
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * https://github.com/tomtom215/cartographus
+ */
+/**
+ * Error Boundary Component
+ *
+ * Full-screen error overlay for critical application errors.
+ * Provides retry and dismiss actions with accessibility support.
+ */
+
+.error-boundary-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: var(--z-modal, 10000);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.error-boundary-overlay.visible {
+    opacity: 1;
+}
+
+.error-boundary-content {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.error-boundary-icon {
+    margin-bottom: 20px;
+    color: var(--color-error);
+}
+
+.error-boundary-icon svg {
+    width: 64px;
+    height: 64px;
+}
+
+.error-boundary-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.error-boundary-message {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.error-boundary-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.error-boundary-actions .btn-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--highlight);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: 44px;
+}
+
+.error-boundary-actions .btn-retry:hover {
+    background: var(--highlight-hover);
+}
+
+.error-boundary-actions .btn-retry:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.error-boundary-actions .btn-retry:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.error-boundary-actions .btn-retry svg {
+    width: 16px;
+    height: 16px;
+}
+
+.error-boundary-actions .btn-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.error-boundary-actions .btn-dismiss:hover {
+    background: var(--accent);
+    color: var(--text-primary);
+    border-color: var(--highlight);
+}
+
+.error-boundary-actions .btn-dismiss:focus-visible {
+    outline: 2px solid var(--focus-indicator);
+    outline-offset: 2px;
+}
+
+.error-boundary-help {
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+/* Error type variations */
+.error-boundary-overlay[data-error-type="network"] .error-boundary-icon {
+    color: var(--color-warning);
+}
+
+.error-boundary-overlay[data-error-type="runtime"] .error-boundary-icon {
+    color: var(--color-error);
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .error-boundary-content {
+        padding: 24px 20px;
+    }
+
+    .error-boundary-actions {
+        flex-direction: column;
+    }
+
+    .error-boundary-actions .btn-retry,
+    .error-boundary-actions .btn-dismiss {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .error-boundary-overlay {
+        transition: none;
+    }
+
+    .error-boundary-actions .btn-retry,
+    .error-boundary-actions .btn-dismiss {
+        transition: none;
+    }
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .error-boundary-overlay {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .error-boundary-content {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* High contrast mode */
+[data-theme="high-contrast"] .error-boundary-content {
+    border-width: 2px;
+}
+
+[data-theme="high-contrast"] .error-boundary-actions .btn-retry,
+[data-theme="high-contrast"] .error-boundary-actions .btn-dismiss {
+    border-width: 2px;
+}

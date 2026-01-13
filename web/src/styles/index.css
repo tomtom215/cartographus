@@ -45,6 +45,7 @@
 @import './components/security-alerts.css';
 @import './components/data-table.css';
 @import './components/tooltip.css';
+@import './components/error-boundary.css';
 /* Cookie consent banner disabled - self-hosted app with no tracking analytics */
 /* @import './components/cookie-consent.css'; */
 
