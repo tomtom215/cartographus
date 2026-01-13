@@ -13,6 +13,10 @@ import (
 	"github.com/tomtom215/cartographus/internal/recommend"
 )
 
+// maxRerankSize limits slice allocations to prevent excessive memory usage.
+// This is a defense-in-depth measure; k is also bounded by len(items).
+const maxRerankSize = 10000
+
 // MMR implements Maximal Marginal Relevance reranking.
 // It balances relevance and diversity by iteratively selecting items
 // that are both relevant and dissimilar to already selected items.
@@ -58,6 +62,10 @@ func (m *MMR) Rerank(ctx context.Context, items []recommend.ScoredItem, k int) [
 		return items
 	}
 
+	// Bound k to prevent excessive memory allocation
+	if k > maxRerankSize {
+		k = maxRerankSize
+	}
 	if k > len(items) {
 		k = len(items)
 	}

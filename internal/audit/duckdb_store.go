@@ -297,12 +297,16 @@ func (s *DuckDBStore) Get(ctx context.Context, id string) (*Event, error) {
 }
 
 // Query retrieves events matching the filter.
+// Security: Query uses parameterized values (?) for all filter conditions and ORDER BY
+// columns are validated against a whitelist in appendOrderAndLimit. See buildQuery, buildFilterConditions.
 func (s *DuckDBStore) Query(ctx context.Context, filter QueryFilter) ([]Event, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	query, args := s.buildQuery(filter, false)
 
+	// codeql[go/sql-injection]: False positive - all user values use parameterized queries (?),
+	// ORDER BY columns are validated against validFields whitelist in appendOrderAndLimit
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query audit events: %w", err)

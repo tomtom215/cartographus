@@ -1903,13 +1903,23 @@ export function createMockApp(options: { logRequests?: boolean } = {}): express.
 
     // SPA fallback - serve index.html for all non-API, non-file routes
     // lgtm[js/missing-rate-limiting] - This is a test mock server, rate limiting not needed
+    // codeql[js/missing-rate-limiting]: Test mock server, rate limiting unnecessary
     app.get('/{*path}', (req, res) => {
       // Don't serve index.html for files that exist
       const filePath = path.join(distPath!, req.path);
-      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-        res.sendFile(filePath);
+
+      // Prevent path traversal attacks by verifying resolved path is within distPath
+      const resolvedPath = path.resolve(filePath);
+      const resolvedDistPath = path.resolve(distPath!);
+      if (!resolvedPath.startsWith(resolvedDistPath + path.sep) && resolvedPath !== resolvedDistPath) {
+        res.status(403).send('Forbidden');
+        return;
+      }
+
+      if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isFile()) {
+        res.sendFile(resolvedPath);
       } else {
-        res.sendFile(path.join(distPath!, 'index.html'));
+        res.sendFile(path.join(resolvedDistPath, 'index.html'));
       }
     });
   } else {

@@ -53,6 +53,25 @@ func validateRedirectURI(uri string) string {
 		return ""
 	}
 
+	// Reject backslashes which some browsers normalize to forward slashes,
+	// potentially turning /\evil.com into //evil.com (open redirect)
+	if strings.Contains(uri, "\\") {
+		logging.Warn().Str("redirect_uri", uri).Msg("Rejected redirect URI: backslashes not allowed")
+		return ""
+	}
+
+	// Reject URIs with @ before the path portion (could be interpreted as user:pass@host)
+	// e.g., /@evil.com or /foo@evil.com could be problematic
+	if strings.Contains(uri[1:], "@") && !strings.Contains(strings.SplitN(uri[1:], "/", 2)[0], "/") {
+		// Check if @ appears before the first / in the path
+		firstSlash := strings.Index(uri[1:], "/")
+		atSign := strings.Index(uri[1:], "@")
+		if atSign >= 0 && (firstSlash < 0 || atSign < firstSlash) {
+			logging.Warn().Str("redirect_uri", uri).Msg("Rejected redirect URI: @ in authority position not allowed")
+			return ""
+		}
+	}
+
 	// Additional validation: parse as URL to ensure it's well-formed
 	// Using ParseRequestURI to be strict about validation
 	if _, err := url.ParseRequestURI(uri); err != nil {
