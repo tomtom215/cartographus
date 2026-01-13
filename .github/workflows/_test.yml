@@ -10,6 +10,11 @@ on:
         type: string
         default: '1.24.0'
 
+# Permissions for reusable workflow - required for publishing test reports
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   test:
     name: Go Tests

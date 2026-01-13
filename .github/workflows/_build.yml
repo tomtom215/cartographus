@@ -19,6 +19,12 @@ on:
         description: 'Docker image tag'
         value: ${{ jobs.docker.outputs.image-tag }}
 
+# Permissions for reusable workflow - required for GHCR push
+# Note: Calling workflows must also grant these permissions
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   binary:
     name: Build Binary (${{ matrix.goos }}-${{ matrix.goarch }})

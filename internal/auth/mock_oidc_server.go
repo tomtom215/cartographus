@@ -383,9 +383,9 @@ func (m *MockOIDCServer) handleAuthorize(w http.ResponseWriter, r *http.Request)
 	code := m.CreateAuthorizationCode(redirectURI, "", nonce)
 
 	// Build redirect URL safely using url.Values to prevent injection
-	// Note: redirectURI is validated above via isRedirectURIAllowed() which checks against
-	// AllowedRedirectURIs whitelist. This is a mock server for testing only.
-	// CodeQL flags this as "unvalidated-url-redirection" but validation IS performed.
+	// Security: redirectURI is validated via isRedirectURIAllowed() (line 377) which checks
+	// against AllowedRedirectURIs whitelist. Only pre-configured patterns are accepted.
+	// codeql[go/unvalidated-url-redirection]: False positive - redirect_uri validated against whitelist
 	query := parsedURI.Query()
 	query.Set("code", code)
 	query.Set("state", state)

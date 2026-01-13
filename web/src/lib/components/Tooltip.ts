@@ -245,6 +245,9 @@ export function createTooltip(
     }
 
     // Set content
+    // @security allowHtml is opt-in (default: false). When enabled, caller is responsible
+    // for sanitizing content. This is a deliberate design choice for rich tooltip content.
+    // codeql[js/xss-through-dom]: allowHtml is opt-in; callers must sanitize when using it
     function updateContent(content: string): void {
         if (config.allowHtml) {
             contentEl.innerHTML = content;

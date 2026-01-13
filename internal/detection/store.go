@@ -367,9 +367,13 @@ func (s *DuckDBStore) GetAlert(ctx context.Context, id int64) (*Alert, error) {
 }
 
 // ListAlerts retrieves alerts with optional filtering.
+// Security: Query uses parameterized values (?) and ORDER BY columns are whitelisted
+// via validAlertOrderColumns map. See buildAlertQuery, applyAlertFilters, applyAlertOrdering.
 func (s *DuckDBStore) ListAlerts(ctx context.Context, filter AlertFilter) ([]Alert, error) {
 	query, args := s.buildAlertQuery(filter)
 
+	// codeql[go/sql-injection]: False positive - all user values use parameterized queries (?),
+	// ORDER BY columns are validated against validAlertOrderColumns whitelist
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query alerts: %w", err)

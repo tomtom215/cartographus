@@ -92,13 +92,19 @@ export class LineageRenderer extends BaseRenderer {
             );
 
             if (dedupeEntry) {
+                // Escape all user-controlled and external data to prevent XSS
+                const safeEventId = this.escapeHtml(eventId);
+                const safeSource = this.escapeHtml(dedupeEntry.discarded_source);
+                const safeStatus = this.escapeHtml(STATUS_CONFIG[dedupeEntry.status]?.name || dedupeEntry.status);
+                const safeReason = this.escapeHtml(REASON_NAMES[dedupeEntry.dedupe_reason] || dedupeEntry.dedupe_reason);
+
                 eventInfoEl.innerHTML = `
                     <div class="lineage-event-card">
                         <h4>Event Found in Dedupe Audit</h4>
-                        <div class="lineage-field"><strong>Event ID:</strong> ${eventId}</div>
+                        <div class="lineage-field"><strong>Event ID:</strong> ${safeEventId}</div>
                         <div class="lineage-field"><strong>User:</strong> ${this.escapeHtml(dedupeEntry.username || 'Unknown')}</div>
-                        <div class="lineage-field"><strong>Source:</strong> ${dedupeEntry.discarded_source}</div>
-                        <div class="lineage-field"><strong>Status:</strong> ${STATUS_CONFIG[dedupeEntry.status]?.name || dedupeEntry.status}</div>
+                        <div class="lineage-field"><strong>Source:</strong> ${safeSource}</div>
+                        <div class="lineage-field"><strong>Status:</strong> ${safeStatus}</div>
                     </div>
                 `;
 
@@ -113,7 +119,7 @@ export class LineageRenderer extends BaseRenderer {
                     <div class="lineage-timeline-item">
                         <div class="timeline-marker"></div>
                         <div class="timeline-content">
-                            <div class="timeline-title">Deduplicated (${REASON_NAMES[dedupeEntry.dedupe_reason]})</div>
+                            <div class="timeline-title">Deduplicated (${safeReason})</div>
                             <div class="timeline-time">${this.formatTimestamp(dedupeEntry.timestamp)}</div>
                         </div>
                     </div>

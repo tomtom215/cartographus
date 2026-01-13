@@ -158,6 +158,10 @@ func (c *Calibration) Rerank(ctx context.Context, items []recommend.ScoredItem, 
 		return items
 	}
 
+	// Bound k to prevent excessive memory allocation
+	if k > maxRerankSize {
+		k = maxRerankSize
+	}
 	if k > len(items) {
 		k = len(items)
 	}

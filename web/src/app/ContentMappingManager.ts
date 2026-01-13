@@ -819,14 +819,19 @@ export class ContentMappingManager {
       return;
     }
 
+    // Escape metadata values for XSS prevention (defense in depth)
+    const safeLabel = escapeHtml(metadata.idLabel);
+    const safeHint = escapeHtml(metadata.idHint);
+    const safePlatform = escapeHtml(platform);
+
     const modal = this.createModal(`Link to ${metadata.displayName}`, `
       <form id="link-platform-form" class="cross-platform-modal-form">
         <div class="cross-platform-modal-form-group">
-          <label class="cross-platform-modal-form-label">${metadata.idLabel}</label>
+          <label class="cross-platform-modal-form-label">${safeLabel}</label>
           <input type="text" id="platform-id" class="form-input" required
-            placeholder="Enter the ${platform} item ID" />
+            placeholder="Enter the ${safePlatform} item ID" />
           <span class="cross-platform-modal-form-hint">
-            ${metadata.idHint}
+            ${safeHint}
           </span>
         </div>
         <div class="modal-actions">
@@ -1158,6 +1163,11 @@ export class ContentMappingManager {
 
   /**
    * Create a modal dialog
+   * @param title - Modal title (will be escaped)
+   * @param content - Modal body HTML (must be pre-sanitized by caller)
+   * @security The content parameter accepts trusted HTML for flexibility.
+   *   All callers in this file use static templates with escaped dynamic values.
+   *   codeql[js/xss-through-dom]: Content is controlled by callers using static templates
    */
   private createModal(title: string, content: string): HTMLElement {
     // Remove existing modal
