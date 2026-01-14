@@ -654,3 +654,292 @@ func TestAnalyticsMethodNotAllowed(t *testing.T) {
 		t.Errorf("Expected status 405, got %d", w.Code)
 	}
 }
+
+// TestAnalyticsCohortRetention_MethodNotAllowed tests that only GET is allowed.
+func TestAnalyticsCohortRetention_MethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	methods := []string{http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch}
+
+	for _, method := range methods {
+		t.Run(method, func(t *testing.T) {
+			t.Parallel()
+
+			handler, db := setupTestHandlerForAnalytics(t)
+			defer db.Close()
+
+			req := httptest.NewRequest(method, "/api/v1/analytics/cohort-retention", nil)
+			rec := httptest.NewRecorder()
+
+			handler.AnalyticsCohortRetention(rec, req)
+
+			if rec.Code != http.StatusMethodNotAllowed {
+				t.Errorf("Expected status %d, got %d", http.StatusMethodNotAllowed, rec.Code)
+			}
+		})
+	}
+}
+
+// TestAnalyticsQoE_MethodNotAllowed tests that only GET is allowed.
+func TestAnalyticsQoE_MethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	methods := []string{http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch}
+
+	for _, method := range methods {
+		t.Run(method, func(t *testing.T) {
+			t.Parallel()
+
+			handler, db := setupTestHandlerForAnalytics(t)
+			defer db.Close()
+
+			req := httptest.NewRequest(method, "/api/v1/analytics/qoe", nil)
+			rec := httptest.NewRecorder()
+
+			handler.AnalyticsQoE(rec, req)
+
+			if rec.Code != http.StatusMethodNotAllowed {
+				t.Errorf("Expected status %d, got %d", http.StatusMethodNotAllowed, rec.Code)
+			}
+		})
+	}
+}
+
+// TestAnalyticsDataQuality_MethodNotAllowed tests that only GET is allowed.
+func TestAnalyticsDataQuality_MethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	methods := []string{http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch}
+
+	for _, method := range methods {
+		t.Run(method, func(t *testing.T) {
+			t.Parallel()
+
+			handler, db := setupTestHandlerForAnalytics(t)
+			defer db.Close()
+
+			req := httptest.NewRequest(method, "/api/v1/analytics/data-quality", nil)
+			rec := httptest.NewRecorder()
+
+			handler.AnalyticsDataQuality(rec, req)
+
+			if rec.Code != http.StatusMethodNotAllowed {
+				t.Errorf("Expected status %d, got %d", http.StatusMethodNotAllowed, rec.Code)
+			}
+		})
+	}
+}
+
+// TestAnalyticsUserNetwork_MethodNotAllowed tests that only GET is allowed.
+func TestAnalyticsUserNetwork_MethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	methods := []string{http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch}
+
+	for _, method := range methods {
+		t.Run(method, func(t *testing.T) {
+			t.Parallel()
+
+			handler, db := setupTestHandlerForAnalytics(t)
+			defer db.Close()
+
+			req := httptest.NewRequest(method, "/api/v1/analytics/user-network", nil)
+			rec := httptest.NewRecorder()
+
+			handler.AnalyticsUserNetwork(rec, req)
+
+			if rec.Code != http.StatusMethodNotAllowed {
+				t.Errorf("Expected status %d, got %d", http.StatusMethodNotAllowed, rec.Code)
+			}
+		})
+	}
+}
+
+// TestAnalyticsCohortRetention_WithParams tests the cohort retention endpoint with query params.
+func TestAnalyticsCohortRetention_WithParams(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name           string
+		queryParams    string
+		expectedStatus int
+	}{
+		{
+			name:           "default_params",
+			queryParams:    "",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "with_max_weeks",
+			queryParams:    "max_weeks=24",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "with_min_cohort_size",
+			queryParams:    "min_cohort_size=5",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "with_granularity_month",
+			queryParams:    "granularity=month",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "with_granularity_week",
+			queryParams:    "granularity=week",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "invalid_max_weeks_too_high",
+			queryParams:    "max_weeks=100",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+		{
+			name:           "invalid_max_weeks_zero",
+			queryParams:    "max_weeks=0",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+		{
+			name:           "invalid_max_weeks_negative",
+			queryParams:    "max_weeks=-5",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+		{
+			name:           "invalid_max_weeks_string",
+			queryParams:    "max_weeks=abc",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler, db := setupTestHandlerForAnalytics(t)
+			defer db.Close()
+
+			url := "/api/v1/analytics/cohort-retention"
+			if tt.queryParams != "" {
+				url += "?" + tt.queryParams
+			}
+
+			req := httptest.NewRequest(http.MethodGet, url, nil)
+			rec := httptest.NewRecorder()
+
+			handler.AnalyticsCohortRetention(rec, req)
+
+			if rec.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, rec.Code)
+			}
+		})
+	}
+}
+
+// TestAnalyticsUserNetwork_WithParams tests the user network endpoint with query params.
+func TestAnalyticsUserNetwork_WithParams(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name           string
+		queryParams    string
+		expectedStatus int
+	}{
+		{
+			name:           "default_params",
+			queryParams:    "",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "with_min_shared_sessions",
+			queryParams:    "min_shared_sessions=5",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "with_min_content_overlap",
+			queryParams:    "min_content_overlap=0.5",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "with_both_params",
+			queryParams:    "min_shared_sessions=3&min_content_overlap=0.4",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "invalid_min_shared_sessions_zero",
+			queryParams:    "min_shared_sessions=0",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+		{
+			name:           "invalid_min_shared_sessions_negative",
+			queryParams:    "min_shared_sessions=-1",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+		{
+			name:           "invalid_min_content_overlap_too_high",
+			queryParams:    "min_content_overlap=1.5",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+		{
+			name:           "invalid_min_content_overlap_negative",
+			queryParams:    "min_content_overlap=-0.5",
+			expectedStatus: http.StatusOK, // Defaults to config value
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler, db := setupTestHandlerForAnalytics(t)
+			defer db.Close()
+
+			url := "/api/v1/analytics/user-network"
+			if tt.queryParams != "" {
+				url += "?" + tt.queryParams
+			}
+
+			req := httptest.NewRequest(http.MethodGet, url, nil)
+			rec := httptest.NewRecorder()
+
+			handler.AnalyticsUserNetwork(rec, req)
+
+			if rec.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, rec.Code)
+			}
+		})
+	}
+}
+
+// TestAnalyticsQoE_Success tests successful QoE analytics request.
+func TestAnalyticsQoE_Success(t *testing.T) {
+	t.Parallel()
+
+	handler, db := setupTestHandlerForAnalytics(t)
+	defer db.Close()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/qoe", nil)
+	rec := httptest.NewRecorder()
+
+	handler.AnalyticsQoE(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+// TestAnalyticsDataQuality_Success tests successful data quality analytics request.
+func TestAnalyticsDataQuality_Success(t *testing.T) {
+	t.Parallel()
+
+	handler, db := setupTestHandlerForAnalytics(t)
+	defer db.Close()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/data-quality", nil)
+	rec := httptest.NewRecorder()
+
+	handler.AnalyticsDataQuality(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}

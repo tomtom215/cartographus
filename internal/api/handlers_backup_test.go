@@ -996,3 +996,332 @@ func TestRetentionPolicyAllFields(t *testing.T) {
 		t.Error("not all policy fields captured")
 	}
 }
+
+// ========================================
+// Schedule Config Tests (0% coverage)
+// ========================================
+
+func TestHandleGetScheduleConfig_MethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{
+		getScheduleConfigFunc: func() backup.ScheduleConfig {
+			return backup.ScheduleConfig{}
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	methods := []string{http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch}
+	for _, method := range methods {
+		t.Run(method, func(t *testing.T) {
+			req := httptest.NewRequest(method, "/api/v1/backup/schedule", nil)
+			w := httptest.NewRecorder()
+			handler.HandleGetScheduleConfig(w, req)
+
+			if w.Code != http.StatusMethodNotAllowed {
+				t.Errorf("Expected status %d, got %d", http.StatusMethodNotAllowed, w.Code)
+			}
+		})
+	}
+}
+
+func TestHandleGetScheduleConfig_NoBackupManager(t *testing.T) {
+	t.Parallel()
+
+	handler := setupBackupTestHandler(t, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/backup/schedule", nil)
+	w := httptest.NewRecorder()
+	handler.HandleGetScheduleConfig(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("Expected status %d, got %d", http.StatusServiceUnavailable, w.Code)
+	}
+}
+
+func TestHandleGetScheduleConfig_Success(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{
+		getScheduleConfigFunc: func() backup.ScheduleConfig {
+			return backup.ScheduleConfig{
+				Enabled:       true,
+				Interval:      24 * time.Hour,
+				PreferredHour: 3,
+				BackupType:    backup.TypeFull,
+				PreSyncBackup: true,
+			}
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/backup/schedule", nil)
+	w := httptest.NewRecorder()
+	handler.HandleGetScheduleConfig(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got %v", response.Status)
+	}
+
+	data, ok := response.Data.(map[string]interface{})
+	if !ok {
+		t.Fatal("Expected data to be a map")
+	}
+
+	if data["enabled"] != true {
+		t.Errorf("Expected enabled=true, got %v", data["enabled"])
+	}
+	if data["interval_hours"].(float64) != 24 {
+		t.Errorf("Expected interval_hours=24, got %v", data["interval_hours"])
+	}
+	if data["preferred_hour"].(float64) != 3 {
+		t.Errorf("Expected preferred_hour=3, got %v", data["preferred_hour"])
+	}
+}
+
+func TestHandleSetScheduleConfig_MethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{
+		setScheduleConfigFunc: func(_ context.Context, _ backup.ScheduleConfig) error {
+			return nil
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	methods := []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch}
+	for _, method := range methods {
+		t.Run(method, func(t *testing.T) {
+			req := httptest.NewRequest(method, "/api/v1/backup/schedule", nil)
+			w := httptest.NewRecorder()
+			handler.HandleSetScheduleConfig(w, req)
+
+			if w.Code != http.StatusMethodNotAllowed {
+				t.Errorf("Expected status %d, got %d", http.StatusMethodNotAllowed, w.Code)
+			}
+		})
+	}
+}
+
+func TestHandleSetScheduleConfig_NoBackupManager(t *testing.T) {
+	t.Parallel()
+
+	handler := setupBackupTestHandler(t, nil)
+
+	body := `{"enabled": true, "interval_hours": 24}`
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/backup/schedule", strings.NewReader(body))
+	w := httptest.NewRecorder()
+	handler.HandleSetScheduleConfig(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("Expected status %d, got %d", http.StatusServiceUnavailable, w.Code)
+	}
+}
+
+func TestHandleSetScheduleConfig_InvalidJSON(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{}
+	handler := setupBackupTestHandler(t, mock)
+
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/backup/schedule", strings.NewReader("{invalid"))
+	w := httptest.NewRecorder()
+	handler.HandleSetScheduleConfig(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, w.Code)
+	}
+}
+
+func TestHandleSetScheduleConfig_Success(t *testing.T) {
+	t.Parallel()
+
+	var captured backup.ScheduleConfig
+	mock := &mockBackupManager{
+		setScheduleConfigFunc: func(_ context.Context, schedule backup.ScheduleConfig) error {
+			captured = schedule
+			return nil
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	body := `{
+		"enabled": true,
+		"interval_hours": 12,
+		"preferred_hour": 2,
+		"backup_type": "full",
+		"pre_sync_backup": true
+	}`
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/backup/schedule", strings.NewReader(body))
+	w := httptest.NewRecorder()
+	handler.HandleSetScheduleConfig(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
+	}
+
+	if !captured.Enabled {
+		t.Error("Expected enabled=true")
+	}
+	if captured.Interval != 12*time.Hour {
+		t.Errorf("Expected interval 12h, got %v", captured.Interval)
+	}
+	if captured.PreferredHour != 2 {
+		t.Errorf("Expected preferred_hour=2, got %d", captured.PreferredHour)
+	}
+	if captured.BackupType != backup.TypeFull {
+		t.Errorf("Expected backup_type=full, got %v", captured.BackupType)
+	}
+	if !captured.PreSyncBackup {
+		t.Error("Expected pre_sync_backup=true")
+	}
+}
+
+func TestHandleSetScheduleConfig_Error(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{
+		setScheduleConfigFunc: func(_ context.Context, _ backup.ScheduleConfig) error {
+			return errors.New("invalid schedule configuration")
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	body := `{"enabled": true, "interval_hours": 24}`
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/backup/schedule", strings.NewReader(body))
+	w := httptest.NewRecorder()
+	handler.HandleSetScheduleConfig(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, w.Code)
+	}
+}
+
+func TestHandleTriggerScheduledBackup_MethodNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{
+		triggerScheduledBackupFunc: func(_ context.Context) (*backup.Backup, error) {
+			return &backup.Backup{ID: "test-123"}, nil
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	methods := []string{http.MethodGet, http.MethodPut, http.MethodDelete, http.MethodPatch}
+	for _, method := range methods {
+		t.Run(method, func(t *testing.T) {
+			req := httptest.NewRequest(method, "/api/v1/backup/schedule/trigger", nil)
+			w := httptest.NewRecorder()
+			handler.HandleTriggerScheduledBackup(w, req)
+
+			if w.Code != http.StatusMethodNotAllowed {
+				t.Errorf("Expected status %d, got %d", http.StatusMethodNotAllowed, w.Code)
+			}
+		})
+	}
+}
+
+func TestHandleTriggerScheduledBackup_NoBackupManager(t *testing.T) {
+	t.Parallel()
+
+	handler := setupBackupTestHandler(t, nil)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/backup/schedule/trigger", nil)
+	w := httptest.NewRecorder()
+	handler.HandleTriggerScheduledBackup(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("Expected status %d, got %d", http.StatusServiceUnavailable, w.Code)
+	}
+}
+
+func TestHandleTriggerScheduledBackup_Success(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{
+		triggerScheduledBackupFunc: func(_ context.Context) (*backup.Backup, error) {
+			return &backup.Backup{
+				ID:        "backup-triggered-123",
+				Type:      backup.TypeFull,
+				Notes:     "Scheduled backup triggered manually",
+				CreatedAt: time.Now(),
+			}, nil
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/backup/schedule/trigger", nil)
+	w := httptest.NewRecorder()
+	handler.HandleTriggerScheduledBackup(w, req)
+
+	if w.Code != http.StatusCreated {
+		t.Errorf("Expected status %d, got %d", http.StatusCreated, w.Code)
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got %v", response.Status)
+	}
+}
+
+func TestHandleTriggerScheduledBackup_Error(t *testing.T) {
+	t.Parallel()
+
+	mock := &mockBackupManager{
+		triggerScheduledBackupFunc: func(_ context.Context) (*backup.Backup, error) {
+			return nil, errors.New("backup failed: disk full")
+		},
+	}
+	handler := setupBackupTestHandler(t, mock)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/backup/schedule/trigger", nil)
+	w := httptest.NewRecorder()
+	handler.HandleTriggerScheduledBackup(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, w.Code)
+	}
+}
+
+func TestBuildScheduleResponseData(t *testing.T) {
+	t.Parallel()
+
+	schedule := backup.ScheduleConfig{
+		Enabled:       true,
+		Interval:      48 * time.Hour,
+		PreferredHour: 4,
+		BackupType:    backup.TypeIncremental,
+		PreSyncBackup: false,
+	}
+
+	result := buildScheduleResponseData(schedule)
+
+	if result["enabled"] != true {
+		t.Errorf("Expected enabled=true, got %v", result["enabled"])
+	}
+	if result["interval_hours"] != 48 {
+		t.Errorf("Expected interval_hours=48, got %v", result["interval_hours"])
+	}
+	if result["preferred_hour"] != 4 {
+		t.Errorf("Expected preferred_hour=4, got %v", result["preferred_hour"])
+	}
+	if result["backup_type"] != "incremental" {
+		t.Errorf("Expected backup_type=incremental, got %v", result["backup_type"])
+	}
+	if result["pre_sync_backup"] != false {
+		t.Errorf("Expected pre_sync_backup=false, got %v", result["pre_sync_backup"])
+	}
+}
