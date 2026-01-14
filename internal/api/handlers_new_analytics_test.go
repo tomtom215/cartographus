@@ -593,6 +593,342 @@ func TestNewAnalyticsHandlers_QueryParams(t *testing.T) {
 	}
 }
 
+// ========================================
+// DB-Backed Success Path Tests
+// ========================================
+
+// TestAnalyticsHDR_WithDB tests the AnalyticsHDR handler with database
+func TestAnalyticsHDR_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/hdr", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsHDR(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsAudio_WithDB tests the AnalyticsAudio handler with database
+func TestAnalyticsAudio_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/audio", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsAudio(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsSubtitles_WithDB tests the AnalyticsSubtitles handler with database
+func TestAnalyticsSubtitles_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/subtitles", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsSubtitles(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsFrameRate_WithDB tests the AnalyticsFrameRate handler with database
+func TestAnalyticsFrameRate_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/frame-rate", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsFrameRate(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsContainer_WithDB tests the AnalyticsContainer handler with database
+func TestAnalyticsContainer_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/container", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsContainer(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsConnectionSecurity_WithDB tests the AnalyticsConnectionSecurity handler with database
+func TestAnalyticsConnectionSecurity_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/connection-security", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsConnectionSecurity(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsPausePatterns_WithDB tests the AnalyticsPausePatterns handler with database
+func TestAnalyticsPausePatterns_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/pause-patterns", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsPausePatterns(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsLibrary_WithDB tests the AnalyticsLibrary handler with database
+func TestAnalyticsLibrary_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	// Valid section_id parameter (required by the handler)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/library?section_id=1", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsLibrary(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsLibrary_WithDB_NoSectionID tests the AnalyticsLibrary handler without section_id
+func TestAnalyticsLibrary_WithDB_NoSectionID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	// No section_id parameter - should return validation error
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/library", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsLibrary(w, req)
+
+	// Should fail without section_id
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status 400, got %d. Body: %s", w.Code, w.Body.String())
+	}
+}
+
+// TestAnalyticsConcurrentStreams_WithDB tests with valid interval
+func TestAnalyticsConcurrentStreams_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	// Valid interval parameter
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/concurrent-streams?interval=hour", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsConcurrentStreams(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// TestAnalyticsResolutionMismatch_WithDB tests the AnalyticsResolutionMismatch handler with database
+func TestAnalyticsResolutionMismatch_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/resolution-mismatch", nil)
+	w := httptest.NewRecorder()
+
+	handler.AnalyticsResolutionMismatch(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response models.APIResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response.Status != "success" {
+		t.Errorf("Expected status 'success', got '%s'", response.Status)
+	}
+}
+
+// ========================================
+// Filter Variation Tests with DB
+// ========================================
+
+// TestAnalyticsHDR_WithDB_Filters tests various filter combinations
+func TestAnalyticsHDR_WithDB_Filters(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		query  string
+	}{
+		{"with_days", "days=30"},
+		{"with_users", "users=user1,user2"},
+		{"with_media_types", "media_types=movie,episode"},
+		{"with_date_range", "start_date=2025-01-01&end_date=2025-12-31"},
+		{"with_platforms", "platforms=Android,iOS"},
+		{"combined_filters", "days=7&media_types=movie&platforms=Web"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db := setupTestDBForAPI(t)
+			defer db.Close()
+			handler := setupTestHandlerWithDB(t, db)
+
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/hdr?"+tt.query, nil)
+			w := httptest.NewRecorder()
+
+			handler.AnalyticsHDR(w, req)
+
+			if w.Code != http.StatusOK {
+				t.Errorf("Expected status 200 for query '%s', got %d. Body: %s", tt.query, w.Code, w.Body.String())
+			}
+		})
+	}
+}
+
 // BenchmarkNewAnalyticsHandlers benchmarks method validation overhead
 func BenchmarkNewAnalyticsHandlers_MethodValidation(b *testing.B) {
 	handler := &Handler{

@@ -546,6 +546,206 @@ func TestExportGeoJSON_InvalidDateFormat(t *testing.T) {
 	runBadRequestTests(t, handler, (*Handler).ExportGeoJSON, "/api/v1/export/geojson", tests)
 }
 
+// ========================================
+// DB-Backed Export Tests
+// ========================================
+
+// TestExportGeoJSON_WithDB tests the ExportGeoJSON handler with database
+func TestExportGeoJSON_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/export/geojson", nil)
+	w := httptest.NewRecorder()
+
+	handler.ExportGeoJSON(w, req)
+
+	// Handler executes without panicking - status can vary based on DB state
+	// This tests the code path through the handler, not the file serving
+	validStatuses := map[int]bool{
+		http.StatusOK:                  true,
+		http.StatusInternalServerError: true,
+		http.StatusNotFound:            true, // http.ServeFile returns 404 if file not created
+	}
+	if !validStatuses[w.Code] {
+		t.Errorf("Unexpected status %d. Body: %s", w.Code, w.Body.String())
+	}
+}
+
+// TestExportGeoJSON_WithDB_ValidFilters tests ExportGeoJSON with valid filter parameters
+func TestExportGeoJSON_WithDB_ValidFilters(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		query  string
+	}{
+		{"with_date_range", "start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z"},
+		{"with_users", "users=user1,user2"},
+		{"with_media_types", "media_types=movie,episode"},
+		{"combined_filters", "start_date=2025-01-01T00:00:00Z&users=user1&media_types=movie"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db := setupTestDBForAPI(t)
+			defer db.Close()
+			handler := setupTestHandlerWithDB(t, db)
+
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/export/geojson?"+tt.query, nil)
+			w := httptest.NewRecorder()
+
+			handler.ExportGeoJSON(w, req)
+
+			// Handler executes without panicking
+			// Valid filters should not cause validation error
+			if w.Code == http.StatusBadRequest {
+				var response models.APIResponse
+				if err := json.NewDecoder(w.Body).Decode(&response); err == nil {
+					if response.Error != nil && response.Error.Code == "VALIDATION_ERROR" {
+						t.Errorf("Got VALIDATION_ERROR for valid params: %s", tt.query)
+					}
+				}
+			}
+			// Success: handler didn't panic and processed the request
+		})
+	}
+}
+
+// TestExportGeoParquet_WithDB tests the ExportGeoParquet handler with database
+func TestExportGeoParquet_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/export/geoparquet", nil)
+	w := httptest.NewRecorder()
+
+	handler.ExportGeoParquet(w, req)
+
+	// May return 503 if spatial extension not available, or 200 for success
+	// Should not return validation error for valid request
+	if w.Code == http.StatusBadRequest {
+		var response models.APIResponse
+		if err := json.NewDecoder(w.Body).Decode(&response); err == nil {
+			if response.Error != nil && response.Error.Code == "VALIDATION_ERROR" {
+				t.Error("Got VALIDATION_ERROR for valid request")
+			}
+		}
+	}
+}
+
+// TestExportGeoParquet_WithDB_ValidFilters tests ExportGeoParquet with valid filter parameters
+func TestExportGeoParquet_WithDB_ValidFilters(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		query  string
+	}{
+		{"with_date_range", "start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z"},
+		{"with_users", "users=user1,user2,user3"},
+		{"with_media_types", "media_types=movie,episode,track"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db := setupTestDBForAPI(t)
+			defer db.Close()
+			handler := setupTestHandlerWithDB(t, db)
+
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/export/geoparquet?"+tt.query, nil)
+			w := httptest.NewRecorder()
+
+			handler.ExportGeoParquet(w, req)
+
+			// Valid filters should not cause validation error
+			if w.Code == http.StatusBadRequest {
+				var response models.APIResponse
+				if err := json.NewDecoder(w.Body).Decode(&response); err == nil {
+					if response.Error != nil && response.Error.Code == "VALIDATION_ERROR" {
+						t.Errorf("Got VALIDATION_ERROR for valid params: %s", tt.query)
+					}
+				}
+			}
+		})
+	}
+}
+
+// TestGetVectorTile_WithDB tests the GetVectorTile handler with database
+func TestGetVectorTile_WithDB(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	// Valid tile coordinates - path must have 7 parts: /api/v1/tiles/{z}/{x}/{y}.pbf
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/tiles/10/512/512.pbf", nil)
+	w := httptest.NewRecorder()
+
+	handler.GetVectorTile(w, req)
+
+	// Should not return a validation error for valid tile coordinates
+	// May return 500 if spatial extension not available
+	if w.Code == http.StatusBadRequest {
+		var response models.APIResponse
+		if err := json.NewDecoder(w.Body).Decode(&response); err == nil {
+			if response.Error != nil && response.Error.Code == "VALIDATION_ERROR" {
+				t.Error("Got VALIDATION_ERROR for valid tile coordinates")
+			}
+		}
+	}
+}
+
+// TestGetVectorTile_WithDB_InvalidCoordinates tests invalid tile coordinates
+func TestGetVectorTile_WithDB_InvalidCoordinates(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		z    string
+		x    string
+		y    string
+	}{
+		{"negative_z", "-1", "0", "0"},
+		{"z_too_high", "25", "0", "0"},
+		{"x_out_of_range", "1", "10", "0"},
+		{"y_out_of_range", "1", "0", "10"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db := setupTestDBForAPI(t)
+			defer db.Close()
+			handler := setupTestHandlerWithDB(t, db)
+
+			// Path must have 7 parts for parsing: /api/v1/tiles/{z}/{x}/{y}.pbf
+			path := "/api/v1/tiles/" + tt.z + "/" + tt.x + "/" + tt.y + ".pbf"
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			w := httptest.NewRecorder()
+
+			handler.GetVectorTile(w, req)
+
+			if w.Code != http.StatusBadRequest {
+				t.Errorf("Expected status 400 for invalid coordinates %s/%s/%s, got %d",
+					tt.z, tt.x, tt.y, w.Code)
+			}
+		})
+	}
+}
+
 // BenchmarkBuildCSVRow benchmarks the CSV row building function
 func BenchmarkBuildCSVRow(b *testing.B) {
 	fixedTime := time.Date(2025, 11, 25, 14, 30, 0, 0, time.UTC)
