@@ -646,3 +646,427 @@ func TestSuggestedLinksResponse_JSONMarshaling(t *testing.T) {
 		t.Error("Expected suggestions map")
 	}
 }
+
+// ========================================
+// ContentMappingLink* Tests (0% coverage)
+// ========================================
+
+func TestContentMappingLinkPlex_InvalidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	body := `{"rating_key": "12345"}`
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/content/abc/link/plex", strings.NewReader(body))
+	req.SetPathValue("id", "abc")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	handler.ContentMappingLinkPlex(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["error"] != "Invalid mapping ID" {
+		t.Errorf("Expected 'Invalid mapping ID' error, got %v", response["error"])
+	}
+}
+
+func TestContentMappingLinkPlex_MissingRatingKey(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		body string
+	}{
+		{name: "empty_body", body: `{}`},
+		{name: "empty_rating_key", body: `{"rating_key": ""}`},
+		{name: "invalid_json", body: `{invalid`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db := setupTestDBForAPI(t)
+			defer db.Close()
+			handler := setupTestHandlerWithDB(t, db)
+
+			req := httptest.NewRequest(http.MethodPost, "/api/v1/content/1/link/plex", strings.NewReader(tt.body))
+			req.SetPathValue("id", "1")
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+
+			handler.ContentMappingLinkPlex(rec, req)
+
+			if rec.Code != http.StatusBadRequest {
+				t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+			}
+
+			var response map[string]interface{}
+			if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+				t.Fatalf("Failed to decode response: %v", err)
+			}
+
+			if response["error"] != "rating_key is required" {
+				t.Errorf("Expected 'rating_key is required' error, got %v", response["error"])
+			}
+		})
+	}
+}
+
+func TestContentMappingLinkJellyfin_InvalidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	body := `{"item_id": "abc-uuid"}`
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/content/invalid/link/jellyfin", strings.NewReader(body))
+	req.SetPathValue("id", "invalid")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	handler.ContentMappingLinkJellyfin(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["error"] != "Invalid mapping ID" {
+		t.Errorf("Expected 'Invalid mapping ID' error, got %v", response["error"])
+	}
+}
+
+func TestContentMappingLinkJellyfin_MissingItemID(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		body string
+	}{
+		{name: "empty_body", body: `{}`},
+		{name: "empty_item_id", body: `{"item_id": ""}`},
+		{name: "invalid_json", body: `{bad`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db := setupTestDBForAPI(t)
+			defer db.Close()
+			handler := setupTestHandlerWithDB(t, db)
+
+			req := httptest.NewRequest(http.MethodPost, "/api/v1/content/1/link/jellyfin", strings.NewReader(tt.body))
+			req.SetPathValue("id", "1")
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+
+			handler.ContentMappingLinkJellyfin(rec, req)
+
+			if rec.Code != http.StatusBadRequest {
+				t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+			}
+
+			var response map[string]interface{}
+			if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+				t.Fatalf("Failed to decode response: %v", err)
+			}
+
+			if response["error"] != "item_id is required" {
+				t.Errorf("Expected 'item_id is required' error, got %v", response["error"])
+			}
+		})
+	}
+}
+
+func TestContentMappingLinkEmby_InvalidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	body := `{"item_id": "emby-123"}`
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/content/xyz/link/emby", strings.NewReader(body))
+	req.SetPathValue("id", "xyz")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	handler.ContentMappingLinkEmby(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["error"] != "Invalid mapping ID" {
+		t.Errorf("Expected 'Invalid mapping ID' error, got %v", response["error"])
+	}
+}
+
+func TestContentMappingLinkEmby_MissingItemID(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		body string
+	}{
+		{name: "empty_body", body: `{}`},
+		{name: "empty_item_id", body: `{"item_id": ""}`},
+		{name: "invalid_json", body: `{nope`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db := setupTestDBForAPI(t)
+			defer db.Close()
+			handler := setupTestHandlerWithDB(t, db)
+
+			req := httptest.NewRequest(http.MethodPost, "/api/v1/content/1/link/emby", strings.NewReader(tt.body))
+			req.SetPathValue("id", "1")
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+
+			handler.ContentMappingLinkEmby(rec, req)
+
+			if rec.Code != http.StatusBadRequest {
+				t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+			}
+
+			var response map[string]interface{}
+			if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+				t.Fatalf("Failed to decode response: %v", err)
+			}
+
+			if response["error"] != "item_id is required" {
+				t.Errorf("Expected 'item_id is required' error, got %v", response["error"])
+			}
+		})
+	}
+}
+
+// ========================================
+// UserLinkedGet Tests (0% coverage)
+// ========================================
+
+func TestUserLinkedGet_InvalidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users/invalid/linked", nil)
+	req.SetPathValue("id", "invalid")
+	rec := httptest.NewRecorder()
+
+	handler.UserLinkedGet(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["error"] != "Invalid user ID" {
+		t.Errorf("Expected 'Invalid user ID' error, got %v", response["error"])
+	}
+}
+
+func TestUserLinkedGet_ValidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users/1/linked", nil)
+	req.SetPathValue("id", "1")
+	rec := httptest.NewRecorder()
+
+	handler.UserLinkedGet(rec, req)
+
+	// Should succeed or return empty results (not error on valid ID)
+	if rec.Code != http.StatusOK && rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 200 or 500, got %d", rec.Code)
+	}
+}
+
+// ========================================
+// UserSuggestLinks Tests (0% coverage)
+// ========================================
+
+func TestUserSuggestLinks_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users/suggest-links", nil)
+	rec := httptest.NewRecorder()
+
+	handler.UserSuggestLinks(rec, req)
+
+	// Should succeed (empty suggestions is fine)
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["success"] != true {
+		t.Error("Expected success=true")
+	}
+}
+
+// ========================================
+// CrossPlatform Analytics Tests (0% coverage)
+// ========================================
+
+func TestCrossPlatformUserStats_InvalidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/cross-platform/user/abc", nil)
+	req.SetPathValue("id", "abc")
+	rec := httptest.NewRecorder()
+
+	handler.CrossPlatformUserStats(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["error"] != "Invalid user ID" {
+		t.Errorf("Expected 'Invalid user ID' error, got %v", response["error"])
+	}
+}
+
+func TestCrossPlatformUserStats_ValidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/cross-platform/user/1", nil)
+	req.SetPathValue("id", "1")
+	rec := httptest.NewRecorder()
+
+	handler.CrossPlatformUserStats(rec, req)
+
+	// Should succeed or return error based on data availability
+	if rec.Code != http.StatusOK && rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 200 or 500, got %d", rec.Code)
+	}
+}
+
+func TestCrossPlatformContentStats_InvalidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/cross-platform/content/invalid", nil)
+	req.SetPathValue("id", "invalid")
+	rec := httptest.NewRecorder()
+
+	handler.CrossPlatformContentStats(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["error"] != "Invalid content mapping ID" {
+		t.Errorf("Expected 'Invalid content mapping ID' error, got %v", response["error"])
+	}
+}
+
+func TestCrossPlatformContentStats_ValidID(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/cross-platform/content/1", nil)
+	req.SetPathValue("id", "1")
+	rec := httptest.NewRecorder()
+
+	handler.CrossPlatformContentStats(rec, req)
+
+	// Should succeed or return not found/error based on data
+	if rec.Code != http.StatusOK && rec.Code != http.StatusNotFound && rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 200, 404, or 500, got %d", rec.Code)
+	}
+}
+
+func TestCrossPlatformSummary_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/analytics/cross-platform/summary", nil)
+	rec := httptest.NewRecorder()
+
+	handler.CrossPlatformSummary(rec, req)
+
+	// Should succeed with empty or populated summary
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["success"] != true {
+		t.Error("Expected success=true")
+	}
+}

@@ -1239,3 +1239,285 @@ func TestNewsletterDeliveryGet_MissingID(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusBadRequest, rec.Code)
 	}
 }
+
+// ========================================
+// NewsletterTemplateList Tests (0% coverage)
+// ========================================
+
+func TestNewsletterTemplateList_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/templates", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterTemplateList(rec, req)
+
+	// Should succeed (possibly empty list)
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+func TestNewsletterTemplateList_WithPagination(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/templates?limit=10&offset=0", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterTemplateList(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+// ========================================
+// NewsletterScheduleList Tests (0% coverage)
+// ========================================
+
+func TestNewsletterScheduleList_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/schedules", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterScheduleList(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+func TestNewsletterScheduleList_WithFilters(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/schedules?enabled=true&limit=50", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterScheduleList(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+// ========================================
+// NewsletterDeliveryList Tests (0% coverage)
+// ========================================
+
+func TestNewsletterDeliveryList_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/deliveries", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterDeliveryList(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+func TestNewsletterDeliveryList_WithFilters(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/deliveries?status=delivered&limit=50", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterDeliveryList(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+// ========================================
+// NewsletterStats Tests (0% coverage)
+// ========================================
+
+func TestNewsletterStats_Unauthorized(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	// No auth context - should be unauthorized
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/stats", nil)
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterStats(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected status %d, got %d", http.StatusUnauthorized, rec.Code)
+	}
+}
+
+func TestNewsletterStats_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/stats", nil)
+	req = addAuthContext(req, "user-1", "testuser", "viewer") // Any authenticated user works
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterStats(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+// ========================================
+// NewsletterAuditLog Tests (0% coverage)
+// ========================================
+
+func TestNewsletterAuditLog_Unauthorized(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/audit", nil)
+	req = addAuthContext(req, "user-1", "testuser", "viewer") // Not admin
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterAuditLog(rec, req)
+
+	if rec.Code != http.StatusForbidden {
+		t.Errorf("Expected status %d, got %d", http.StatusForbidden, rec.Code)
+	}
+}
+
+func TestNewsletterAuditLog_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/audit", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterAuditLog(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+func TestNewsletterAuditLog_WithFilters(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/audit?resource_type=template&action=create&limit=50", nil)
+	req = addAuthContext(req, "user-1", "testuser", "admin")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterAuditLog(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+}
+
+// ========================================
+// NewsletterUserPreferencesGet Tests (0% coverage)
+// ========================================
+
+func TestNewsletterUserPreferencesGet_Unauthorized(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	// Test without auth context
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/preferences", nil)
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterUserPreferencesGet(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected status %d, got %d", http.StatusUnauthorized, rec.Code)
+	}
+}
+
+func TestNewsletterUserPreferencesGet_Success(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/newsletter/preferences", nil)
+	req = addAuthContext(req, "user-1", "testuser", "viewer")
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterUserPreferencesGet(rec, req)
+
+	// Should succeed or return not found (both acceptable)
+	if rec.Code != http.StatusOK && rec.Code != http.StatusNotFound {
+		t.Errorf("Expected status 200 or 404, got %d", rec.Code)
+	}
+}
+
+// ========================================
+// NewsletterUnsubscribe Tests (0% coverage)
+// ========================================
+
+func TestNewsletterUnsubscribe_Unauthorized(t *testing.T) {
+	t.Parallel()
+
+	db := setupTestDBForAPI(t)
+	defer db.Close()
+	handler := setupTestHandlerWithDB(t, db)
+
+	// No auth context - should be unauthorized
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/newsletter/unsubscribe", nil)
+	rec := httptest.NewRecorder()
+
+	handler.NewsletterUnsubscribe(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected status %d, got %d", http.StatusUnauthorized, rec.Code)
+	}
+}
