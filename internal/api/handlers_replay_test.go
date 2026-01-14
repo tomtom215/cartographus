@@ -36,7 +36,7 @@ func TestNewReplayHandlers_WithStore(t *testing.T) {
 	handlers := NewReplayHandlers(store)
 
 	if handlers == nil {
-		t.Error("Expected non-nil handlers")
+		t.Fatal("Expected non-nil handlers")
 	}
 	if handlers.checkpointStore != store {
 		t.Error("Expected checkpoint store to be set")
