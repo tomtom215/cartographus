@@ -34,10 +34,36 @@ export class GlobeManagerDeckGL {
     private isVisible: boolean = false;
     private pendingResizeId: number | null = null;
 
+    /**
+     * FIX: Cached CSS variable values for marker colors.
+     * Prevents repeated getComputedStyle calls during visualization updates.
+     * Refreshed on theme changes in updateTheme().
+     */
+    private cachedMarkerColors: {
+        high: [number, number, number];
+        mediumHigh: [number, number, number];
+        medium: [number, number, number];
+        low: [number, number, number];
+    } | null = null;
+
     constructor(containerId: string) {
         this.containerId = containerId;
         this.isDarkTheme = !document.documentElement.hasAttribute('data-theme');
+        this.refreshCachedColors(); // Initialize color cache
         this.createTooltipElement();
+    }
+
+    /**
+     * Refresh cached CSS variable values for marker colors.
+     * Called on construction and theme changes.
+     */
+    private refreshCachedColors(): void {
+        this.cachedMarkerColors = {
+            high: this.parseCssColor(this.getCssVariable('--globe-marker-high') || '#ec4899'),
+            mediumHigh: this.parseCssColor(this.getCssVariable('--globe-marker-medium-high') || '#f97316'),
+            medium: this.parseCssColor(this.getCssVariable('--globe-marker-medium') || '#f59e0b'),
+            low: this.parseCssColor(this.getCssVariable('--globe-marker-low') || '#14b8a6'),
+        };
     }
 
     /**
@@ -294,26 +320,30 @@ export class GlobeManagerDeckGL {
 
     /**
      * Get color based on playback count
-     * Uses CSS variables for theming
+     * FIX: Uses cached CSS variable values for better performance.
+     * Cache is refreshed on theme changes.
      */
     private getColorByPlaybackCount(count: number): Color {
         const alpha = 220;
 
-        if (count > 500) {
-            const rgb = this.parseCssColor(this.getCssVariable('--globe-marker-high') || '#ec4899');
-            return [rgb[0], rgb[1], rgb[2], alpha];
-        }
-        if (count > 200) {
-            const rgb = this.parseCssColor(this.getCssVariable('--globe-marker-medium-high') || '#f97316');
-            return [rgb[0], rgb[1], rgb[2], alpha];
-        }
-        if (count > 50) {
-            const rgb = this.parseCssColor(this.getCssVariable('--globe-marker-medium') || '#f59e0b');
-            return [rgb[0], rgb[1], rgb[2], alpha];
+        // Ensure cache is initialized (defensive check)
+        if (!this.cachedMarkerColors) {
+            this.refreshCachedColors();
         }
 
-        const rgb = this.parseCssColor(this.getCssVariable('--globe-marker-low') || '#14b8a6');
-        return [rgb[0], rgb[1], rgb[2], alpha];
+        const colors = this.cachedMarkerColors!;
+
+        if (count > 500) {
+            return [colors.high[0], colors.high[1], colors.high[2], alpha];
+        }
+        if (count > 200) {
+            return [colors.mediumHigh[0], colors.mediumHigh[1], colors.mediumHigh[2], alpha];
+        }
+        if (count > 50) {
+            return [colors.medium[0], colors.medium[1], colors.medium[2], alpha];
+        }
+
+        return [colors.low[0], colors.low[1], colors.low[2], alpha];
     }
 
     /**
@@ -412,7 +442,7 @@ export class GlobeManagerDeckGL {
 
     /**
      * Update theme
-     * Also updates tooltip styles for theming
+     * Also updates tooltip styles and cached colors for theming
      */
     public updateTheme(isDark: boolean): void {
         this.isDarkTheme = isDark;
@@ -431,6 +461,9 @@ export class GlobeManagerDeckGL {
                 logger.warn('Theme update deferred', { error });
             }
         }
+
+        // FIX: Refresh cached marker colors for new theme
+        this.refreshCachedColors();
 
         // Update tooltip styles for new theme
         this.updateTooltipStyles();
