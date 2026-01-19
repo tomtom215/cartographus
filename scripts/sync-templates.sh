@@ -36,6 +36,8 @@ set -euo pipefail
 # Configuration
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+readonly WEB_DIR="$PROJECT_ROOT/web"
+readonly PARTIALS_DIR="$WEB_DIR/partials"
 readonly DEV_TEMPLATE="$PROJECT_ROOT/web/public/index.html"
 readonly PROD_TEMPLATE="$PROJECT_ROOT/internal/templates/index.html.tmpl"
 readonly TEMP_DIR="${TMPDIR:-/tmp}/cartographus-template-sync"
@@ -60,6 +62,24 @@ log_info() { echo -e "${BLUE}[INFO]${NC} $*"; }
 log_success() { echo -e "${GREEN}[OK]${NC} $*"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+
+# Ensure HTML is composed from partials before syncing
+ensure_composed() {
+    if [[ -d "$PARTIALS_DIR" ]] && [[ -f "$PARTIALS_DIR/_base.html" ]]; then
+        log_info "Composing HTML from partials..."
+        if command -v node &> /dev/null; then
+            (cd "$WEB_DIR" && node build/compose-html.js) || {
+                log_error "Failed to compose HTML from partials"
+                return 1
+            }
+            log_success "HTML composed from partials"
+        else
+            log_warn "Node.js not found - skipping HTML composition"
+            log_warn "Ensure web/public/index.html is up to date"
+        fi
+    fi
+    return 0
+}
 
 # Show usage information
 show_help() {
@@ -92,8 +112,14 @@ EXAMPLES:
     ./scripts/sync-templates.sh --diff
 
 FILES:
-    Source (development):  web/public/index.html
+    Partials (source):     web/partials/*.html
+    Composed (dev):        web/public/index.html (generated)
     Target (production):   internal/templates/index.html.tmpl
+
+WORKFLOW:
+    1. If web/partials/ exists, compose HTML from partials first
+    2. Transform composed HTML to production template (add nonces)
+    3. Write to internal/templates/index.html.tmpl
 
 TRANSFORMATIONS APPLIED:
     The following Go template syntax is added to production template:
@@ -166,6 +192,11 @@ check_sync() {
     log_info "Checking template synchronization..."
     log_info "  Source: $DEV_TEMPLATE"
     log_info "  Target: $PROD_TEMPLATE"
+
+    # Ensure HTML is composed from partials first
+    if ! ensure_composed; then
+        return 1
+    fi
 
     if ! validate_files; then
         return 1
@@ -274,6 +305,11 @@ sync_templates() {
     log_info "Syncing templates..."
     log_info "  Source: $DEV_TEMPLATE"
     log_info "  Target: $PROD_TEMPLATE"
+
+    # Ensure HTML is composed from partials first
+    if ! ensure_composed; then
+        return 1
+    fi
 
     if ! validate_files; then
         return 1

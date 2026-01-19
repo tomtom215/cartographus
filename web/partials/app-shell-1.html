@@ -1,0 +1,460 @@
+    <div id="login-container">
+        <div id="login-box">
+            <!-- Login Branding -->
+            <div class="login-logo" aria-hidden="true">
+                <svg viewBox="0 0 100 120" width="80" height="96">
+                    <g transform="translate(50, 40)">
+                        <circle cx="0" cy="0" r="30" fill="var(--highlight)" stroke="var(--text-primary)" stroke-width="4"/>
+                        <path d="M 0,24 L 12,60 L -12,60 Z" fill="var(--highlight)" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round"/>
+                        <circle cx="0" cy="0" r="12" fill="var(--text-primary)"/>
+                    </g>
+                </svg>
+            </div>
+            <h1 class="login-title">Cartographus</h1>
+            <p class="login-subtitle">Geographic playback visualization</p>
+
+            <div id="login-error" class="error-message"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="form-input"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <div class="checkbox-group">
+                    <input
+                        type="checkbox"
+                        id="remember-me"
+                        name="remember_me"
+                        class="form-checkbox"
+                    >
+                    <label for="remember-me">Remember me for 30 days</label>
+                </div>
+
+                <button type="submit" class="btn-login" id="btn-login">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="login-divider">
+                <span>or</span>
+            </div>
+
+            <button type="button" class="btn-plex-oauth" id="btn-plex-oauth">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                Login with Plex
+            </button>
+        </div>
+    </div>
+
+    <div id="app" class="hidden">
+        <!-- Global Progress Bar -->
+        <div id="global-progress-bar"
+             class="global-progress-bar hidden"
+             role="progressbar"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="0"
+             aria-label="Loading progress">
+            <div class="progress-fill"></div>
+        </div>
+
+        <!-- Stale Data Warning -->
+        <div id="stale-data-warning"
+             class="stale-data-warning hidden"
+             role="alert"
+             aria-live="polite">
+            <span class="stale-warning-icon" aria-hidden="true">&#9888;</span>
+            <span class="stale-warning-text">Data may be outdated. Last updated <span id="stale-data-time">--</span>.</span>
+            <button type="button" class="stale-warning-refresh" data-action="refresh" aria-label="Refresh data now">
+                Refresh Now
+            </button>
+            <button type="button" class="stale-warning-dismiss" data-action="dismiss" aria-label="Dismiss stale data warning">
+                &times;
+            </button>
+        </div>
+
+        <!-- Mobile Hamburger Menu Button -->
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle sidebar menu" aria-expanded="false" aria-controls="sidebar">
+            <span></span>
+        </button>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+        <div id="sidebar">
+            <div id="header">
+                <div id="header-top">
+                    <div class="header-title-group">
+                        <h1>Cartographus</h1>
+                        <!-- WebSocket Connection Status Indicator -->
+                        <div id="ws-status"
+                             class="ws-status"
+                             data-testid="ws-status"
+                             data-status="connecting"
+                             role="status"
+                             aria-live="polite"
+                             aria-label="WebSocket connection: connecting"
+                             title="WebSocket: Connecting..."
+                             tabindex="0">
+                            <span class="ws-status-dot"></span>
+                            <span class="ws-status-text">Connecting</span>
+                        </div>
+                        <!-- Data Quality Indicator -->
+                        <div id="data-quality-indicator"
+                             class="data-quality-indicator hidden"
+                             role="status"
+                             aria-live="polite"
+                             aria-label="Data quality status">
+                            <div id="data-quality-status" class="data-quality-status status-healthy" aria-label="System status: checking">
+                                <span class="status-dot" aria-hidden="true"></span>
+                                <span class="status-text">Checking</span>
+                            </div>
+                            <span id="data-quality-sync-time" class="data-quality-sync-time">--</span>
+                            <div id="data-quality-connection" class="data-quality-connection">
+                                <span class="connection-db" title="Database" aria-label="Database: checking">DB</span>
+                                <span class="connection-tautulli" title="Tautulli" aria-label="Tautulli: checking">T</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header-controls">
+                        <!-- Sidebar Collapse Toggle -->
+                        <button id="sidebar-collapse" class="sidebar-collapse-toggle" aria-label="Collapse sidebar" title="Collapse sidebar" aria-expanded="true">
+                            <span id="collapse-icon">◀</span>
+                        </button>
+                        <button id="colorblind-toggle" class="colorblind-toggle" data-testid="colorblind-toggle" aria-label="Toggle colorblind-safe mode" title="Toggle colorblind-safe mode">
+                            <span id="colorblind-icon">👁️</span>
+                        </button>
+                        <button id="theme-toggle" aria-label="Switch to light mode" title="Switch to light mode">
+                            <span id="theme-icon">☀️</span>
+                        </button>
+                        <button id="settings-button" aria-label="Open settings" title="Settings">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                        </button>
+                        <button id="recommendation-button" aria-label="Open recommendations" title="Recommendations">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </button>
+                        <button id="help-docs-btn" aria-label="Open help documentation" title="Help & Documentation (Press H)">
+                            <span class="help-icon" aria-hidden="true">&#x1F4D6;</span> Docs
+                        </button>
+                        <button id="help-tour-btn" aria-label="Start tour guide" title="Tour Guide">
+                            <span>&#x2753;</span> Tour
+                        </button>
+                        <!-- Notification Center Toggle -->
+                        <button id="notification-center-toggle"
+                                class="notification-toggle-btn"
+                                aria-label="Notifications (0 unread)"
+                                aria-expanded="false"
+                                aria-haspopup="dialog"
+                                title="View notifications">
+                            <span class="notification-icon" aria-hidden="true">&#x1F514;</span>
+                        </button>
+                        <button id="btn-logout" aria-label="Logout from application">Logout</button>
+                    </div>
+                </div>
+                <p>Geographic playback visualization</p>
+            </div>
+
+            <nav id="nav-tabs" role="tablist" aria-label="Main navigation" data-testid="nav-tabs">
+                <button class="nav-tab active" data-view="maps" data-testid="nav-tab-maps" role="tab" aria-selected="true" aria-controls="map-container" tabindex="0" id="tab-maps">
+                    🗺️ Maps
+                </button>
+                <button class="nav-tab" data-view="activity" data-testid="nav-tab-activity" role="tab" aria-selected="false" aria-controls="activity-container" tabindex="-1" id="tab-activity">
+                    📡 Live Activity
+                </button>
+                <button class="nav-tab" data-view="analytics" data-testid="nav-tab-analytics" role="tab" aria-selected="false" aria-controls="analytics-container" tabindex="-1" id="tab-analytics">
+                    📊 Analytics
+                </button>
+                <button class="nav-tab" data-view="recently-added" data-testid="nav-tab-recently-added" role="tab" aria-selected="false" aria-controls="recently-added-container" tabindex="-1" id="tab-recently-added">
+                    ✨ Recently Added
+                </button>
+                <button class="nav-tab" data-view="server" data-testid="nav-tab-server" role="tab" aria-selected="false" aria-controls="server-container" tabindex="-1" id="tab-server">
+                    🖥️ Server
+                </button>
+                <button class="nav-tab" data-view="cross-platform" data-testid="nav-tab-cross-platform" role="tab" aria-selected="false" aria-controls="cross-platform-container" tabindex="-1" id="tab-cross-platform">
+                    🔗 Cross-Platform
+                </button>
+                <button class="nav-tab" data-view="data-governance" data-testid="nav-tab-data-governance" role="tab" aria-selected="false" aria-controls="data-governance-container" tabindex="-1" id="tab-data-governance">
+                    Data Governance
+                </button>
+                <button class="nav-tab" data-view="newsletter" data-testid="nav-tab-newsletter" role="tab" aria-selected="false" aria-controls="newsletter-container" tabindex="-1" id="tab-newsletter">
+                    Newsletters
+                </button>
+            </nav>
+
+            <div id="stats">
+                <div class="stat-grid" data-testid="stat-grid">
+                    <div class="stat-card" data-testid="stat-card-playbacks">
+                        <div class="stat-label">Total Playbacks</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value" id="stat-playbacks" aria-live="polite" aria-atomic="true">-</div>
+                            <div class="stat-trend" id="stat-playbacks-trend" data-testid="stat-trend" data-direction="neutral" aria-label="No change" title="vs last 7 days">
+                                <span class="trend-arrow">-</span>
+                                <span class="stat-trend-value">0%</span>
+                            </div>
+                        </div>
+                        <!-- Mini sparkline showing trend -->
+                        <div class="stat-sparkline" id="sparkline-playbacks" role="img" aria-label="Playback trend"></div>
+                    </div>
+                    <div class="stat-card" data-testid="stat-card-locations">
+                        <div class="stat-label">Locations</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value" id="stat-locations" aria-live="polite" aria-atomic="true">-</div>
+                            <div class="stat-trend" id="stat-locations-trend" data-testid="stat-trend" data-direction="neutral" aria-label="No change" title="vs last 7 days">
+                                <span class="trend-arrow">-</span>
+                                <span class="stat-trend-value">0%</span>
+                            </div>
+                        </div>
+                        <!-- Mini sparkline showing trend -->
+                        <div class="stat-sparkline" id="sparkline-locations" role="img" aria-label="Location trend"></div>
+                    </div>
+                    <div class="stat-card" data-testid="stat-card-users">
+                        <div class="stat-label">Users</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value" id="stat-users" aria-live="polite" aria-atomic="true">-</div>
+                            <div class="stat-trend" id="stat-users-trend" data-testid="stat-trend" data-direction="neutral" aria-label="No change" title="vs last 7 days">
+                                <span class="trend-arrow">-</span>
+                                <span class="stat-trend-value">0%</span>
+                            </div>
+                        </div>
+                        <!-- Mini sparkline showing trend -->
+                        <div class="stat-sparkline" id="sparkline-users" role="img" aria-label="User trend"></div>
+                    </div>
+                    <div class="stat-card" data-testid="stat-card-recent">
+                        <div class="stat-label">Recent (24h)</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value" id="stat-recent" aria-live="polite" aria-atomic="true">-</div>
+                            <div class="stat-trend" id="stat-recent-trend" data-testid="stat-trend" data-direction="neutral" aria-label="No change" title="vs yesterday">
+                                <span class="trend-arrow">-</span>
+                                <span class="stat-trend-value">0%</span>
+                            </div>
+                        </div>
+                        <!-- Mini sparkline showing trend -->
+                        <div class="stat-sparkline" id="sparkline-recent" role="img" aria-label="Recent activity trend"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automated Insights Panel -->
+            <div id="insights-panel" class="insights-panel" data-testid="insights-panel" role="region" aria-label="Automated Insights">
+                <div class="insights-header" id="insights-header">
+                    <h3 class="panel-title">Insights</h3>
+                </div>
+                <div class="insights-loading">
+                    <div class="loading-spinner"></div>
+                    <span>Analyzing data...</span>
+                </div>
+            </div>
+
+            <!-- Plex Transcode Monitoring Panel (Phase 1.2: v1.40) -->
+            <div id="transcode-panel" class="transcode-panel hidden">
+                <div class="transcode-header">
+                    <h3>🎬 Active Transcodes</h3>
+                    <span id="transcode-count-badge" class="badge badge-info">0</span>
+                </div>
+                <div id="transcode-sessions-list" class="transcode-sessions">
+                    <p class="transcode-empty-message">No active transcodes</p>
+                </div>
+            </div>
+
+            <!-- Buffer Health Monitoring Panel (Phase 2.1: v1.41) -->
+            <div id="buffer-health-panel" class="buffer-health-panel hidden">
+                <div class="buffer-health-header">
+                    <h3>📊 Buffer Health</h3>
+                    <div class="buffer-health-badges">
+                        <span id="buffer-critical-badge" class="badge badge-error">0</span>
+                        <span id="buffer-risky-badge" class="badge badge-warning">0</span>
+                    </div>
+                </div>
+                <div id="buffer-health-sessions-list" class="buffer-health-sessions">
+                    <p class="buffer-health-empty-message">All sessions healthy</p>
+                </div>
+            </div>
+
+            <div id="filters" class="filters-panel">
+                <!-- Filter Panel Header -->
+                <div class="filters-header">
+                    <h3 class="filters-title">Filters</h3>
+                    <button
+                        id="filters-collapse-btn"
+                        type="button"
+                        class="filters-collapse-btn"
+                        aria-expanded="true"
+                        aria-controls="filters-content"
+                        aria-label="Collapse filters panel"
+                        title="Collapse filters">
+                        <span class="filters-collapse-icon" aria-hidden="true">&#x25B2;</span>
+                    </button>
+                </div>
+
+                <div id="filters-content" class="filters-content">
+                    <!-- Filter Announcer for Screen Readers -->
+                    <div id="filter-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+                    <!-- Active Filter Badges/Chips -->
+                <div id="filter-badges"
+                     class="filter-badges-container"
+                     role="region"
+                     aria-label="Active filters"
+                     aria-live="polite">
+                    <span class="filter-badges-placeholder visually-hidden" aria-hidden="true">No active filters</span>
+                    <!-- Filter badges are dynamically inserted here -->
+                </div>
+
+                <!-- Filter Presets -->
+                <div class="filter-presets-section">
+                    <div class="filter-presets-header">
+                        <label class="filter-label">Saved Presets</label>
+                        <button id="btn-save-preset"
+                                type="button"
+                                class="btn-save-preset"
+                                aria-label="Save current filters as preset">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Save
+                        </button>
+                    </div>
+                    <div id="preset-list" class="preset-list" role="list" aria-label="Saved filter presets">
+                        <div id="preset-list-empty" class="preset-empty-state">
+                            No saved presets
+                        </div>
+                        <!-- Preset items are dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Quick Date Picker Buttons -->
+                <div class="filter-group" id="quick-date-buttons" role="group" aria-label="Quick date selection">
+                    <label class="filter-label">Quick Select</label>
+                    <div class="quick-date-buttons">
+                        <button id="quick-date-today" type="button" class="quick-date-btn" aria-label="Set date to Today">Today</button>
+                        <button id="quick-date-yesterday" type="button" class="quick-date-btn" aria-label="Set date to Yesterday">Yesterday</button>
+                        <button id="quick-date-week" type="button" class="quick-date-btn" aria-label="Set date range to This Week">This Week</button>
+                        <button id="quick-date-month" type="button" class="quick-date-btn" aria-label="Set date range to This Month">This Month</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Time Range Preset</label>
+                    <select id="filter-days">
+                        <option value="">Custom range</option>
+                        <option value="1">Last 24 hours</option>
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90" selected>Last 90 days</option>
+                        <option value="365">Last year</option>
+                        <option value="3650">All time</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Custom Start Date</label>
+                    <input type="date" id="filter-start-date" class="form-input">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Custom End Date</label>
+                    <input type="date" id="filter-end-date" class="form-input">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">User</label>
+                    <select id="filter-users">
+                        <option value="">All Users</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Media Type</label>
+                    <select id="filter-media-types">
+                        <option value="">All Media Types</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <button id="btn-clear-filters" class="btn-secondary">Clear Filters</button>
+                </div>
+
+                <div class="filter-group">
+                    <button id="btn-refresh">
+                        <span id="refresh-icon" class="refresh-icon">&#8635;</span>
+                        <span id="refresh-text">Refresh Data</span>
+                    </button>
+                    <!-- Data Refresh Indicator -->
+                    <div id="data-refresh-indicator" class="data-refresh-indicator" role="status" aria-live="polite" style="display: none;">
+                        <span class="refresh-spinner"></span>
+                        <span id="refresh-status-text">Loading data...</span>
+                    </div>
+                </div>
+
+                <!-- Auto-Refresh Toggle -->
+                <div class="filter-group auto-refresh-group">
+                    <label class="filter-label" for="auto-refresh-toggle">Auto-Refresh</label>
+                    <div class="auto-refresh-control">
+                        <input type="checkbox"
+                               id="auto-refresh-toggle"
+                               class="auto-refresh-toggle"
+                               aria-label="Enable automatic data refresh every 60 seconds"
+                               checked>
+                        <label for="auto-refresh-toggle" class="auto-refresh-toggle-label">
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </label>
+                        <span class="auto-refresh-interval" id="refresh-interval-display">60s</span>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Export Data</label>
+                    <button id="btn-export-csv" class="btn-export">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 2v8M4 6l4 4 4-4M2 14h12"/>
+                        </svg>
+                        Export Playbacks (CSV)
+                    </button>
+                    <button id="btn-export-geojson" class="btn-export">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 2v8M4 6l4 4 4-4M2 14h12"/>
+                        </svg>
+                        Export Locations (GeoJSON)
+                    </button>
+                    <!-- GeoParquet Export -->
+                    <button id="btn-export-geoparquet" class="btn-export btn-export-advanced" title="Export locations in GeoParquet format for GIS analysis">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 2v8M4 6l4 4 4-4M2 14h12"/>
+                        </svg>
+                        Export (GeoParquet)
+                    </button>
+                </div>
+                </div> <!-- Close filters-content -->
+            </div>
+        </div>
+

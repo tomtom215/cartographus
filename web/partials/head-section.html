@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+
+<!--
+  Cartographus - Media Server Analytics and Geographic Visualization
+  Copyright 2026 Tom F. (tomtom215)
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  https://github.com/tomtom215/cartographus
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Geographic visualization for Plex Media Server playback activity via Tautulli">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="author" content="Cartographus">
+    <meta name="keywords" content="Tautulli, Plex, Maps, Geographic, Visualization, Analytics, Media Server">
+    <title>Cartographus - Geographic Playback Visualization</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Cartographus - Geographic Playback Visualization">
+    <meta property="og:description" content="Interactive maps and analytics for Plex Media Server playback activity via Tautulli. Visualize where your content is being watched worldwide.">
+    <meta property="og:image" content="/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Cartographus - Geographic visualization of Plex playback">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="Cartographus">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cartographus - Geographic Playback Visualization">
+    <meta name="twitter:description" content="Interactive maps and analytics for Plex Media Server playback activity via Tautulli.">
+    <meta name="twitter:image" content="/og-image.png">
+    <meta name="twitter:image:alt" content="Cartographus - Geographic visualization of Plex playback">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Icons -->
+    <!-- Note: Run scripts/generate-icons.sh to create PNG icons and favicon.ico from SVG source -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cartographus">
+
+    <!-- Resource Hints for Performance -->
+    <!-- Preconnect to critical third-party origins -->
+    <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin>
+    <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossorigin>
+    <link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossorigin>
+    <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+    <!-- DNS prefetch for map tile servers (fallback for older browsers) -->
+    <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com">
+    <link rel="dns-prefetch" href="https://b.basemaps.cartocdn.com">
+    <link rel="dns-prefetch" href="https://c.basemaps.cartocdn.com">
+    <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org">
+
+    <!-- Critical CSS - Inline for fastest first paint -->
+    <!-- Critical CSS contains only above-the-fold styles (~4KB minified) -->
+    <link rel="stylesheet" href="critical.css">
+
+    <!-- Preload full stylesheets (async loading below) -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.css" as="style">
+
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/icon.svg" as="image" type="image/svg+xml">
+
+    <!-- Preload critical fonts (if any are used - commented for reference) -->
+    <!-- <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin> -->
+
+    <!-- Prefetch likely-needed resources (loaded after critical path) -->
+    <!-- Main application entry point - use modulepreload for ES modules -->
+    <link rel="modulepreload" href="/index.js">
+
+    <!-- Prefetch secondary routes/features that user will likely visit -->
+    <!-- Note: Heavy chunks are lazy-loaded by the app, no need to prefetch -->
+
+    <!-- Async load full stylesheets (non-blocking) -->
+    <!-- Uses media="print" trick: loads async, then switches to media="all" via JS -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.css" media="print" class="async-css">
+    <link rel="stylesheet" href="styles.css" media="print" class="async-css">
+    <!-- Fallback for browsers with JS disabled -->
+    <noscript>
+        <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.css">
+        <link rel="stylesheet" href="styles.css">
+    </noscript>
+
+    <!-- WebGL Support Detection + Async CSS Loading (CSP-compliant) -->
+    <script>
+        // Detect WebGL support before page load
+        window.webglSupported = (function() {
+            try {
+                var canvas = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext &&
+                    (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            } catch(e) {
+                return false;
+            }
+        })();
+        // CSP-compliant async CSS loading (replaces inline onload handlers)
+        document.querySelectorAll('link.async-css').forEach(function(link) {
+            link.addEventListener('load', function() { this.media = 'all'; });
+        });
+    </script>
+</head>

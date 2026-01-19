@@ -1,0 +1,564 @@
+
+    <!-- Create Backup Dialog -->
+    <div id="create-backup-dialog"
+         class="backup-dialog-overlay"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="create-backup-dialog-title"
+         aria-hidden="true"
+         style="display: none;">
+        <div class="backup-dialog-content">
+            <h2 id="create-backup-dialog-title" class="backup-dialog-title">Create Backup</h2>
+            <div class="backup-dialog-form">
+                <div class="backup-form-group">
+                    <label for="backup-type-select">Backup Type</label>
+                    <select id="backup-type-select" class="backup-type-select">
+                        <option value="full">Full Backup (Database + Config)</option>
+                        <option value="database">Database Only</option>
+                        <option value="config">Config Only</option>
+                    </select>
+                </div>
+                <div class="backup-form-group">
+                    <label for="backup-notes-input">Notes (optional)</label>
+                    <input type="text"
+                           id="backup-notes-input"
+                           class="backup-notes-input"
+                           placeholder="e.g., Before update"
+                           maxlength="200">
+                </div>
+            </div>
+            <div class="backup-dialog-actions">
+                <button type="button" class="btn-confirm" id="btn-confirm-backup">Create Backup</button>
+                <button type="button" class="btn-cancel" id="btn-cancel-backup">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Backup Dialog -->
+    <div id="restore-backup-dialog"
+         class="backup-dialog-overlay restore-dialog"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="restore-backup-dialog-title"
+         aria-hidden="true"
+         style="display: none;">
+        <div class="backup-dialog-content">
+            <h2 id="restore-backup-dialog-title" class="backup-dialog-title">Restore Backup</h2>
+            <p id="restore-backup-info" class="restore-backup-info">
+                Restore from backup will replace your current data.
+            </p>
+            <div class="backup-dialog-form">
+                <div class="backup-form-group">
+                    <label class="restore-option">
+                        <input type="checkbox" id="restore-database-checkbox" checked>
+                        <span>Restore Database</span>
+                    </label>
+                </div>
+                <div class="backup-form-group">
+                    <label class="restore-option">
+                        <input type="checkbox" id="restore-pre-backup-checkbox" checked>
+                        <span>Create pre-restore backup</span>
+                    </label>
+                </div>
+                <div class="backup-form-group">
+                    <label class="restore-option">
+                        <input type="checkbox" id="restore-verify-checkbox" checked>
+                        <span>Verify after restore</span>
+                    </label>
+                </div>
+            </div>
+            <div class="backup-dialog-warning">
+                <strong>Warning:</strong> This action cannot be easily undone. Make sure you have a recent backup.
+            </div>
+            <div class="backup-dialog-actions">
+                <button type="button" class="btn-confirm btn-danger" id="btn-confirm-restore">Restore</button>
+                <button type="button" class="btn-cancel" id="btn-cancel-restore">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aria-live announcer for chart keyboard navigation and dynamic updates -->
+    <div id="chart-announcer" class="visually-hidden" aria-live="assertive" aria-atomic="true"></div>
+
+    <!-- Settings Panel Overlay -->
+    <div id="settings-overlay" class="settings-overlay" style="display: none;"></div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel"
+         class="settings-panel"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="settings-panel-title"
+         aria-hidden="true"
+         style="display: none;">
+        <div class="settings-header">
+            <h2 id="settings-panel-title">Settings</h2>
+            <button class="settings-close" aria-label="Close settings" data-action="close-settings">&times;</button>
+        </div>
+
+        <div class="settings-content">
+            <!-- Appearance Section -->
+            <section class="settings-section">
+                <h3 class="settings-section-title">Appearance</h3>
+
+                <div class="settings-group">
+                    <label class="settings-label">Theme</label>
+                    <div class="theme-options">
+                        <button class="theme-option" data-theme="dark" title="Dark theme">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                            <span>Dark</span>
+                        </button>
+                        <button class="theme-option" data-theme="light" title="Light theme">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                            </svg>
+                            <span>Light</span>
+                        </button>
+                        <button class="theme-option" data-theme="high-contrast" title="High contrast theme">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/><path d="M12 2v20"/>
+                            </svg>
+                            <span>High Contrast</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="settings-label" for="colorblind-settings-toggle">Colorblind Mode</label>
+                    <div class="settings-toggle-row">
+                        <span class="settings-description">Use colorblind-friendly color palette</span>
+                        <label class="settings-toggle">
+                            <input type="checkbox" id="colorblind-settings-toggle" name="colorblind-mode">
+                            <span class="settings-toggle-track">
+                                <span class="settings-toggle-thumb"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Map Settings Section -->
+            <section class="settings-section">
+                <h3 class="settings-section-title">Map</h3>
+
+                <div class="settings-group">
+                    <label class="settings-label">Default Visualization</label>
+                    <div class="viz-mode-options">
+                        <button class="viz-mode-option" data-viz-mode="points" title="Point markers">
+                            <span>Points</span>
+                        </button>
+                        <button class="viz-mode-option" data-viz-mode="heatmap" title="Heatmap">
+                            <span>Heatmap</span>
+                        </button>
+                        <button class="viz-mode-option" data-viz-mode="clusters" title="Clusters">
+                            <span>Clusters</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="settings-label">Default View</label>
+                    <div class="view-mode-options">
+                        <button class="view-mode-option" data-view-mode="2d" title="2D Map">
+                            <span>2D Map</span>
+                        </button>
+                        <button class="view-mode-option" data-view-mode="3d" title="3D Globe">
+                            <span>3D Globe</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Settings Section -->
+            <section class="settings-section">
+                <h3 class="settings-section-title">Data</h3>
+
+                <div class="settings-group">
+                    <label class="settings-label" for="auto-refresh-toggle-settings">Auto-Refresh</label>
+                    <div class="settings-toggle-row">
+                        <span class="settings-description">Automatically refresh data periodically</span>
+                        <label class="settings-toggle">
+                            <input type="checkbox" id="auto-refresh-toggle-settings" name="auto-refresh">
+                            <span class="settings-toggle-track">
+                                <span class="settings-toggle-thumb"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Management Section -->
+            <section class="settings-section">
+                <h3 class="settings-section-title">Data Management</h3>
+
+                <div class="settings-actions">
+                    <button type="button" class="btn-settings-action btn-export-settings" id="btn-export-settings">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Export Settings
+                    </button>
+                    <button type="button" class="btn-settings-action btn-import-settings" id="btn-import-settings">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Import Settings
+                    </button>
+                    <button type="button" class="btn-settings-action btn-clear-settings btn-danger" id="btn-clear-settings">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        Clear All Settings
+                    </button>
+                </div>
+
+                <!-- Hidden file input for import -->
+                <input type="file" id="settings-import-input" class="settings-import" accept=".json" style="display: none;">
+            </section>
+        </div>
+    </div>
+
+    <!-- Recommendation Panel Overlay -->
+    <div id="recommendation-overlay" class="recommendation-overlay" style="display: none;"></div>
+
+    <!-- Recommendation Panel -->
+    <div id="recommendation-panel"
+         class="recommendation-panel"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="recommendation-panel-title"
+         aria-hidden="true"
+         style="display: none;">
+        <div class="recommendation-header">
+            <h2 id="recommendation-panel-title">Recommendations</h2>
+            <div class="recommendation-header-actions">
+                <button class="recommendation-refresh" aria-label="Refresh recommendations" data-action="refresh-recommendations">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+                <button class="recommendation-close" aria-label="Close recommendations" data-action="close-recommendations">&times;</button>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="recommendation-tabs" role="tablist" aria-label="Recommendation panel tabs">
+            <button class="tab-button active" data-tab="recommendations" role="tab" aria-selected="true">
+                <span class="tab-icon">&#9734;</span>
+                Recommendations
+            </button>
+            <button class="tab-button" data-tab="whatsnext" role="tab" aria-selected="false">
+                <span class="tab-icon">&#128302;</span>
+                What's Next
+            </button>
+            <button class="tab-button" data-tab="algorithms" role="tab" aria-selected="false">
+                <span class="tab-icon">&#9881;</span>
+                Algorithms
+            </button>
+        </div>
+
+        <div class="recommendation-content">
+            <!-- ===============================================================
+                 RECOMMENDATIONS TAB
+                 =============================================================== -->
+            <div class="recommendations-tab-content">
+                <!-- Mode Selector -->
+                <div class="recommendation-modes" role="tablist" aria-label="Recommendation modes">
+                    <button class="recommendation-mode active" data-mode="personalized" role="tab" aria-selected="true">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        For You
+                    </button>
+                    <button class="recommendation-mode" data-mode="trending" role="tab" aria-selected="false">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                        Trending
+                    </button>
+                    <button class="recommendation-mode" data-mode="similar" role="tab" aria-selected="false">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Similar
+                    </button>
+                </div>
+
+                <!-- Training Status -->
+                <div class="training-status" role="status" aria-live="polite">
+                    <div class="training-info">
+                        <span class="training-label">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Config Display -->
+                <div class="recommendation-config">
+                    <!-- Config info populated by JS -->
+                </div>
+
+                <!-- Recommendation Grid -->
+                <div class="recommendation-grid" role="list" aria-label="Recommended content">
+                    <div class="recommendation-empty">
+                        <span class="empty-icon">&#128173;</span>
+                        <span class="empty-text">Select a user to see recommendations</span>
+                    </div>
+                </div>
+
+                <!-- Metadata -->
+                <div class="recommendation-meta" role="contentinfo">
+                    <!-- Metadata populated by JS -->
+                </div>
+            </div>
+
+            <!-- ===============================================================
+                 WHAT'S NEXT TAB (Markov Chain Predictions)
+                 =============================================================== -->
+            <div class="whatsnext-tab-content" style="display: none;">
+                <div class="whatsnext-header">
+                    <div class="whatsnext-source">
+                        <span class="whatsnext-source-label">Watch something to see predictions</span>
+                    </div>
+                </div>
+
+                <div class="whatsnext-grid" role="list" aria-label="What to watch next predictions">
+                    <div class="whatsnext-empty">
+                        <span class="empty-icon">&#128302;</span>
+                        <span class="empty-text">Watch something first to see predictions based on viewing patterns</span>
+                    </div>
+                </div>
+
+                <div class="whatsnext-meta">
+                    <!-- Metadata populated by JS -->
+                </div>
+            </div>
+
+            <!-- ===============================================================
+                 ALGORITHMS TAB (Info and Tooltips)
+                 =============================================================== -->
+            <div class="algorithms-tab-content" style="display: none;">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+
+        <!-- Training Actions -->
+        <div class="recommendation-footer">
+            <button class="btn-train" data-action="trigger-training">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+                Retrain Models
+            </button>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="keyboard-shortcuts-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="keyboard-shortcuts-title" aria-hidden="true" style="display: none;">
+        <div class="modal-content keyboard-shortcuts-content">
+            <div class="modal-header">
+                <h2 id="keyboard-shortcuts-title">Keyboard Shortcuts</h2>
+                <button class="modal-close" aria-label="Close keyboard shortcuts modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <section class="shortcut-section">
+                    <h3>Global</h3>
+                    <div class="shortcut-list">
+                        <div class="shortcut-item">
+                            <kbd>?</kbd>
+                            <span>Open this shortcuts modal</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Escape</kbd>
+                            <span>Close modal or sidebar</span>
+                        </div>
+                    </div>
+                </section>
+                <section class="shortcut-section">
+                    <h3>Navigation</h3>
+                    <div class="shortcut-list">
+                        <div class="shortcut-item">
+                            <kbd>Tab</kbd>
+                            <span>Move focus to next element</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Shift</kbd> + <kbd>Tab</kbd>
+                            <span>Move focus to previous element</span>
+                        </div>
+                    </div>
+                </section>
+                <section class="shortcut-section">
+                    <h3>Analytics Pages</h3>
+                    <div class="shortcut-list">
+                        <div class="shortcut-item">
+                            <kbd>Arrow Left</kbd> / <kbd>Arrow Right</kbd>
+                            <span>Navigate between analytics pages</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>1-6</kbd>
+                            <span>Jump to specific analytics page</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>1</kbd> Overview <kbd>2</kbd> Content <kbd>3</kbd> Users
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>4</kbd> Performance <kbd>5</kbd> Geographic <kbd>6</kbd> Advanced
+                        </div>
+                    </div>
+                </section>
+                <section class="shortcut-section">
+                    <h3>Charts (when focused)</h3>
+                    <div class="shortcut-list">
+                        <div class="shortcut-item">
+                            <kbd>Arrow Left</kbd> / <kbd>Arrow Right</kbd>
+                            <span>Navigate data points</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Home</kbd> / <kbd>End</kbd>
+                            <span>Jump to first/last data point</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Enter</kbd>
+                            <span>Announce current data point</span>
+                        </div>
+                    </div>
+                </section>
+                <section class="shortcut-section">
+                    <h3>Onboarding Tour</h3>
+                    <div class="shortcut-list">
+                        <div class="shortcut-item">
+                            <kbd>Arrow Right</kbd>
+                            <span>Next step</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Arrow Left</kbd>
+                            <span>Previous step</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Escape</kbd>
+                            <span>Skip tour</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- User IP History Modal -->
+    <div id="user-ip-history-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ip-history-title" aria-hidden="true" data-testid="user-ip-history-modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px; max-height: 80vh;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #3a3a4e;">
+                <h2 id="ip-history-title" style="margin: 0; font-size: 18px; font-weight: 600;">IP Address History</h2>
+                <button id="btn-close-ip-history" class="modal-close" aria-label="Close IP history modal" style="background: none; border: none; font-size: 24px; color: #9ca3af; cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: calc(80vh - 80px);">
+                <!-- Container for UserIPDetailsManager -->
+                <div id="user-ip-details-container" data-testid="user-ip-details-container">
+                    <div class="loading-state" style="text-align: center; padding: 40px; color: #9ca3af;">
+                        Loading IP history...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmation-dialog"
+         class="confirmation-dialog-overlay"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="confirmation-dialog-title"
+         aria-describedby="confirmation-dialog-message"
+         aria-hidden="true"
+         style="display: none;">
+        <div class="confirmation-dialog-content">
+            <h2 id="confirmation-dialog-title" class="confirmation-dialog-title">Confirm Action</h2>
+            <p id="confirmation-dialog-message" class="confirmation-dialog-message">Are you sure you want to proceed?</p>
+            <div class="confirmation-dialog-actions">
+                <button type="button" class="btn-confirm" id="confirmation-dialog-confirm">Confirm</button>
+                <button type="button" class="btn-cancel" id="confirmation-dialog-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Boundary Overlay -->
+    <div id="error-boundary-overlay"
+         class="error-boundary-overlay"
+         role="alertdialog"
+         aria-modal="true"
+         aria-labelledby="error-boundary-title"
+         aria-describedby="error-boundary-message"
+         aria-hidden="true"
+         style="display: none;">
+        <div class="error-boundary-content">
+            <div class="error-boundary-icon" aria-hidden="true">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+            </div>
+            <h2 id="error-boundary-title" class="error-boundary-title">Unable to Load Data</h2>
+            <p id="error-boundary-message" class="error-boundary-message">
+                We encountered a problem loading your data. Please check your connection and try again.
+            </p>
+            <div class="error-boundary-actions">
+                <button type="button" class="btn-retry" id="error-boundary-retry">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    Retry
+                </button>
+                <button type="button" class="btn-dismiss" id="error-boundary-dismiss">
+                    Dismiss
+                </button>
+            </div>
+            <p class="error-boundary-help">
+                If the problem persists, try refreshing the page or contact your administrator.
+            </p>
+        </div>
+    </div>
+
+    <!-- Save Preset Dialog -->
+    <div id="save-preset-dialog"
+         class="save-preset-dialog-overlay"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="save-preset-dialog-title"
+         aria-hidden="true"
+         style="display: none;">
+        <div class="save-preset-dialog-content">
+            <h2 id="save-preset-dialog-title" class="save-preset-dialog-title">Save Filter Preset</h2>
+            <div class="save-preset-form">
+                <label for="preset-name-input" class="save-preset-label">Preset Name</label>
+                <input type="text"
+                       id="preset-name-input"
+                       class="save-preset-input"
+                       placeholder="Enter preset name"
+                       maxlength="50"
+                       autocomplete="off">
+                <p class="preset-name-error" role="alert" aria-live="polite"></p>
+            </div>
+            <div class="save-preset-dialog-actions">
+                <button type="button" class="btn-confirm" id="btn-confirm-save-preset">Save Preset</button>
+                <button type="button" class="btn-cancel" id="btn-cancel-save-preset">Cancel</button>
+            </div>
+        </div>
+    </div>
+

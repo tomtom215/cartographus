@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "Frontend for Cartographus geographic visualization",
   "scripts": {
+    "compose": "node build/compose-html.js",
+    "compose:watch": "node build/compose-html.js --watch",
+    "compose:verify": "node build/compose-html.js --verify",
+    "predev": "npm run compose",
+    "prebuild": "npm run compose",
     "build": "npm run build:critical && npm run build:css && npm run build:app && npm run build:sw",
     "build:prod": "npm run build:critical && npm run build:css && npm run build:app:prod && npm run build:sw:prod",
     "build:critical": "npx esbuild src/styles/critical.css --bundle --outfile=public/critical.css --minify",

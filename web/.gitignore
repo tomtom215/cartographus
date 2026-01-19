@@ -1,0 +1,45 @@
+# Cartographus Web Frontend - Git Ignore
+# =============================================================================
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+public/styles.css
+public/styles.css.map
+public/critical.css
+public/service-worker.js
+
+# Generated HTML (source of truth is partials/)
+# The public/index.html is composed from partials/ by npm run compose
+public/index.html
+public/index.html.backup
+
+# TypeScript
+*.tsbuildinfo
+
+# Test output
+test-results/
+playwright-report/
+playwright/.cache/
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
