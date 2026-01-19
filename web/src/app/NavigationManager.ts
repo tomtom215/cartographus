@@ -107,6 +107,11 @@ export class NavigationManager {
     // Reference to the nav element for cleanup
     private analyticsNavElement: HTMLElement | null = null;
 
+    // Maps to store click handlers for nav tabs and analytics tabs
+    // Enables proper cleanup without DOM cloning anti-pattern
+    private navTabHandlers: Map<HTMLElement, (e: MouseEvent) => void> = new Map();
+    private analyticsTabHandlers: Map<HTMLElement, (e: MouseEvent) => void> = new Map();
+
     // BreadcrumbNavigationManager reference for notifying of view changes
     private breadcrumbManager: BreadcrumbNavigationManager | null = null;
 
@@ -263,39 +268,60 @@ export class NavigationManager {
      * This is called immediately after showing the app, BEFORE any async operations,
      * to ensure navigation tabs are clickable right away.
      * This is critical for E2E tests that wait for #app visibility and then click tabs.
+     *
+     * Uses stored handler references for proper cleanup instead of DOM cloning.
      */
     private setupNavigationListeners(): void {
-        // Navigation tabs (Maps, Analytics, Activity, Server Info, Recently Added)
-        const navTabs = document.querySelectorAll('.nav-tab');
-        navTabs.forEach(tab => {
-            // Remove any existing listeners to avoid duplicates
-            const newTab = tab.cloneNode(true) as HTMLElement;
-            tab.parentNode?.replaceChild(newTab, tab);
+        // Clean up any existing handlers first (prevents duplicates on re-initialization)
+        this.cleanupNavigationListeners();
 
-            newTab.addEventListener('click', (e) => {
+        // Navigation tabs (Maps, Analytics, Activity, Server Info, Recently Added)
+        const navTabs = document.querySelectorAll<HTMLElement>('.nav-tab');
+        navTabs.forEach(tab => {
+            const handler = (e: MouseEvent): void => {
                 const button = e.currentTarget as HTMLButtonElement;
                 const view = button.getAttribute('data-view') as DashboardView;
                 if (view) {
                     this.switchDashboardView(view);
                 }
-            });
+            };
+            // Store handler reference for cleanup
+            this.navTabHandlers.set(tab, handler);
+            tab.addEventListener('click', handler);
         });
 
         // Analytics sub-navigation tabs (Overview, Content, Users, Performance, Geographic, Advanced)
-        const analyticsTabs = document.querySelectorAll('.analytics-tab');
+        const analyticsTabs = document.querySelectorAll<HTMLElement>('.analytics-tab');
         analyticsTabs.forEach(tab => {
-            // Remove any existing listeners to avoid duplicates
-            const newTab = tab.cloneNode(true) as HTMLElement;
-            tab.parentNode?.replaceChild(newTab, tab);
-
-            newTab.addEventListener('click', (e) => {
+            const handler = (e: MouseEvent): void => {
                 const button = e.currentTarget as HTMLButtonElement;
                 const page = button.getAttribute('data-analytics-page') as AnalyticsPage;
                 if (page) {
                     this.switchAnalyticsPage(page);
                 }
-            });
+            };
+            // Store handler reference for cleanup
+            this.analyticsTabHandlers.set(tab, handler);
+            tab.addEventListener('click', handler);
         });
+    }
+
+    /**
+     * Clean up navigation tab listeners.
+     * Removes all stored click handlers from nav and analytics tabs.
+     */
+    private cleanupNavigationListeners(): void {
+        // Remove nav tab handlers
+        this.navTabHandlers.forEach((handler, tab) => {
+            tab.removeEventListener('click', handler);
+        });
+        this.navTabHandlers.clear();
+
+        // Remove analytics tab handlers
+        this.analyticsTabHandlers.forEach((handler, tab) => {
+            tab.removeEventListener('click', handler);
+        });
+        this.analyticsTabHandlers.clear();
     }
 
     /**
@@ -1043,6 +1069,9 @@ export class NavigationManager {
         window.removeEventListener('hashchange', this.boundHandleHashChange);
         window.removeEventListener('keydown', this.boundHandleKeyDown);
         window.removeEventListener('resize', this.boundHandleResize);
+
+        // Remove navigation tab listeners
+        this.cleanupNavigationListeners();
 
         // Remove scroll listener from nav element
         if (this.analyticsNavElement && this.scrollUpdateHandler) {

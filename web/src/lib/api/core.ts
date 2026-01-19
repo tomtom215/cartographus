@@ -78,7 +78,14 @@ export class LocationsAPI extends BaseAPIClient {
 
     /**
      * Get playback events with offset-based pagination (legacy)
-     * @deprecated Use getPlaybacksWithCursor for better performance
+     *
+     * @deprecated Since v1.0.0 - Use {@link getPlaybacksWithCursor} instead.
+     * Offset-based pagination has O(n) performance for large datasets because
+     * the database must scan and skip `offset` rows. Cursor-based pagination
+     * maintains O(1) performance regardless of dataset size.
+     *
+     * @see {@link getPlaybacksWithCursor} - Recommended cursor-based alternative
+     * @see {@link getAllPlaybacks} - Fetches all pages using cursor pagination
      */
     async getPlaybacks(filter: LocationFilter = {}, limit: number = 100, offset: number = 0): Promise<PlaybackEvent[]> {
         const params = this.buildFilterParams(filter);
