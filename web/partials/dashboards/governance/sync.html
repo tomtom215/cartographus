@@ -1,0 +1,111 @@
+                <!-- Sync Status Page -->
+                <div id="governance-sync-page" class="governance-page" data-page="sync" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>Sync Status &amp; Event Pipeline</h3>
+                        <div class="governance-actions">
+                            <button type="button" class="btn-governance" id="sync-refresh-btn" aria-label="Refresh sync status">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sync Sources Status -->
+                    <div class="sync-sources-grid" id="sync-sources-grid">
+                        <div class="sync-source-card">
+                            <div class="source-header">
+                                <span class="source-name">Tautulli</span>
+                                <span class="source-status" id="sync-tautulli-status">--</span>
+                            </div>
+                            <div class="source-details">
+                                <div class="source-stat">
+                                    <span class="stat-label">Last Sync</span>
+                                    <span class="stat-value" id="sync-tautulli-last">--</span>
+                                </div>
+                                <div class="source-stat">
+                                    <span class="stat-label">Events Today</span>
+                                    <span class="stat-value" id="sync-tautulli-events">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sync-source-card">
+                            <div class="source-header">
+                                <span class="source-name">Plex</span>
+                                <span class="source-status" id="sync-plex-status">--</span>
+                            </div>
+                            <div class="source-details">
+                                <div class="source-stat">
+                                    <span class="stat-label">Last Sync</span>
+                                    <span class="stat-value" id="sync-plex-last">--</span>
+                                </div>
+                                <div class="source-stat">
+                                    <span class="stat-label">Events Today</span>
+                                    <span class="stat-value" id="sync-plex-events">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sync-source-card">
+                            <div class="source-header">
+                                <span class="source-name">Jellyfin</span>
+                                <span class="source-status" id="sync-jellyfin-status">--</span>
+                            </div>
+                            <div class="source-details">
+                                <div class="source-stat">
+                                    <span class="stat-label">Last Sync</span>
+                                    <span class="stat-value" id="sync-jellyfin-last">--</span>
+                                </div>
+                                <div class="source-stat">
+                                    <span class="stat-label">Events Today</span>
+                                    <span class="stat-value" id="sync-jellyfin-events">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sync-source-card">
+                            <div class="source-header">
+                                <span class="source-name">Emby</span>
+                                <span class="source-status" id="sync-emby-status">--</span>
+                            </div>
+                            <div class="source-details">
+                                <div class="source-stat">
+                                    <span class="stat-label">Last Sync</span>
+                                    <span class="stat-value" id="sync-emby-last">--</span>
+                                </div>
+                                <div class="source-stat">
+                                    <span class="stat-label">Events Today</span>
+                                    <span class="stat-value" id="sync-emby-events">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Pipeline Stats -->
+                    <div class="governance-section">
+                        <h4>Event Pipeline Metrics</h4>
+                        <div class="pipeline-metrics-grid" id="pipeline-metrics">
+                            <div class="pipeline-metric">
+                                <div class="metric-value" id="pipeline-received">--</div>
+                                <div class="metric-label">Events Received</div>
+                            </div>
+                            <div class="pipeline-metric">
+                                <div class="metric-value" id="pipeline-processed">--</div>
+                                <div class="metric-label">Events Processed</div>
+                            </div>
+                            <div class="pipeline-metric">
+                                <div class="metric-value" id="pipeline-deduplicated">--</div>
+                                <div class="metric-label">Deduplicated</div>
+                            </div>
+                            <div class="pipeline-metric">
+                                <div class="metric-value" id="pipeline-failed">--</div>
+                                <div class="metric-label">Failed</div>
+                            </div>
+                            <div class="pipeline-metric">
+                                <div class="metric-value" id="pipeline-latency">--</div>
+                                <div class="metric-label">Avg Latency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+

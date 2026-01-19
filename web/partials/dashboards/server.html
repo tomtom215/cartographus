@@ -1,0 +1,63 @@
+            <!-- Server Health Dashboard -->
+            <div id="server-container" class="dashboard-view" style="display: none;" role="tabpanel" aria-labelledby="tab-server" tabindex="-1">
+                <h2>Server Information</h2>
+                <div id="server-health" class="server-health">
+                    <div id="plex-server-card" class="server-card plex-card">
+                        <div class="server-card-header">
+                            <h3>Plex Media Server</h3>
+                            <span id="server-status" class="server-status">●</span>
+                        </div>
+                        <div class="server-details">
+                            <div class="server-detail-row">
+                                <span class="server-detail-label">Server Name:</span>
+                                <span class="server-detail-value" id="server-name">-</span>
+                            </div>
+                            <div class="server-detail-row">
+                                <span class="server-detail-label">Version:</span>
+                                <span class="server-detail-value" id="server-version">-</span>
+                            </div>
+                            <div class="server-detail-row">
+                                <span class="server-detail-label">Platform:</span>
+                                <span class="server-detail-value" id="server-platform">-</span>
+                            </div>
+                            <div class="server-detail-row">
+                                <span class="server-detail-label">Platform Version:</span>
+                                <span class="server-detail-value" id="server-platform-version">-</span>
+                            </div>
+                            <div class="server-detail-row">
+                                <span class="server-detail-label">Machine ID:</span>
+                                <span class="server-detail-value" id="server-machine-id">-</span>
+                            </div>
+                            <div id="server-update-available" class="server-update-notice" style="display: none;">
+                                <strong>Update Available!</strong>
+                                <span id="server-update-version"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup/Restore Section -->
+                <div id="backup-section" class="backup-section">
+                    <div class="backup-header">
+                        <h3>Database Backups</h3>
+                        <button id="btn-create-backup" type="button" class="btn-create-backup">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Create Backup
+                        </button>
+                    </div>
+                    <div id="backup-stats" class="backup-stats">
+                        <!-- Stats populated by BackupRestoreManager -->
+                    </div>
+                    <div id="backup-list" class="backup-list" role="list" aria-label="Backup list">
+                        <div class="backup-empty-state">
+                            <p>Loading backups...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+

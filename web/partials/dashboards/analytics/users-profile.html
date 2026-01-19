@@ -1,0 +1,104 @@
+            <!-- User Profile Analytics -->
+            <div id="analytics-users-profile" class="analytics-page" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics-users-profile" tabindex="0">
+                <h2>User Profile Analytics</h2>
+                <p class="page-description">Individual user viewing patterns and preferences</p>
+
+                <!-- User Selector -->
+                <div class="user-selector-container" style="margin-bottom: 20px; padding: 15px; background: #1e1e2e; border-radius: 8px;">
+                    <label for="user-profile-selector" style="margin-right: 10px; font-weight: 500;">Select User:</label>
+                    <select id="user-profile-selector" aria-label="Select a user for detailed profile analytics" style="background: #2a2a3e; color: #e0e0e0; border: 1px solid #3a3a4e; padding: 8px 15px; border-radius: 4px; min-width: 200px;">
+                        <option value="">-- Select a user --</option>
+                    </select>
+                    <span id="user-profile-loading" style="margin-left: 15px; display: none;">Loading...</span>
+                </div>
+
+                <!-- User Profile Info -->
+                <div id="user-profile-info" style="display: none; align-items: center; gap: 20px; margin-bottom: 20px; padding: 20px; background: #1e1e2e; border-radius: 8px;">
+                    <div class="user-avatar" style="width: 60px; height: 60px; background: linear-gradient(135deg, #7c3aed, #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">
+                        U
+                    </div>
+                    <div class="user-details" style="flex: 1;">
+                        <div id="user-profile-name" style="font-size: 20px; font-weight: 600; color: #e0e0e0;"></div>
+                        <div id="user-profile-username" style="font-size: 14px; color: #9ca3af;"></div>
+                    </div>
+                    <div id="user-profile-status" class="status-badge" style="padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;"></div>
+                    <!-- View IP History Button -->
+                    <button id="btn-view-ip-history" class="action-button" data-testid="btn-view-ip-history" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; display: none;" aria-label="View IP address history for this user">
+                        View IP History
+                    </button>
+                </div>
+
+                <!-- User Overview Stats -->
+                <div id="user-profile-stats" class="user-stats" style="display: none; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Plays</div>
+                        <div class="stat-value" id="user-total-plays">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Watch Time</div>
+                        <div class="stat-value" id="user-watch-time">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Unique Content</div>
+                        <div class="stat-value" id="user-unique-content">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Avg Completion</div>
+                        <div class="stat-value" id="user-avg-completion">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Favorite Library</div>
+                        <div class="stat-value" id="user-favorite-library" style="font-size: 14px;">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Favorite Platform</div>
+                        <div class="stat-value" id="user-favorite-platform" style="font-size: 14px;">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">First Played</div>
+                        <div class="stat-value" id="user-first-played" style="font-size: 14px;">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Last Played</div>
+                        <div class="stat-value" id="user-last-played" style="font-size: 14px;">-</div>
+                    </div>
+                </div>
+
+                <!-- User Charts -->
+                <div class="chart-grid" role="region" aria-label="User profile charts" style="display: none;">
+                    <!-- Activity Trend Chart -->
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Activity Trend</div>
+                            <button class="chart-export" data-chart="user-activity-trend">Export PNG</button>
+                        </div>
+                        <div class="chart-container chart-content" id="chart-user-activity-trend" tabindex="0" aria-label="User activity trend showing plays and watch time over time"></div>
+                    </div>
+
+                    <!-- Top Content Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Content</div>
+                            <button class="chart-export" data-chart="user-top-content">Export PNG</button>
+                        </div>
+                        <div class="chart-container chart-content" id="chart-user-top-content" tabindex="0" aria-label="User top watched content by plays and watch time"></div>
+                    </div>
+
+                    <!-- Platform Usage Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Platform Usage</div>
+                            <button class="chart-export" data-chart="user-platforms">Export PNG</button>
+                        </div>
+                        <div class="chart-container chart-content" id="chart-user-platforms" tabindex="0" aria-label="User platform usage distribution"></div>
+                    </div>
+                </div>
+
+                <!-- Empty state when no user selected -->
+                <div id="user-profile-empty-state" class="empty-state" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 60px 20px; color: #9ca3af;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">👤</div>
+                    <div style="font-size: 18px; font-weight: 500; margin-bottom: 10px;">Select a User</div>
+                    <div>Choose a user from the dropdown above to view their profile and activity analytics</div>
+                </div>
+            </div>
+

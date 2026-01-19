@@ -1,0 +1,134 @@
+            <!-- Advanced Analytics Page -->
+            <div id="analytics-advanced" class="analytics-page" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics-advanced" tabindex="0">
+                <h2>Advanced Analytics</h2>
+                <p class="page-description">Comparative analysis and temporal patterns</p>
+
+                <div class="chart-grid" role="region" aria-label="Advanced analytics charts">
+                    <h3 class="section-header">Comparative Analytics</h3>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                Period Comparison
+                                <select id="comparison-type-selector" style="margin-left: 10px; background: #2a2a3e; color: #e0e0e0; border: 1px solid #3a3a4e; padding: 5px; border-radius: 4px;">
+                                    <option value="week" selected>Week over Week</option>
+                                    <option value="month">Month over Month</option>
+                                    <option value="quarter">Quarter over Quarter</option>
+                                    <option value="year">Year over Year</option>
+                                </select>
+                            </div>
+                            <button class="chart-export" data-chart="comparative-metrics">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-comparative-metrics" tabindex="0" aria-label="Comparative Metrics interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Content Comparison</div>
+                            <button class="chart-export" data-chart="comparative-content">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-comparative-content" tabindex="0" aria-label="Comparative Content Analysis interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Users Comparison</div>
+                            <button class="chart-export" data-chart="comparative-users">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-comparative-users" tabindex="0" aria-label="Comparative User Analysis interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Key Insights</div>
+                        </div>
+                        <div class="chart-content" id="comparative-insights" style="padding: 20px;">
+                            <ul id="insights-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+                        </div>
+                    </div>
+
+                    <h3 class="section-header">Temporal Geographic</h3>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                Geographic Density Over Time
+                                <select id="temporal-interval-selector" style="margin-left: 10px; background: #2a2a3e; color: #e0e0e0; border: 1px solid #3a3a4e; padding: 5px; border-radius: 4px;">
+                                    <option value="hour">Hourly</option>
+                                    <option value="day" selected>Daily</option>
+                                    <option value="week">Weekly</option>
+                                    <option value="month">Monthly</option>
+                                </select>
+                            </div>
+                            <button class="chart-export" data-chart="temporal-heatmap">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-temporal-heatmap" tabindex="0" aria-label="Temporal Heatmap interactive chart" style="height: 600px; position: relative;">
+                            <div id="temporal-map-container" style="width: 100%; height: 500px;"></div>
+                            <div id="temporal-controls" style="margin-top: 10px; display: flex; align-items: center; gap: 10px; justify-content: center;">
+                                <button id="temporal-play-pause" class="btn-secondary" style="padding: 8px 16px;">
+                                    ▶ Play
+                                </button>
+                                <button id="temporal-reset" class="btn-secondary" style="padding: 8px 16px;">
+                                    ⏮ Reset
+                                </button>
+                                <input type="range" id="temporal-slider" min="0" max="100" value="0" style="flex: 1; max-width: 500px;" />
+                                <span id="temporal-label" style="min-width: 150px; text-align: center;">-</span>
+                                <select id="temporal-speed" style="background: #2a2a3e; color: #e0e0e0; border: 1px solid #3a3a4e; padding: 5px; border-radius: 4px;">
+                                    <option value="500">0.5x</option>
+                                    <option value="1000" selected>1x</option>
+                                    <option value="2000">2x</option>
+                                    <option value="5000">5x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-header">GPU & Engagement Analytics</h3>
+
+                    <!-- Hardware Transcode Analytics -->
+                    <div class="chart-card chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Hardware Transcode Analytics</div>
+                            <button class="chart-export" data-chart="hardware-transcode">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-hardware-transcode" tabindex="0" aria-label="Hardware Transcode Analytics showing GPU utilization breakdown"></div>
+                    </div>
+
+                    <!-- Abandonment Analytics -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Content Abandonment Analysis</div>
+                            <button class="chart-export" data-chart="abandonment">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-abandonment" tabindex="0" aria-label="Content Abandonment Analysis showing drop-off patterns"></div>
+                    </div>
+
+                    <!-- Frame Rate Analytics -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Frame Rate Distribution</div>
+                            <button class="chart-export" data-chart="frame-rate">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-frame-rate" tabindex="0" aria-label="Frame Rate Distribution showing 24/30/60fps breakdown"></div>
+                    </div>
+
+                    <!-- Container Format Analytics -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Container Format Distribution</div>
+                            <button class="chart-export" data-chart="container-format">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-container-format" tabindex="0" aria-label="Container Format Distribution showing MKV, MP4, AVI usage"></div>
+                    </div>
+
+                    <!-- Hardware Transcode Trends -->
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Hardware Transcode Trends</div>
+                            <button class="chart-export" data-chart="hw-transcode-trends">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-hw-transcode-trends" tabindex="0" aria-label="Hardware Transcode Trends showing historical GPU vs CPU transcoding" style="height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+

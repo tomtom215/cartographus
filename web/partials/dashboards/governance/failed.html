@@ -1,0 +1,60 @@
+                <!-- Failed Events Page -->
+                <div id="governance-failed-page" class="governance-page" data-page="failed" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>Failed Events (Dead Letter Queue)</h3>
+                        <div class="governance-actions">
+                            <button type="button" class="btn-governance" id="failed-refresh-btn" aria-label="Refresh failed events">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                            <button type="button" class="btn-governance btn-danger" id="failed-retry-all-btn" aria-label="Retry all failed events">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                                </svg>
+                                Retry All
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Failed Events Stats -->
+                    <div class="failed-stats-grid" id="failed-stats-grid">
+                        <div class="failed-stat-card">
+                            <div class="stat-value" id="failed-total">--</div>
+                            <div class="stat-label">Total Failed</div>
+                        </div>
+                        <div class="failed-stat-card">
+                            <div class="stat-value" id="failed-pending">--</div>
+                            <div class="stat-label">Pending Retry</div>
+                        </div>
+                        <div class="failed-stat-card">
+                            <div class="stat-value" id="failed-retried">--</div>
+                            <div class="stat-label">Retry Success</div>
+                        </div>
+                        <div class="failed-stat-card">
+                            <div class="stat-value" id="failed-permanent">--</div>
+                            <div class="stat-label">Permanent Failures</div>
+                        </div>
+                    </div>
+
+                    <!-- Failed Events Table -->
+                    <div class="failed-table-container">
+                        <table class="governance-table" id="failed-events-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Source</th>
+                                    <th>Reason</th>
+                                    <th>Retries</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="failed-events-tbody">
+                                <tr><td colspan="6" class="table-loading">Loading failed events...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>

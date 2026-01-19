@@ -1,0 +1,109 @@
+                <!-- Audit Log Page -->
+                <div id="governance-audit-page" class="governance-page" data-page="audit" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>Security Audit Log</h3>
+                        <div class="governance-actions">
+                            <button type="button" class="btn-governance" id="audit-refresh-btn" aria-label="Refresh audit log">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                            <button type="button" class="btn-governance" id="audit-export-btn" aria-label="Export audit log">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Audit Statistics -->
+                    <div class="audit-stats-grid" id="audit-stats-grid">
+                        <div class="audit-stat-card">
+                            <div class="stat-value" id="audit-total-events">--</div>
+                            <div class="stat-label">Total Events</div>
+                        </div>
+                        <div class="audit-stat-card severity-critical">
+                            <div class="stat-value" id="audit-critical-count">--</div>
+                            <div class="stat-label">Critical</div>
+                        </div>
+                        <div class="audit-stat-card severity-warning">
+                            <div class="stat-value" id="audit-warning-count">--</div>
+                            <div class="stat-label">Warnings</div>
+                        </div>
+                        <div class="audit-stat-card severity-info">
+                            <div class="stat-value" id="audit-info-count">--</div>
+                            <div class="stat-label">Info</div>
+                        </div>
+                        <div class="audit-stat-card">
+                            <div class="stat-value" id="audit-auth-events">--</div>
+                            <div class="stat-label">Auth Events</div>
+                        </div>
+                        <div class="audit-stat-card">
+                            <div class="stat-value" id="audit-failures">--</div>
+                            <div class="stat-label">Failures</div>
+                        </div>
+                    </div>
+
+                    <!-- Audit Filters -->
+                    <div class="audit-filters">
+                        <select class="governance-select" id="audit-type-filter">
+                            <option value="">All Types</option>
+                            <option value="auth.success">Auth Success</option>
+                            <option value="auth.failure">Auth Failure</option>
+                            <option value="auth.lockout">Lockout</option>
+                            <option value="authz.denied">Access Denied</option>
+                            <option value="detection.alert">Detection Alert</option>
+                            <option value="config.changed">Config Changed</option>
+                            <option value="data.export">Data Export</option>
+                            <option value="data.backup">Backup</option>
+                            <option value="admin.action">Admin Action</option>
+                        </select>
+                        <select class="governance-select" id="audit-severity-filter">
+                            <option value="">All Severities</option>
+                            <option value="critical">Critical</option>
+                            <option value="error">Error</option>
+                            <option value="warning">Warning</option>
+                            <option value="info">Info</option>
+                        </select>
+                        <select class="governance-select" id="audit-outcome-filter">
+                            <option value="">All Outcomes</option>
+                            <option value="success">Success</option>
+                            <option value="failure">Failure</option>
+                        </select>
+                        <input type="text" class="governance-input" id="audit-search" placeholder="Search events..." style="max-width: 200px;">
+                    </div>
+
+                    <!-- Audit Events Table -->
+                    <div class="audit-table-container">
+                        <table class="governance-table" id="audit-events-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>Severity</th>
+                                    <th>Actor</th>
+                                    <th>Action</th>
+                                    <th>Description</th>
+                                    <th>Outcome</th>
+                                    <th>Source IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-events-tbody">
+                                <tr><td colspan="8" class="table-loading">Loading audit events...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="audit-pagination" id="audit-pagination">
+                        <button type="button" class="btn-governance btn-small" id="audit-prev-btn" disabled>Previous</button>
+                        <span class="pagination-info" id="audit-page-info">Page 1</span>
+                        <button type="button" class="btn-governance btn-small" id="audit-next-btn">Next</button>
+                    </div>
+                </div>
+

@@ -1,0 +1,204 @@
+            <div id="analytics-overview" class="analytics-page active" role="tabpanel" aria-labelledby="tab-analytics-overview" tabindex="0">
+                <h2>Overview</h2>
+                <p class="page-description">Quick insights and key metrics at a glance</p>
+
+                <!-- Quick Insights Row -->
+                <div class="quick-insights-row" role="region" aria-label="Quick insights">
+                    <!-- Binge Watching Quick Insight -->
+                    <div class="quick-insight-card" id="binge-insight-card" aria-label="Binge Watching Summary">
+                        <div class="quick-insight-header">
+                            <span class="quick-insight-icon" aria-hidden="true">&#x1F4FA;</span>
+                            <span class="quick-insight-title">Binge Watching</span>
+                            <a href="#analytics-users" class="quick-insight-link" data-navigate-analytics="users" aria-label="View full binge analytics">View More</a>
+                        </div>
+                        <div class="quick-insight-metrics">
+                            <div class="quick-insight-metric">
+                                <span class="metric-value" id="binge-sessions-count">--</span>
+                                <span class="metric-label">Binge Sessions</span>
+                            </div>
+                            <div class="quick-insight-metric">
+                                <span class="metric-value" id="binge-avg-episodes">--</span>
+                                <span class="metric-label">Avg Episodes</span>
+                            </div>
+                            <div class="quick-insight-metric">
+                                <span class="metric-value" id="binge-top-show">--</span>
+                                <span class="metric-label">Top Show</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Watch Party Quick Insight -->
+                    <div class="quick-insight-card" id="watch-party-insight-card" aria-label="Watch Party Summary">
+                        <div class="quick-insight-header">
+                            <span class="quick-insight-icon" aria-hidden="true">&#x1F91D;</span>
+                            <span class="quick-insight-title">Watch Parties</span>
+                            <a href="#analytics-users" class="quick-insight-link" data-navigate-analytics="users" aria-label="View full watch party analytics">View More</a>
+                        </div>
+                        <div class="quick-insight-metrics">
+                            <div class="quick-insight-metric">
+                                <span class="metric-value" id="watch-party-count">--</span>
+                                <span class="metric-label">Watch Parties</span>
+                            </div>
+                            <div class="quick-insight-metric">
+                                <span class="metric-value" id="watch-party-avg-users">--</span>
+                                <span class="metric-label">Avg Viewers</span>
+                            </div>
+                            <div class="quick-insight-metric">
+                                <span class="metric-value" id="watch-party-top-content">--</span>
+                                <span class="metric-label">Top Content</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Period Comparison Row -->
+                <div class="period-comparison-row" role="region" aria-label="Period comparison insights">
+                    <div class="period-comparison-header">
+                        <h3 class="period-comparison-title">
+                            <span class="comparison-icon" aria-hidden="true">&#x1F4C8;</span>
+                            vs Last Period
+                        </h3>
+                        <select id="comparison-period-select" class="period-select" aria-label="Select comparison period">
+                            <option value="week">vs Last Week</option>
+                            <option value="month">vs Last Month</option>
+                            <option value="quarter">vs Last Quarter</option>
+                            <option value="year">vs Last Year</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <!-- Custom Date Range Picker -->
+                    <div id="custom-date-container" class="custom-date-container hidden" aria-hidden="true">
+                        <div class="custom-date-row">
+                            <div class="custom-date-field">
+                                <label for="comparison-start-date" class="custom-date-label">Start Date</label>
+                                <input type="date" id="comparison-start-date" class="custom-date-input" aria-describedby="custom-date-error" />
+                            </div>
+                            <span class="custom-date-separator" aria-hidden="true">to</span>
+                            <div class="custom-date-field">
+                                <label for="comparison-end-date" class="custom-date-label">End Date</label>
+                                <input type="date" id="comparison-end-date" class="custom-date-input" aria-describedby="custom-date-error" />
+                            </div>
+                            <button type="button" id="apply-custom-comparison" class="custom-date-apply" aria-label="Apply custom date range comparison">
+                                Apply
+                            </button>
+                        </div>
+                        <div id="custom-date-error" class="custom-date-error hidden" role="alert" aria-live="polite"></div>
+                        <div class="custom-date-hint">Compare selected period with the equivalent previous period</div>
+                    </div>
+                    <div class="period-comparison-metrics" id="period-comparison-metrics">
+                        <div class="comparison-metric-card" data-metric="playbacks">
+                            <div class="comparison-metric-label">Total Playbacks</div>
+                            <div class="comparison-metric-value" id="comp-playbacks-value">--</div>
+                            <div class="comparison-metric-change" id="comp-playbacks-change">
+                                <span class="change-arrow"></span>
+                                <span class="change-value">--</span>
+                            </div>
+                        </div>
+                        <div class="comparison-metric-card" data-metric="users">
+                            <div class="comparison-metric-label">Active Users</div>
+                            <div class="comparison-metric-value" id="comp-users-value">--</div>
+                            <div class="comparison-metric-change" id="comp-users-change">
+                                <span class="change-arrow"></span>
+                                <span class="change-value">--</span>
+                            </div>
+                        </div>
+                        <div class="comparison-metric-card" data-metric="watchtime">
+                            <div class="comparison-metric-label">Watch Time</div>
+                            <div class="comparison-metric-value" id="comp-watchtime-value">--</div>
+                            <div class="comparison-metric-change" id="comp-watchtime-change">
+                                <span class="change-arrow"></span>
+                                <span class="change-value">--</span>
+                            </div>
+                        </div>
+                        <div class="comparison-metric-card" data-metric="completion">
+                            <div class="comparison-metric-label">Avg Completion</div>
+                            <div class="comparison-metric-value" id="comp-completion-value">--</div>
+                            <div class="comparison-metric-change" id="comp-completion-change">
+                                <span class="change-arrow"></span>
+                                <span class="change-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="period-comparison-insights" id="period-comparison-insights" aria-live="polite">
+                        <!-- Key insights will be populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Anomaly Detection Section -->
+                <div class="anomaly-detection-row" role="region" aria-label="Pattern anomalies">
+                    <div class="anomaly-detection-header">
+                        <h3 class="anomaly-detection-title">
+                            <span class="anomaly-title-icon" aria-hidden="true">&#x1F50D;</span>
+                            Unusual Patterns
+                        </h3>
+                        <span class="anomaly-badge" id="anomaly-count-badge" hidden></span>
+                    </div>
+                    <div class="anomaly-detection-content" id="anomaly-detection-content" aria-live="polite">
+                        <div class="anomaly-empty">
+                            <span class="anomaly-empty-icon" aria-hidden="true">&#x2714;</span>
+                            <span>No unusual patterns detected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geographic Drill-Down Section -->
+                <div id="geographic-drilldown-container" class="geo-drilldown-container" role="region" aria-label="Geographic drill-down">
+                    <!-- Content populated by GeographicDrillDownManager -->
+                </div>
+
+                <!-- Chart Timeline Animation Controls -->
+                <div id="chart-timeline-animation-container" class="chart-timeline-animation-container" role="region" aria-label="Chart timeline animation controls">
+                    <!-- Content populated by ChartTimelineAnimationManager -->
+                </div>
+
+                <div class="chart-grid" role="region" aria-label="Overview charts">
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Playback Trends Over Time</div>
+                            <button class="chart-export" data-chart="trends">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-trends" tabindex="0" aria-label="Playback Trends Over Time interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Media Type Distribution</div>
+                            <button class="chart-export" data-chart="media">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-media" tabindex="0" aria-label="Media Type Distribution interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Users</div>
+                            <button class="chart-export" data-chart="users">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-users" tabindex="0" aria-label="Top Users interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Viewing Hours Heatmap</div>
+                            <button class="chart-export" data-chart="heatmap">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-heatmap" tabindex="0" aria-label="Viewing Hours Heatmap interactive chart" style="height: 320px;"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Platform Distribution</div>
+                            <button class="chart-export" data-chart="platforms">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-platforms" tabindex="0" aria-label="Platform Distribution interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Player Distribution</div>
+                            <button class="chart-export" data-chart="players">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-players" tabindex="0" aria-label="Player Distribution interactive chart"></div>
+                    </div>
+                </div>
+            </div>
+

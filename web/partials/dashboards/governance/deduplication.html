@@ -1,0 +1,93 @@
+                <!-- Deduplication Page -->
+                <div id="governance-deduplication-page" class="governance-page" data-page="deduplication" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>Deduplication Audit Log</h3>
+                        <div class="governance-actions">
+                            <button type="button" class="btn-governance" id="dedupe-refresh-btn" aria-label="Refresh audit log">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                            <button type="button" class="btn-governance" id="dedupe-export-btn" aria-label="Export to CSV">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dedupe Statistics -->
+                    <div class="dedupe-stats-grid" id="dedupe-stats-grid">
+                        <div class="dedupe-stat-card">
+                            <div class="stat-value" id="dedupe-total">--</div>
+                            <div class="stat-label">Total Deduplicated</div>
+                        </div>
+                        <div class="dedupe-stat-card">
+                            <div class="stat-value" id="dedupe-pending">--</div>
+                            <div class="stat-label">Pending Review</div>
+                        </div>
+                        <div class="dedupe-stat-card">
+                            <div class="stat-value" id="dedupe-confirmed">--</div>
+                            <div class="stat-label">Confirmed</div>
+                        </div>
+                        <div class="dedupe-stat-card">
+                            <div class="stat-value" id="dedupe-restored">--</div>
+                            <div class="stat-label">Restored</div>
+                        </div>
+                        <div class="dedupe-stat-card">
+                            <div class="stat-value" id="dedupe-accuracy">--</div>
+                            <div class="stat-label">Accuracy Rate</div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="dedupe-filters">
+                        <select id="dedupe-filter-status" class="governance-select" aria-label="Filter by status">
+                            <option value="">All Statuses</option>
+                            <option value="auto_dedupe">Pending Review</option>
+                            <option value="user_confirmed">Confirmed</option>
+                            <option value="user_restored">Restored</option>
+                        </select>
+                        <select id="dedupe-filter-reason" class="governance-select" aria-label="Filter by reason">
+                            <option value="">All Reasons</option>
+                            <option value="event_id">Event ID Match</option>
+                            <option value="session_key">Session Key Match</option>
+                            <option value="correlation_key">Correlation Key</option>
+                            <option value="cross_source_key">Cross-Source Match</option>
+                            <option value="db_constraint">DB Constraint</option>
+                        </select>
+                        <select id="dedupe-filter-source" class="governance-select" aria-label="Filter by source">
+                            <option value="">All Sources</option>
+                            <option value="tautulli">Tautulli</option>
+                            <option value="plex">Plex</option>
+                            <option value="jellyfin">Jellyfin</option>
+                            <option value="emby">Emby</option>
+                        </select>
+                    </div>
+
+                    <!-- Audit Log Table -->
+                    <div class="dedupe-table-container">
+                        <table class="governance-table" id="dedupe-audit-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>User</th>
+                                    <th>Source</th>
+                                    <th>Reason</th>
+                                    <th>Layer</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dedupe-audit-tbody">
+                                <tr><td colspan="7" class="table-loading">Loading audit entries...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
