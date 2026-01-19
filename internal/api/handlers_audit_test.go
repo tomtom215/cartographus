@@ -25,12 +25,12 @@ import (
 // =============================================================================
 
 type mockAuditStore struct {
-	events    []audit.Event
-	stats     *audit.Stats
-	queryErr  error
-	countErr  error
-	getErr    error
-	statsErr  error
+	events   []audit.Event
+	stats    *audit.Stats
+	queryErr error
+	countErr error
+	getErr   error
+	statsErr error
 }
 
 func (m *mockAuditStore) Query(_ context.Context, _ audit.QueryFilter) ([]audit.Event, error) {
@@ -349,8 +349,8 @@ func TestAuditGetStats_Success(t *testing.T) {
 
 	store := &mockAuditStore{
 		stats: &audit.Stats{
-			TotalEvents:     100,
-			EventsByType:    map[string]int64{string(audit.EventTypeAuthSuccess): 50, string(audit.EventTypeAuthFailure): 50},
+			TotalEvents:      100,
+			EventsByType:     map[string]int64{string(audit.EventTypeAuthSuccess): 50, string(audit.EventTypeAuthFailure): 50},
 			EventsBySeverity: map[string]int64{string(audit.SeverityInfo): 80, string(audit.SeverityWarning): 20},
 		},
 	}

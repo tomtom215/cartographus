@@ -22,13 +22,13 @@ import (
 // =============================================================================
 
 type mockDLQStore struct {
-	entries          []DLQEntryInternal
-	stats            DLQStatsInternal
-	maxRetries       int
-	retryErr         error
-	retryAllErr      error
-	retryAllCount    int
-	cleanupCount     int
+	entries       []DLQEntryInternal
+	stats         DLQStatsInternal
+	maxRetries    int
+	retryErr      error
+	retryAllErr   error
+	retryAllCount int
+	cleanupCount  int
 }
 
 func (m *mockDLQStore) ListEntries() []DLQEntryInternal {
@@ -240,23 +240,23 @@ func TestDLQListEntries_WithFilters(t *testing.T) {
 	store := &mockDLQStore{
 		entries: []DLQEntryInternal{
 			{
-				EventID:    "evt-001",
-				Category:   "database",
-				RetryCount: 0,
+				EventID:      "evt-001",
+				Category:     "database",
+				RetryCount:   0,
 				FirstFailure: now,
 				LastFailure:  now,
 			},
 			{
-				EventID:    "evt-002",
-				Category:   "timeout",
-				RetryCount: 3,
+				EventID:      "evt-002",
+				Category:     "timeout",
+				RetryCount:   3,
 				FirstFailure: now,
 				LastFailure:  now,
 			},
 			{
-				EventID:    "evt-003",
-				Category:   "database",
-				RetryCount: 5, // At max retries
+				EventID:      "evt-003",
+				Category:     "database",
+				RetryCount:   5, // At max retries
 				FirstFailure: now,
 				LastFailure:  now,
 			},

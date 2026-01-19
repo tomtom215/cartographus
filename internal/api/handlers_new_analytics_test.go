@@ -898,8 +898,8 @@ func TestAnalyticsHDR_WithDB_Filters(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name   string
-		query  string
+		name  string
+		query string
 	}{
 		{"with_days", "days=30"},
 		{"with_users", "users=user1,user2"},

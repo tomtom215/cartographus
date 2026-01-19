@@ -580,8 +580,8 @@ func TestExportGeoJSON_WithDB_ValidFilters(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name   string
-		query  string
+		name  string
+		query string
 	}{
 		{"with_date_range", "start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z"},
 		{"with_users", "users=user1,user2"},
@@ -647,8 +647,8 @@ func TestExportGeoParquet_WithDB_ValidFilters(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name   string
-		query  string
+		name  string
+		query string
 	}{
 		{"with_date_range", "start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z"},
 		{"with_users", "users=user1,user2,user3"},
