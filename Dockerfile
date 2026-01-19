@@ -89,7 +89,7 @@ RUN if [ "$USE_PREBUILT_FRONTEND" != "true" ]; then \
 # Stage 2: Build backend with CROSS-COMPILATION (10-20x faster for ARM64)
 # Uses build platform (AMD64) to compile for target platform (ARM64)
 # This avoids slow QEMU emulation for Go compilation
-FROM --platform=$BUILDPLATFORM golang:1.25.5-trixie AS backend-builder
+FROM --platform=$BUILDPLATFORM golang:1.26rc2-trixie AS backend-builder
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
