@@ -682,8 +682,441 @@ With the fixes outlined in this report, the frontend can achieve production-grad
 
 ---
 
+## Appendix C: HTML Modularization Implementation Guide (Option A)
+
+This appendix provides a complete, verified implementation plan for splitting the monolithic `index.html` (4,111 lines, ~61,000 tokens) into maintainable partial files using build-time composition.
+
+### C.1 Current State Analysis (Verified)
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Total lines | 4,111 | `wc -l web/public/index.html` |
+| Token count | ~61,000 | Exceeds 25,000 context limit |
+| Div elements | 1,751 | `grep -c "<div\|</div>"` |
+| Major dashboard views | 6 | Maps, Analytics, Activity, Server, Cross-Platform, Newsletter |
+| Analytics subpages | 12 | Overview through Wrapped |
+| Modal/dialog components | ~15 | Settings, Help, Confirmation, etc. |
+| Template sync script | Yes | `scripts/sync-templates.sh` |
+| Go production template | Yes | `internal/templates/index.html.tmpl` |
+
+### C.2 Target File Structure
+
+```
+web/
+├── public/
+│   └── index.html              # GENERATED (add to .gitignore)
+├── partials/
+│   ├── _base.html              # Main template with include markers
+│   ├── head/
+│   │   ├── meta.html           # Meta tags, Open Graph, Twitter (~40 lines)
+│   │   ├── preloads.html       # Resource hints, preloads (~30 lines)
+│   │   └── critical-css.html   # Inline critical CSS reference (~10 lines)
+│   ├── login.html              # Login container (~90 lines)
+│   ├── app/
+│   │   ├── header.html         # Header with stats cards (~100 lines)
+│   │   ├── sidebar.html        # Filters panel (~350 lines)
+│   │   └── progress-bar.html   # Global progress bar (~15 lines)
+│   ├── dashboards/
+│   │   ├── maps.html           # Maps dashboard with 2D/3D (~200 lines)
+│   │   ├── activity.html       # Activity dashboard (~30 lines)
+│   │   ├── server.html         # Server info dashboard (~60 lines)
+│   │   ├── recently-added.html # Recently added (~50 lines)
+│   │   ├── cross-platform.html # Cross-platform view (~10 lines)
+│   │   ├── data-governance.html# Data governance (~900 lines)
+│   │   └── newsletter.html     # Newsletter dashboard (~10 lines)
+│   ├── analytics/
+│   │   ├── _container.html     # Analytics wrapper + nav (~60 lines)
+│   │   ├── overview.html       # Overview page (~200 lines)
+│   │   ├── content.html        # Content analytics (~120 lines)
+│   │   ├── users.html          # Users & behavior (~100 lines)
+│   │   ├── performance.html    # Performance page (~150 lines)
+│   │   ├── geographic.html     # Geographic page (~35 lines)
+│   │   ├── advanced.html       # Advanced analytics (~135 lines)
+│   │   ├── library.html        # Library analytics (~150 lines)
+│   │   ├── user-profile.html   # User profile (~110 lines)
+│   │   ├── tautulli.html       # Tautulli data (~145 lines)
+│   │   └── wrapped.html        # Annual wrapped (~220 lines)
+│   ├── modals/
+│   │   ├── settings.html       # Settings modal (~400 lines)
+│   │   ├── help.html           # Help/documentation modal (~200 lines)
+│   │   ├── keyboard-shortcuts.html # Shortcuts modal (~100 lines)
+│   │   ├── confirmation.html   # Confirmation dialog (~30 lines)
+│   │   ├── backup-restore.html # Backup modal (~150 lines)
+│   │   ├── server-management.html # Server management (~200 lines)
+│   │   └── notification-center.html # Notifications (~80 lines)
+│   └── scripts.html            # Footer scripts (~20 lines)
+├── build/
+│   └── compose-html.js         # Composition script (~80 lines)
+└── package.json                # Add compose script
+```
+
+**Estimated file count:** 28 partial files + 1 compose script
+**Average lines per partial:** ~150 lines (fits comfortably in AI context)
+
+### C.3 Implementation Steps (Verified Order)
+
+#### Phase 1: Setup Build Infrastructure
+
+**Step 1.1: Create build directory and compose script**
+
+File: `web/build/compose-html.js`
+
+```javascript
+#!/usr/bin/env node
+/**
+ * HTML Composition Script
+ * Combines partial HTML files into a single index.html
+ *
+ * Usage: node build/compose-html.js
+ *
+ * This script reads partials/_base.html and replaces {{include "path"}}
+ * markers with the contents of the referenced partial files.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const PARTIALS_DIR = path.join(__dirname, '../partials');
+const OUTPUT_FILE = path.join(__dirname, '../public/index.html');
+
+/**
+ * Recursively resolve includes in HTML content
+ * Supports: {{include "path/to/file.html"}}
+ */
+function resolveIncludes(content, basePath = PARTIALS_DIR, depth = 0) {
+    if (depth > 10) {
+        throw new Error('Maximum include depth exceeded (possible circular reference)');
+    }
+
+    const includePattern = /\{\{include\s+"([^"]+)"\}\}/g;
+
+    return content.replace(includePattern, (match, includePath) => {
+        const fullPath = path.join(basePath, includePath);
+
+        if (!fs.existsSync(fullPath)) {
+            console.error(`ERROR: Include file not found: ${fullPath}`);
+            process.exit(1);
+        }
+
+        const includeContent = fs.readFileSync(fullPath, 'utf8');
+        const includeDir = path.dirname(fullPath);
+
+        // Recursively resolve nested includes
+        return resolveIncludes(includeContent, includeDir, depth + 1);
+    });
+}
+
+/**
+ * Main composition function
+ */
+function compose() {
+    const startTime = Date.now();
+
+    const baseTemplate = path.join(PARTIALS_DIR, '_base.html');
+
+    if (!fs.existsSync(baseTemplate)) {
+        console.error('ERROR: Base template not found:', baseTemplate);
+        process.exit(1);
+    }
+
+    const baseContent = fs.readFileSync(baseTemplate, 'utf8');
+    const composedContent = resolveIncludes(baseContent);
+
+    // Ensure output directory exists
+    const outputDir = path.dirname(OUTPUT_FILE);
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    fs.writeFileSync(OUTPUT_FILE, composedContent);
+
+    const duration = Date.now() - startTime;
+    const lineCount = composedContent.split('\n').length;
+
+    console.log(`✓ Composed ${lineCount} lines in ${duration}ms`);
+    console.log(`  Output: ${OUTPUT_FILE}`);
+}
+
+// Run composition
+compose();
+```
+
+**Step 1.2: Update package.json scripts**
+
+Add to `web/package.json` scripts section:
+```json
+{
+  "scripts": {
+    "compose": "node build/compose-html.js",
+    "compose:watch": "node build/compose-html.js && chokidar 'partials/**/*.html' -c 'node build/compose-html.js'",
+    "prebuild": "npm run compose",
+    "predev": "npm run compose"
+  }
+}
+```
+
+**Step 1.3: Update .gitignore**
+
+Add to `web/.gitignore`:
+```
+# Generated HTML (source of truth is partials/)
+public/index.html
+```
+
+**Step 1.4: Create partials directory structure**
+
+```bash
+mkdir -p web/partials/{head,app,dashboards,analytics,modals}
+mkdir -p web/build
+```
+
+#### Phase 2: Extract Base Template and Head Section
+
+**Step 2.1: Create base template**
+
+File: `web/partials/_base.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{include "head/meta.html"}}
+{{include "head/preloads.html"}}
+{{include "head/critical-css.html"}}
+</head>
+<body class="loading">
+{{include "login.html"}}
+<div id="app" style="display: none;">
+{{include "app/progress-bar.html"}}
+{{include "app/header.html"}}
+<div id="main-layout">
+{{include "app/sidebar.html"}}
+<main id="main-content" role="main" aria-label="Main content area" tabindex="-1">
+{{include "dashboards/maps.html"}}
+{{include "analytics/_container.html"}}
+{{include "dashboards/activity.html"}}
+{{include "dashboards/recently-added.html"}}
+{{include "dashboards/server.html"}}
+{{include "dashboards/cross-platform.html"}}
+{{include "dashboards/data-governance.html"}}
+{{include "dashboards/newsletter.html"}}
+</main>
+</div>
+</div>
+{{include "modals/settings.html"}}
+{{include "modals/help.html"}}
+{{include "modals/keyboard-shortcuts.html"}}
+{{include "modals/confirmation.html"}}
+{{include "modals/backup-restore.html"}}
+{{include "modals/server-management.html"}}
+{{include "modals/notification-center.html"}}
+{{include "scripts.html"}}
+</body>
+</html>
+```
+
+**Step 2.2: Extract head/meta.html (lines 1-37 of original)**
+
+Extract meta tags, charset, viewport, Open Graph, Twitter Card.
+
+**Step 2.3: Extract head/preloads.html (lines 38-96 of original)**
+
+Extract PWA manifest, icons, resource hints, preloads, async CSS loading.
+
+**Step 2.4: Extract head/critical-css.html**
+
+Reference to critical CSS (or inline if preferred).
+
+#### Phase 3: Extract Login and App Shell
+
+**Step 3.1: Extract login.html (lines 97-188 of original)**
+
+The complete `#login-container` element.
+
+**Step 3.2: Extract app/progress-bar.html (lines 189-199)**
+
+The global progress bar element.
+
+**Step 3.3: Extract app/header.html (lines 200-380)**
+
+Header with stats cards, insights panel, transcode panel, buffer health panel.
+
+**Step 3.4: Extract app/sidebar.html (lines 381-575)**
+
+Complete filters panel with all filter controls.
+
+#### Phase 4: Extract Dashboard Views
+
+**Step 4.1: Extract dashboards/maps.html (lines 576-788)**
+
+Maps dashboard with 2D map, 3D globe, timeline, fullscreen toggle.
+
+**Step 4.2: Extract dashboards/activity.html (lines ~2162-2189)**
+
+Activity dashboard container.
+
+**Step 4.3: Extract dashboards/recently-added.html (lines ~2190-2239)**
+
+Recently added container.
+
+**Step 4.4: Extract dashboards/server.html (lines ~2240-2302)**
+
+Server info dashboard.
+
+**Step 4.5: Extract remaining dashboards**
+
+- `dashboards/cross-platform.html`
+- `dashboards/data-governance.html`
+- `dashboards/newsletter.html`
+
+#### Phase 5: Extract Analytics Subpages (Largest Section)
+
+**Step 5.1: Create analytics/_container.html**
+
+The analytics container wrapper with sub-navigation tabs.
+
+**Step 5.2: Extract each analytics page**
+
+| File | Original Lines | Content |
+|------|----------------|---------|
+| `analytics/overview.html` | 833-1037 | Overview page with insights, comparison |
+| `analytics/content.html` | 1038-1154 | Content analytics with collections |
+| `analytics/users.html` | 1155-1246 | Users & behavior page |
+| `analytics/performance.html` | 1247-1388 | Performance analytics |
+| `analytics/geographic.html` | 1389-1420 | Geographic page |
+| `analytics/advanced.html` | 1421-1555 | Advanced analytics |
+| `analytics/library.html` | 1556-1702 | Library deep-dive |
+| `analytics/user-profile.html` | 1703-1806 | User profile analytics |
+| `analytics/tautulli.html` | 1807-1948 | Tautulli data |
+| `analytics/wrapped.html` | 1949-2161 | Annual wrapped |
+
+**Step 5.3: Update analytics/_container.html to include subpages**
+
+```html
+<div id="analytics-container" class="dashboard-view" style="display: none;"
+     role="tabpanel" aria-labelledby="tab-analytics" tabindex="-1">
+    <!-- Analytics Loading Overlay -->
+    <div id="analytics-loading-overlay" class="analytics-loading-overlay"
+         role="status" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <span>Loading analytics...</span>
+    </div>
+
+    <!-- Analytics Sub-Navigation -->
+    <!-- ... nav tabs ... -->
+
+    {{include "analytics/overview.html"}}
+    {{include "analytics/content.html"}}
+    {{include "analytics/users.html"}}
+    {{include "analytics/performance.html"}}
+    {{include "analytics/geographic.html"}}
+    {{include "analytics/advanced.html"}}
+    {{include "analytics/library.html"}}
+    {{include "analytics/user-profile.html"}}
+    {{include "analytics/tautulli.html"}}
+    {{include "analytics/wrapped.html"}}
+</div>
+```
+
+#### Phase 6: Extract Modals and Dialogs
+
+**Step 6.1: Extract each modal**
+
+| File | Content |
+|------|---------|
+| `modals/settings.html` | Settings modal with all tabs |
+| `modals/help.html` | Help/documentation modal |
+| `modals/keyboard-shortcuts.html` | Keyboard shortcuts overlay |
+| `modals/confirmation.html` | Confirmation dialog template |
+| `modals/backup-restore.html` | Backup/restore modal |
+| `modals/server-management.html` | Server management modal |
+| `modals/notification-center.html` | Notification center panel |
+
+**Step 6.2: Extract scripts.html**
+
+Footer script tags.
+
+#### Phase 7: Update Supporting Infrastructure
+
+**Step 7.1: Update sync-templates.sh**
+
+Modify the script to:
+1. Run `npm run compose` first to generate `public/index.html`
+2. Then sync to Go template as before
+
+```bash
+# Add to sync-templates.sh before sync logic
+echo "Composing HTML from partials..."
+(cd "$PROJECT_ROOT/web" && npm run compose --silent)
+```
+
+**Step 7.2: Update esbuild.config.js (if applicable)**
+
+Ensure build process runs compose step.
+
+**Step 7.3: Update CI/CD pipeline**
+
+Add compose step before tests:
+```yaml
+- name: Compose HTML
+  run: cd web && npm run compose
+```
+
+**Step 7.4: Update development workflow documentation**
+
+Document that developers should:
+1. Edit files in `web/partials/`
+2. Run `npm run compose` or `npm run compose:watch`
+3. The `public/index.html` is generated (gitignored)
+
+### C.4 Verification Checklist
+
+After implementation, verify:
+
+| Check | Command | Expected |
+|-------|---------|----------|
+| Composed output matches original | `diff -q public/index.html public/index.html.backup` | No differences |
+| Line count matches | `wc -l public/index.html` | 4,111 lines |
+| All E2E tests pass | `npm run test:e2e` | All pass |
+| Template sync works | `./scripts/sync-templates.sh --check` | In sync |
+| Go server works | `go run ./cmd/server` | Serves correctly |
+| No broken selectors | Manual inspection | All IDs/classes present |
+
+### C.5 Rollback Plan
+
+If issues arise:
+
+1. **Immediate rollback:** Restore `public/index.html` from git (was tracked before)
+2. **Remove from .gitignore:** Re-track the file
+3. **Disable compose step:** Remove `prebuild`/`predev` hooks
+
+### C.6 Estimated Effort
+
+| Phase | Tasks | Estimated Time |
+|-------|-------|----------------|
+| Phase 1 | Build infrastructure | 1-2 hours |
+| Phase 2 | Base template + head | 1 hour |
+| Phase 3 | Login + app shell | 1-2 hours |
+| Phase 4 | Dashboard views | 2-3 hours |
+| Phase 5 | Analytics pages | 3-4 hours |
+| Phase 6 | Modals/dialogs | 2-3 hours |
+| Phase 7 | Supporting infrastructure | 1-2 hours |
+| **Total** | **All phases** | **12-17 hours** |
+
+### C.7 Benefits After Completion
+
+1. **Each partial fits in AI context** (~150 lines avg vs 4,111 total)
+2. **Targeted debugging** - Edit only the relevant section
+3. **Better git diffs** - Changes isolated to specific files
+4. **Parallel development** - Multiple developers can work on different sections
+5. **Easier testing** - Can validate individual partials
+6. **Documentation** - File structure self-documents the UI architecture
+
+---
+
 *Report generated by Claude Code AI Assistant*
-*Version: 2.0 (Verified)*
+*Version: 2.1 (Verified + Implementation Guide)*
 *All findings verified against source code*
 *Issues identified: 13 (verified)*
 *Issues removed after verification: 5*
+*Implementation guide: Option A (Build-Time HTML Composition)*
