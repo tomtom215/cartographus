@@ -27,12 +27,12 @@
     "playwright:install": "npx playwright install"
   },
   "dependencies": {
-    "@deck.gl/aggregation-layers": "^9.2.5",
-    "@deck.gl/core": "^9.2.5",
-    "@deck.gl/geo-layers": "^9.2.5",
-    "@deck.gl/layers": "^9.2.5",
-    "@deck.gl/mapbox": "^9.2.5",
-    "@deck.gl/widgets": "^9.2.5",
+    "@deck.gl/aggregation-layers": "^9.2.6",
+    "@deck.gl/core": "^9.2.6",
+    "@deck.gl/geo-layers": "^9.2.6",
+    "@deck.gl/layers": "^9.2.6",
+    "@deck.gl/mapbox": "^9.2.6",
+    "@deck.gl/widgets": "^9.2.6",
     "echarts": "^6.0.0",
     "maplibre-gl": "^5.16.0",
     "pmtiles": "^4.3.2"
