@@ -1,0 +1,142 @@
+            <!-- Tautulli Data Analytics -->
+            <div id="analytics-tautulli" class="analytics-page" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics-tautulli" tabindex="0">
+                <h2>Tautulli Data Analytics</h2>
+                <p class="page-description">Detailed analytics from Tautulli: logins, IPs, synced items, stream types, and activity history</p>
+
+                <!-- Tautulli Sub-Tabs (Tautulli feature views) -->
+                <nav class="sub-tabs" role="tablist" aria-label="Tautulli view options" data-testid="tautulli-sub-tabs">
+                    <button class="sub-tab active" data-sub-tab="tautulli-charts" role="tab" aria-selected="true" aria-controls="tautulli-charts-panel" id="tab-tautulli-charts">
+                        Charts
+                    </button>
+                    <button class="sub-tab" data-sub-tab="metadata-deep-dive" role="tab" aria-selected="false" aria-controls="metadata-deep-dive-panel" id="tab-metadata-deep-dive">
+                        Metadata
+                    </button>
+                    <button class="sub-tab" data-sub-tab="rating-keys" role="tab" aria-selected="false" aria-controls="rating-keys-panel" id="tab-rating-keys">
+                        Rating Keys
+                    </button>
+                    <button class="sub-tab" data-sub-tab="search" role="tab" aria-selected="false" aria-controls="search-panel" id="tab-search">
+                        Search
+                    </button>
+                    <button class="sub-tab" data-sub-tab="stream-data" role="tab" aria-selected="false" aria-controls="stream-data-panel" id="tab-stream-data">
+                        Stream Data
+                    </button>
+                </nav>
+
+                <!-- Charts Tab Panel (existing content) -->
+                <div id="tautulli-charts-panel" class="sub-tab-panel active" role="tabpanel" aria-labelledby="tab-tautulli-charts" data-testid="tautulli-charts-panel">
+                <div class="chart-grid" role="region" aria-label="Tautulli analytics charts">
+                    <!-- User Login History -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">User Login History</div>
+                            <button class="chart-export" data-chart="user-logins">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-user-logins" tabindex="0" aria-label="User login history showing success and failure breakdown"></div>
+                    </div>
+
+                    <!-- User IP Addresses -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">User IP Addresses</div>
+                            <button class="chart-export" data-chart="user-ips">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-user-ips" tabindex="0" aria-label="User IP addresses showing usage patterns"></div>
+                    </div>
+
+                    <!-- Synced Items Dashboard -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Synced Items by User</div>
+                            <button class="chart-export" data-chart="synced-items">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-synced-items" tabindex="0" aria-label="Synced items showing offline download status by user"></div>
+                    </div>
+
+                    <!-- Stream Type by Platform -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Stream Type by Platform</div>
+                            <button class="chart-export" data-chart="stream-type-platform">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-stream-type-platform" tabindex="0" aria-label="Stream type breakdown by platform showing direct play vs transcode"></div>
+                    </div>
+
+                    <!-- Activity History Timeline -->
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Activity History Timeline</div>
+                            <button class="chart-export" data-chart="activity-history">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-activity-history" tabindex="0" aria-label="Activity history timeline showing recent playback activity" style="height: 350px;"></div>
+                    </div>
+
+                    <!-- Plays Per Month -->
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Plays Per Month</div>
+                            <button class="chart-export" data-chart="plays-per-month">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-plays-per-month" tabindex="0" aria-label="Monthly playback statistics by media type" style="height: 350px;"></div>
+                    </div>
+
+                    <!-- Concurrent Streams by Type -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Concurrent Streams by Type</div>
+                            <button class="chart-export" data-chart="concurrent-streams-type">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-concurrent-streams-type" tabindex="0" aria-label="Concurrent stream distribution by transcode decision"></div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Metadata Deep-Dive Tab Panel (Metadata Deep-Dive Manager) -->
+                <div id="metadata-deep-dive-panel" class="sub-tab-panel" role="tabpanel" aria-labelledby="tab-metadata-deep-dive" data-testid="metadata-deep-dive-panel" style="display: none;">
+                    <!-- Container for MetadataDeepDiveManager - renders metadata lookup and display -->
+                    <div id="metadata-deep-dive-container" data-testid="metadata-deep-dive">
+                        <!-- MetadataDeepDiveManager will render here:
+                             - Rating key input field
+                             - Metadata fetch button
+                             - Basic info, ratings, summary, credits, categories, media info sections
+                        -->
+                    </div>
+                </div>
+
+                <!-- Rating Keys Tab Panel (Rating Keys Manager) -->
+                <div id="rating-keys-panel" class="sub-tab-panel" role="tabpanel" aria-labelledby="tab-rating-keys" data-testid="rating-keys-panel" style="display: none;">
+                    <!-- Container for RatingKeysManager - tracks library changes via rating key mappings -->
+                    <!-- NOTE: data-testid="rating-keys-manager" is set by RatingKeysManager.ts when it renders -->
+                    <div id="rating-keys-container">
+                        <!-- RatingKeysManager will render here:
+                             - Rating key lookup input
+                             - New/Old rating key toggle
+                             - Results table with mappings
+                        -->
+                    </div>
+                </div>
+
+                <!-- Search Tab Panel (Search Manager) -->
+                <div id="search-panel" class="sub-tab-panel" role="tabpanel" aria-labelledby="tab-search" data-testid="search-panel" style="display: none;">
+                    <!-- Container for SearchManager - media library search with fuzzy matching -->
+                    <div id="search-container" data-testid="search-manager">
+                        <!-- SearchManager will render here:
+                             - Search input with debouncing
+                             - Media type filter
+                             - Results grid with thumbnails
+                        -->
+                    </div>
+                </div>
+
+                <!-- Stream Data Tab Panel (Stream Data Manager) -->
+                <div id="stream-data-panel" class="sub-tab-panel" role="tabpanel" aria-labelledby="tab-stream-data" data-testid="stream-data-panel" style="display: none;">
+                    <!-- Container for StreamDataManager - detailed stream information -->
+                    <div id="stream-data-container" data-testid="stream-data-manager">
+                        <!-- StreamDataManager will render here:
+                             - Session/Row ID input
+                             - Video/Audio codec details
+                             - Resolution, bitrate, transcode info
+                        -->
+                    </div>
+                </div>
+            </div>
+

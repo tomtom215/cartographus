@@ -1,0 +1,168 @@
+                <!-- Health Page -->
+                <div id="governance-health-page" class="governance-page" data-page="health" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>System Health Overview</h3>
+                        <div class="governance-actions">
+                            <button type="button" class="btn-governance" id="health-refresh-btn" aria-label="Refresh health status">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Overall Health Status -->
+                    <div class="health-overview-card" id="health-overview-card">
+                        <div class="health-status-indicator" id="health-status-indicator">
+                            <div class="health-status-icon healthy">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <div class="health-status-text">
+                                <span class="health-status-label" id="health-status-label">System Status</span>
+                                <span class="health-status-value" id="health-status-value">--</span>
+                            </div>
+                        </div>
+                        <div class="health-meta">
+                            <div class="health-meta-item">
+                                <span class="meta-label">Version:</span>
+                                <span class="meta-value" id="health-version">--</span>
+                            </div>
+                            <div class="health-meta-item">
+                                <span class="meta-label">Uptime:</span>
+                                <span class="meta-value" id="health-uptime">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Component Health Grid -->
+                    <div class="health-components-grid">
+                        <div class="health-component-card" id="health-database">
+                            <div class="component-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                                </svg>
+                            </div>
+                            <div class="component-details">
+                                <span class="component-name">Database (DuckDB)</span>
+                                <span class="component-status" id="health-db-status">--</span>
+                            </div>
+                            <div class="component-indicator" id="health-db-indicator"></div>
+                        </div>
+
+                        <div class="health-component-card" id="health-tautulli">
+                            <div class="component-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                            </div>
+                            <div class="component-details">
+                                <span class="component-name">Tautulli</span>
+                                <span class="component-status" id="health-tautulli-status">--</span>
+                            </div>
+                            <div class="component-indicator" id="health-tautulli-indicator"></div>
+                        </div>
+
+                        <div class="health-component-card" id="health-nats">
+                            <div class="component-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                </svg>
+                            </div>
+                            <div class="component-details">
+                                <span class="component-name">NATS JetStream</span>
+                                <span class="component-status" id="health-nats-status">--</span>
+                            </div>
+                            <div class="component-indicator" id="health-nats-indicator"></div>
+                        </div>
+
+                        <div class="health-component-card" id="health-wal">
+                            <div class="component-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                </svg>
+                            </div>
+                            <div class="component-details">
+                                <span class="component-name">Write-Ahead Log</span>
+                                <span class="component-status" id="health-wal-status">--</span>
+                            </div>
+                            <div class="component-indicator" id="health-wal-indicator"></div>
+                        </div>
+
+                        <div class="health-component-card" id="health-websocket">
+                            <div class="component-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14"/>
+                                    <path d="M12 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            <div class="component-details">
+                                <span class="component-name">WebSocket Hub</span>
+                                <span class="component-status" id="health-ws-status">--</span>
+                            </div>
+                            <div class="component-indicator" id="health-ws-indicator"></div>
+                        </div>
+
+                        <div class="health-component-card" id="health-detection">
+                            <div class="component-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            </div>
+                            <div class="component-details">
+                                <span class="component-name">Detection Engine</span>
+                                <span class="component-status" id="health-detection-status">--</span>
+                            </div>
+                            <div class="component-indicator" id="health-detection-indicator"></div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Health Events -->
+                    <div class="governance-section">
+                        <h4>Last Sync Times</h4>
+                        <div class="health-sync-times" id="health-sync-times">
+                            <div class="sync-time-item">
+                                <span class="sync-source">Last Data Sync:</span>
+                                <span class="sync-time" id="health-last-sync">--</span>
+                            </div>
+                            <div class="sync-time-item">
+                                <span class="sync-source">Last Backup:</span>
+                                <span class="sync-time" id="health-last-backup">--</span>
+                            </div>
+                            <div class="sync-time-item">
+                                <span class="sync-source">Last Detection Run:</span>
+                                <span class="sync-time" id="health-last-detection">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connected Media Servers -->
+                    <div class="governance-section">
+                        <div class="governance-section-header" style="margin-bottom: 1rem;">
+                            <h4 style="margin: 0;">Connected Media Servers</h4>
+                            <div class="health-servers-summary">
+                                <span class="server-count-badge connected" title="Connected">
+                                    <span id="health-servers-connected">0</span> connected
+                                </span>
+                                <span class="server-count-badge error" title="Errors" id="health-servers-error-badge" style="display: none;">
+                                    <span id="health-servers-error">0</span> errors
+                                </span>
+                            </div>
+                        </div>
+                        <div class="health-servers-grid" id="health-servers-grid">
+                            <div class="health-servers-loading">Loading servers...</div>
+                        </div>
+                    </div>
+                </div>
+

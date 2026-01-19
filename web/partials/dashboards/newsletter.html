@@ -1,0 +1,261 @@
+            <!-- Newsletter Management Container -->
+            <div id="newsletter-container" class="dashboard-view" style="display: none;" role="tabpanel" aria-labelledby="tab-newsletter" tabindex="-1">
+                <!-- Newsletter Navigation -->
+                <nav class="newsletter-nav" role="tablist" aria-label="Newsletter sections">
+                    <button class="newsletter-nav-tab active" data-newsletter-page="overview" role="tab" aria-selected="true">Overview</button>
+                    <button class="newsletter-nav-tab" data-newsletter-page="templates" role="tab" aria-selected="false">Templates</button>
+                    <button class="newsletter-nav-tab" data-newsletter-page="schedules" role="tab" aria-selected="false">Schedules</button>
+                    <button class="newsletter-nav-tab" data-newsletter-page="deliveries" role="tab" aria-selected="false">Delivery History</button>
+                </nav>
+
+                <!-- Newsletter Overview Page -->
+                <div id="newsletter-overview-page" class="newsletter-page" data-page="overview">
+                    <div class="newsletter-section-header">
+                        <h2>Newsletter Overview</h2>
+                        <div class="newsletter-actions">
+                            <button id="newsletter-overview-refresh-btn" class="btn btn-secondary" title="Refresh">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="newsletter-stats-grid">
+                        <div class="newsletter-stat-card">
+                            <div class="stat-value" id="newsletter-total-templates">--</div>
+                            <div class="stat-label">Total Templates</div>
+                            <div class="stat-sub" id="newsletter-active-templates">-- active</div>
+                        </div>
+                        <div class="newsletter-stat-card">
+                            <div class="stat-value" id="newsletter-total-schedules">--</div>
+                            <div class="stat-label">Total Schedules</div>
+                            <div class="stat-sub" id="newsletter-enabled-schedules">-- enabled</div>
+                        </div>
+                        <div class="newsletter-stat-card">
+                            <div class="stat-value" id="newsletter-total-deliveries">--</div>
+                            <div class="stat-label">Total Deliveries</div>
+                            <div class="stat-sub" id="newsletter-success-rate">--%</div>
+                        </div>
+                        <div class="newsletter-stat-card success">
+                            <div class="stat-value" id="newsletter-successful-deliveries">--</div>
+                            <div class="stat-label">Successful</div>
+                        </div>
+                        <div class="newsletter-stat-card error">
+                            <div class="stat-value" id="newsletter-failed-deliveries">--</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                        <div class="newsletter-stat-card">
+                            <div class="stat-value" id="newsletter-last-7-days">--</div>
+                            <div class="stat-label">Last 7 Days</div>
+                            <div class="stat-sub" id="newsletter-last-30-days">-- last 30 days</div>
+                        </div>
+                    </div>
+
+                    <!-- Channel Distribution -->
+                    <div class="newsletter-section">
+                        <h3>Deliveries by Channel</h3>
+                        <div id="newsletter-channel-distribution" class="channel-distribution">
+                            <p class="empty-state">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Recent Deliveries -->
+                    <div class="newsletter-section">
+                        <h3>Recent Deliveries</h3>
+                        <table class="newsletter-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Schedule</th>
+                                    <th>Channel</th>
+                                    <th>Recipients</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="newsletter-recent-deliveries-tbody">
+                                <tr><td colspan="6" class="table-loading">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Newsletter Templates Page -->
+                <div id="newsletter-templates-page" class="newsletter-page" data-page="templates" style="display: none;">
+                    <div class="newsletter-section-header">
+                        <h2>Newsletter Templates</h2>
+                        <div class="newsletter-actions">
+                            <button id="newsletter-templates-refresh-btn" class="btn btn-secondary" title="Refresh">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                            </button>
+                            <button id="newsletter-templates-create-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                Create Template
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="newsletter-filters">
+                        <select id="newsletter-templates-type-filter" class="newsletter-select" aria-label="Filter by type">
+                            <option value="">All Types</option>
+                            <option value="recently_added">Recently Added</option>
+                            <option value="coming_soon">Coming Soon</option>
+                            <option value="weekly_digest">Weekly Digest</option>
+                            <option value="monthly_recap">Monthly Recap</option>
+                            <option value="watchlist_updates">Watchlist Updates</option>
+                            <option value="trending_content">Trending Content</option>
+                            <option value="personalized_recommendations">Personalized</option>
+                        </select>
+                        <select id="newsletter-templates-active-filter" class="newsletter-select" aria-label="Filter by status">
+                            <option value="">All Status</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                        <input type="search" id="newsletter-templates-search" class="newsletter-search" placeholder="Search templates..." aria-label="Search templates">
+                    </div>
+
+                    <!-- Templates Table -->
+                    <table class="newsletter-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Subject</th>
+                                <th>Version</th>
+                                <th>Status</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="newsletter-templates-tbody">
+                            <tr><td colspan="7" class="table-loading">Loading templates...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Newsletter Schedules Page -->
+                <div id="newsletter-schedules-page" class="newsletter-page" data-page="schedules" style="display: none;">
+                    <div class="newsletter-section-header">
+                        <h2>Newsletter Schedules</h2>
+                        <div class="newsletter-actions">
+                            <button id="newsletter-schedules-refresh-btn" class="btn btn-secondary" title="Refresh">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                            </button>
+                            <button id="newsletter-schedules-create-btn" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                Create Schedule
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="newsletter-filters">
+                        <select id="newsletter-schedules-enabled-filter" class="newsletter-select" aria-label="Filter by enabled status">
+                            <option value="">All Schedules</option>
+                            <option value="true">Enabled</option>
+                            <option value="false">Disabled</option>
+                        </select>
+                    </div>
+
+                    <!-- Schedules Table -->
+                    <table class="newsletter-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Template</th>
+                                <th>Schedule</th>
+                                <th>Channels</th>
+                                <th>Recipients</th>
+                                <th>Enabled</th>
+                                <th>Last Run</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="newsletter-schedules-tbody">
+                            <tr><td colspan="8" class="table-loading">Loading schedules...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Newsletter Deliveries Page -->
+                <div id="newsletter-deliveries-page" class="newsletter-page" data-page="deliveries" style="display: none;">
+                    <div class="newsletter-section-header">
+                        <h2>Delivery History</h2>
+                        <div class="newsletter-actions">
+                            <button id="newsletter-deliveries-refresh-btn" class="btn btn-secondary" title="Refresh">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="newsletter-filters">
+                        <select id="newsletter-deliveries-status-filter" class="newsletter-select" aria-label="Filter by status">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="sending">Sending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="failed">Failed</option>
+                            <option value="partial">Partial</option>
+                            <option value="canceled">Canceled</option>
+                        </select>
+                        <select id="newsletter-deliveries-channel-filter" class="newsletter-select" aria-label="Filter by channel">
+                            <option value="">All Channels</option>
+                            <option value="email">Email</option>
+                            <option value="discord">Discord</option>
+                            <option value="slack">Slack</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="webhook">Webhook</option>
+                            <option value="in_app">In-App</option>
+                        </select>
+                    </div>
+
+                    <!-- Deliveries Table -->
+                    <table class="newsletter-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Schedule / Template</th>
+                                <th>Channel</th>
+                                <th>Status</th>
+                                <th>Recipients</th>
+                                <th>Duration</th>
+                                <th>Content</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="newsletter-deliveries-tbody">
+                            <tr><td colspan="8" class="table-loading">Loading deliveries...</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination -->
+                    <div class="newsletter-pagination">
+                        <button id="newsletter-deliveries-prev-btn" class="btn btn-secondary" disabled>Previous</button>
+                        <span id="newsletter-deliveries-page-info">Page 1</span>
+                        <button id="newsletter-deliveries-next-btn" class="btn btn-secondary">Next</button>
+                    </div>
+                </div>
+            </div>
+

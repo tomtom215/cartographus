@@ -1,0 +1,45 @@
+        <!-- Analytics Dashboard Container -->
+        <div id="analytics-container" class="dashboard-view" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics" tabindex="-1">
+            <!-- Analytics Loading Overlay -->
+            <div id="analytics-loading-overlay" class="analytics-loading-overlay" role="status" aria-live="polite">
+                <div class="analytics-loading-spinner"></div>
+                <div class="analytics-loading-text">Loading analytics...</div>
+            </div>
+
+            <!-- Analytics Sub-Navigation (wrapped for scroll indicators) -->
+            <div class="analytics-nav-wrapper" id="analytics-nav-wrapper">
+                <nav id="analytics-nav" role="tablist" aria-label="Analytics sections">
+                    <button class="analytics-tab active" data-analytics-page="overview" role="tab" aria-selected="true" aria-controls="analytics-overview" tabindex="0" id="tab-analytics-overview">
+                        Overview
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="content" role="tab" aria-selected="false" aria-controls="analytics-content" tabindex="-1" id="tab-analytics-content">
+                        Content
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="users" role="tab" aria-selected="false" aria-controls="analytics-users" tabindex="-1" id="tab-analytics-users">
+                        Users
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="performance" role="tab" aria-selected="false" aria-controls="analytics-performance" tabindex="-1" id="tab-analytics-performance">
+                        Performance
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="geographic" role="tab" aria-selected="false" aria-controls="analytics-geographic" tabindex="-1" id="tab-analytics-geographic">
+                        Geographic
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="advanced" role="tab" aria-selected="false" aria-controls="analytics-advanced" tabindex="-1" id="tab-analytics-advanced">
+                        Advanced
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="library" role="tab" aria-selected="false" aria-controls="analytics-library" tabindex="-1" id="tab-analytics-library">
+                        Library
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="users-profile" role="tab" aria-selected="false" aria-controls="analytics-users-profile" tabindex="-1" id="tab-analytics-users-profile">
+                        User Profile
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="tautulli" role="tab" aria-selected="false" aria-controls="analytics-tautulli" tabindex="-1" id="tab-analytics-tautulli">
+                        Tautulli Data
+                    </button>
+                    <button class="analytics-tab" data-analytics-page="wrapped" role="tab" aria-selected="false" aria-controls="analytics-wrapped" tabindex="-1" id="tab-analytics-wrapped">
+                        Wrapped
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Overview Page -->

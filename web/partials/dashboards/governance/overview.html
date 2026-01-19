@@ -1,0 +1,103 @@
+                <!-- Overview Page -->
+                <div id="governance-overview-page" class="governance-page" data-page="overview">
+                    <div class="governance-overview-grid">
+                        <!-- Key Metrics Cards -->
+                        <div class="governance-metrics-row">
+                            <div class="governance-metric-card" data-metric="total-events">
+                                <div class="metric-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 20V10"/>
+                                        <path d="M18 20V4"/>
+                                        <path d="M6 20v-4"/>
+                                    </svg>
+                                </div>
+                                <div class="metric-content">
+                                    <div class="metric-value" id="governance-total-events">--</div>
+                                    <div class="metric-label">Total Events</div>
+                                </div>
+                            </div>
+                            <div class="governance-metric-card" data-metric="dedupe-rate">
+                                <div class="metric-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="8.5" cy="7" r="4"/>
+                                        <path d="M20 8v6"/>
+                                        <path d="M23 11h-6"/>
+                                    </svg>
+                                </div>
+                                <div class="metric-content">
+                                    <div class="metric-value" id="governance-dedupe-rate">--</div>
+                                    <div class="metric-label">Dedupe Rate</div>
+                                </div>
+                            </div>
+                            <div class="governance-metric-card" data-metric="detection-alerts">
+                                <div class="metric-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                        <line x1="12" y1="9" x2="12" y2="13"/>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                    </svg>
+                                </div>
+                                <div class="metric-content">
+                                    <div class="metric-value" id="governance-alerts-count">--</div>
+                                    <div class="metric-label">Active Alerts</div>
+                                </div>
+                            </div>
+                            <div class="governance-metric-card" data-metric="sync-health">
+                                <div class="metric-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 4 23 10 17 10"/>
+                                        <polyline points="1 20 1 14 7 14"/>
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                                    </svg>
+                                </div>
+                                <div class="metric-content">
+                                    <div class="metric-value" id="governance-sync-status">--</div>
+                                    <div class="metric-label">Sync Health</div>
+                                </div>
+                            </div>
+                            <div class="governance-metric-card" data-metric="failed-events">
+                                <div class="metric-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="15" y1="9" x2="9" y2="15"/>
+                                        <line x1="9" y1="9" x2="15" y2="15"/>
+                                    </svg>
+                                </div>
+                                <div class="metric-content">
+                                    <div class="metric-value" id="governance-failed-count">--</div>
+                                    <div class="metric-label">Failed Events</div>
+                                </div>
+                            </div>
+                            <div class="governance-metric-card" data-metric="data-freshness">
+                                <div class="metric-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                </div>
+                                <div class="metric-content">
+                                    <div class="metric-value" id="governance-data-freshness">--</div>
+                                    <div class="metric-label">Data Freshness</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity Timeline -->
+                        <div class="governance-section">
+                            <h3 class="governance-section-title">Recent Data Activity</h3>
+                            <div class="governance-timeline" id="governance-activity-timeline">
+                                <div class="timeline-loading">Loading activity...</div>
+                            </div>
+                        </div>
+
+                        <!-- Data Sources Health -->
+                        <div class="governance-section">
+                            <h3 class="governance-section-title">Data Sources</h3>
+                            <div class="governance-sources-grid" id="governance-sources">
+                                <div class="source-loading">Loading sources...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+

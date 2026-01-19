@@ -1,0 +1,173 @@
+                <!-- Backups Page -->
+                <div id="governance-backups-page" class="governance-page" data-page="backups" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>Backup History &amp; Management</h3>
+                        <div class="governance-actions">
+                            <button type="button" class="btn-governance" id="backups-refresh-btn" aria-label="Refresh backup list">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                            <button type="button" class="btn-governance btn-primary" id="backups-create-btn" aria-label="Create new backup">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                Create Backup
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Backup Statistics -->
+                    <div class="backup-stats-grid" id="backup-stats-grid">
+                        <div class="backup-stat-card">
+                            <div class="stat-value" id="backup-total-count">--</div>
+                            <div class="stat-label">Total Backups</div>
+                        </div>
+                        <div class="backup-stat-card">
+                            <div class="stat-value" id="backup-total-size">--</div>
+                            <div class="stat-label">Total Size</div>
+                        </div>
+                        <div class="backup-stat-card">
+                            <div class="stat-value" id="backup-full-count">--</div>
+                            <div class="stat-label">Full Backups</div>
+                        </div>
+                        <div class="backup-stat-card">
+                            <div class="stat-value" id="backup-db-count">--</div>
+                            <div class="stat-label">DB Backups</div>
+                        </div>
+                        <div class="backup-stat-card">
+                            <div class="stat-value" id="backup-config-count">--</div>
+                            <div class="stat-label">Config Backups</div>
+                        </div>
+                        <div class="backup-stat-card">
+                            <div class="stat-value" id="backup-last-backup">--</div>
+                            <div class="stat-label">Last Backup</div>
+                        </div>
+                    </div>
+
+                    <!-- Backup Schedule Configuration -->
+                    <div class="governance-section backup-schedule-section">
+                        <h4>Automatic Backup Schedule</h4>
+                        <div class="schedule-config-container">
+                            <div class="schedule-status">
+                                <div class="schedule-toggle">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="schedule-enabled" aria-label="Enable scheduled backups">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label">Enable Scheduled Backups</span>
+                                </div>
+                                <div class="schedule-next" id="schedule-next-backup">
+                                    <span class="next-label">Next backup:</span>
+                                    <span class="next-value" id="schedule-next-value">--</span>
+                                </div>
+                            </div>
+                            <div class="schedule-config-grid" id="schedule-config-grid">
+                                <div class="schedule-config-item">
+                                    <label for="schedule-interval">Backup Interval</label>
+                                    <select id="schedule-interval" class="governance-select">
+                                        <option value="1">Every hour</option>
+                                        <option value="6">Every 6 hours</option>
+                                        <option value="12">Every 12 hours</option>
+                                        <option value="24" selected>Daily</option>
+                                        <option value="168">Weekly</option>
+                                    </select>
+                                </div>
+                                <div class="schedule-config-item">
+                                    <label for="schedule-preferred-hour">Preferred Time (Hour)</label>
+                                    <select id="schedule-preferred-hour" class="governance-select">
+                                        <option value="0">12:00 AM</option>
+                                        <option value="1">1:00 AM</option>
+                                        <option value="2" selected>2:00 AM</option>
+                                        <option value="3">3:00 AM</option>
+                                        <option value="4">4:00 AM</option>
+                                        <option value="5">5:00 AM</option>
+                                        <option value="6">6:00 AM</option>
+                                        <option value="12">12:00 PM</option>
+                                        <option value="18">6:00 PM</option>
+                                        <option value="22">10:00 PM</option>
+                                        <option value="23">11:00 PM</option>
+                                    </select>
+                                </div>
+                                <div class="schedule-config-item">
+                                    <label for="schedule-backup-type">Backup Type</label>
+                                    <select id="schedule-backup-type" class="governance-select">
+                                        <option value="full" selected>Full Backup</option>
+                                        <option value="database">Database Only</option>
+                                        <option value="config">Config Only</option>
+                                    </select>
+                                </div>
+                                <div class="schedule-config-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="schedule-pre-sync" aria-label="Create backup before sync">
+                                        <span>Backup before sync</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="schedule-actions">
+                                <button type="button" class="btn-governance btn-small btn-primary" id="schedule-save-btn">Save Schedule</button>
+                                <button type="button" class="btn-governance btn-small" id="schedule-trigger-btn">Run Backup Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Retention Policy Info -->
+                    <div class="governance-section backup-retention-section">
+                        <h4>Retention Policy</h4>
+                        <div class="retention-policy-grid" id="retention-policy-grid">
+                            <div class="retention-item">
+                                <span class="retention-label">Min Keep:</span>
+                                <span class="retention-value" id="retention-min-count">--</span>
+                            </div>
+                            <div class="retention-item">
+                                <span class="retention-label">Max Keep:</span>
+                                <span class="retention-value" id="retention-max-count">--</span>
+                            </div>
+                            <div class="retention-item">
+                                <span class="retention-label">Max Age:</span>
+                                <span class="retention-value" id="retention-max-age">--</span>
+                            </div>
+                            <div class="retention-item">
+                                <span class="retention-label">Keep Daily:</span>
+                                <span class="retention-value" id="retention-daily">--</span>
+                            </div>
+                            <div class="retention-item">
+                                <span class="retention-label">Keep Weekly:</span>
+                                <span class="retention-value" id="retention-weekly">--</span>
+                            </div>
+                            <div class="retention-item">
+                                <span class="retention-label">Keep Monthly:</span>
+                                <span class="retention-value" id="retention-monthly">--</span>
+                            </div>
+                        </div>
+                        <div class="retention-actions">
+                            <button type="button" class="btn-governance btn-small" id="retention-preview-btn">Preview Cleanup</button>
+                            <button type="button" class="btn-governance btn-danger btn-small" id="retention-apply-btn">Apply Retention</button>
+                        </div>
+                    </div>
+
+                    <!-- Backup List Table -->
+                    <div class="backup-table-container">
+                        <table class="governance-table" id="backup-list-table">
+                            <thead>
+                                <tr>
+                                    <th>Created</th>
+                                    <th>Type</th>
+                                    <th>Filename</th>
+                                    <th>Size</th>
+                                    <th>Records</th>
+                                    <th>Valid</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="backup-list-tbody">
+                                <tr><td colspan="8" class="table-loading">Loading backups...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+

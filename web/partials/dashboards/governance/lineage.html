@@ -1,0 +1,40 @@
+                <!-- Data Lineage Page -->
+                <div id="governance-lineage-page" class="governance-page" data-page="lineage" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>Data Lineage &amp; Audit Trail</h3>
+                    </div>
+
+                    <!-- Event Lookup -->
+                    <div class="lineage-lookup">
+                        <label for="lineage-event-id" class="governance-label">Look up event by ID:</label>
+                        <div class="lineage-search">
+                            <input type="text" id="lineage-event-id" class="governance-input" placeholder="Enter event ID...">
+                            <button type="button" class="btn-governance" id="lineage-lookup-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                Trace
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lineage Results -->
+                    <div class="lineage-results" id="lineage-results" style="display: none;">
+                        <div class="lineage-event-info" id="lineage-event-info">
+                            <!-- Event details will be populated here -->
+                        </div>
+                        <div class="lineage-timeline" id="lineage-timeline">
+                            <!-- Event history timeline will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Recent Modifications -->
+                    <div class="governance-section">
+                        <h4>Recent Data Modifications</h4>
+                        <div class="lineage-modifications" id="lineage-modifications">
+                            <div class="modifications-loading">Loading recent modifications...</div>
+                        </div>
+                    </div>
+                </div>
+

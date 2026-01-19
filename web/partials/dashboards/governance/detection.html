@@ -1,0 +1,64 @@
+                <!-- Detection Page -->
+                <div id="governance-detection-page" class="governance-page" data-page="detection" style="display: none;">
+                    <div class="governance-section-header">
+                        <h3>Security Detection Alerts</h3>
+                        <div class="governance-actions">
+                            <button type="button" class="btn-governance" id="detection-refresh-btn" aria-label="Refresh alerts">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Detection Stats -->
+                    <div class="detection-stats-grid" id="detection-stats-grid">
+                        <div class="detection-stat-card severity-critical">
+                            <div class="stat-value" id="detection-critical">--</div>
+                            <div class="stat-label">Critical</div>
+                        </div>
+                        <div class="detection-stat-card severity-high">
+                            <div class="stat-value" id="detection-high">--</div>
+                            <div class="stat-label">High</div>
+                        </div>
+                        <div class="detection-stat-card severity-medium">
+                            <div class="stat-value" id="detection-medium">--</div>
+                            <div class="stat-label">Medium</div>
+                        </div>
+                        <div class="detection-stat-card severity-low">
+                            <div class="stat-value" id="detection-low">--</div>
+                            <div class="stat-label">Low</div>
+                        </div>
+                    </div>
+
+                    <!-- Alerts Table -->
+                    <div class="detection-table-container">
+                        <table class="governance-table" id="detection-alerts-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>User</th>
+                                    <th>Severity</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detection-alerts-tbody">
+                                <tr><td colspan="7" class="table-loading">Loading alerts...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Detection Rules -->
+                    <div class="governance-section">
+                        <h4>Detection Rules Configuration</h4>
+                        <div class="detection-rules-grid" id="detection-rules-grid">
+                            <div class="rules-loading">Loading rules...</div>
+                        </div>
+                    </div>
+                </div>
+

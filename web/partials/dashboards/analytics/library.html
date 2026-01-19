@@ -1,0 +1,147 @@
+            <!-- Library Deep-Dive Dashboard -->
+            <div id="analytics-library" class="analytics-page" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics-library" tabindex="0">
+                <h2>Library Analytics</h2>
+                <p class="page-description">Deep-dive analytics for individual libraries</p>
+
+                <!-- Library Sub-Tabs (Charts vs Details view) -->
+                <nav class="sub-tabs" role="tablist" aria-label="Library view options" data-testid="library-sub-tabs">
+                    <button class="sub-tab active" data-sub-tab="library-charts" role="tab" aria-selected="true" aria-controls="library-charts-panel" id="tab-library-charts">
+                        Charts
+                    </button>
+                    <button class="sub-tab" data-sub-tab="library-details" role="tab" aria-selected="false" aria-controls="library-details-panel" id="tab-library-details">
+                        Details
+                    </button>
+                </nav>
+
+                <!-- Charts Tab Panel (existing content) -->
+                <div id="library-charts-panel" class="sub-tab-panel active" role="tabpanel" aria-labelledby="tab-library-charts" data-testid="library-charts-panel">
+                    <!-- Library Selector -->
+                    <div class="library-selector-container" style="margin-bottom: 20px; padding: 15px; background: #1e1e2e; border-radius: 8px;">
+                    <label for="library-selector" style="margin-right: 10px; font-weight: 500;">Select Library:</label>
+                    <select id="library-selector" aria-label="Select a library for detailed analytics" style="background: #2a2a3e; color: #e0e0e0; border: 1px solid #3a3a4e; padding: 8px 15px; border-radius: 4px; min-width: 200px;">
+                        <option value="">-- Select a library --</option>
+                    </select>
+                    <span id="library-loading" style="margin-left: 15px; display: none;">Loading...</span>
+                </div>
+
+                <!-- Library Overview Stats -->
+                <div id="library-overview-stats" class="library-stats" style="display: none;">
+                    <div class="stats-grid" role="region" aria-label="Library statistics" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Items</div>
+                            <div class="stat-value" id="library-total-items">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Watched</div>
+                            <div class="stat-value" id="library-watched-items">-</div>
+                            <div class="stat-trend" id="library-watched-percent">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Playbacks</div>
+                            <div class="stat-value" id="library-total-playbacks">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Unique Users</div>
+                            <div class="stat-value" id="library-unique-users">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Watch Time</div>
+                            <div class="stat-value" id="library-watch-time">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Avg Completion</div>
+                            <div class="stat-value" id="library-avg-completion">-</div>
+                        </div>
+                    </div>
+
+                    <div class="most-watched" style="margin-bottom: 20px; padding: 15px; background: #1e1e2e; border-radius: 8px;">
+                        <span style="color: #9ca3af;">Most Watched:</span>
+                        <span id="library-most-watched" style="font-weight: 600; color: #00d4aa; margin-left: 10px;">-</span>
+                    </div>
+                </div>
+
+                <div class="chart-grid" role="region" aria-label="Library analytics charts">
+                    <!-- Top Users by Library -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Users in Library</div>
+                            <button class="chart-export" data-chart="library-users">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-library-users" tabindex="0" aria-label="Top users in selected library showing plays and watch time"></div>
+                    </div>
+
+                    <!-- Plays by Day Trend -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Daily Playback Trend</div>
+                            <button class="chart-export" data-chart="library-trend">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-library-trend" tabindex="0" aria-label="Daily playback trend for selected library"></div>
+                    </div>
+
+                    <!-- Quality Distribution -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Quality Distribution</div>
+                            <button class="chart-export" data-chart="library-quality">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-library-quality" tabindex="0" aria-label="Content quality distribution showing HDR, 4K, and surround sound content"></div>
+                    </div>
+
+                    <!-- Content Health Metrics -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Content Health</div>
+                        </div>
+                        <div class="chart-content library-health" id="library-health-metrics" style="padding: 20px;">
+                            <div class="health-metrics-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                                <div class="health-metric">
+                                    <div class="health-label" style="color: #9ca3af; font-size: 12px;">Stale Content</div>
+                                    <div class="health-value" id="health-stale-content" style="font-size: 24px; font-weight: 600; color: #ff9800;">-</div>
+                                    <div class="health-desc" style="font-size: 11px; color: #6b7280;">Not watched in 90 days</div>
+                                </div>
+                                <div class="health-metric">
+                                    <div class="health-label" style="color: #9ca3af; font-size: 12px;">Popularity Score</div>
+                                    <div class="health-value" id="health-popularity" style="font-size: 24px; font-weight: 600; color: #00d4aa;">-</div>
+                                    <div class="health-desc" style="font-size: 11px; color: #6b7280;">Plays per item</div>
+                                </div>
+                                <div class="health-metric">
+                                    <div class="health-label" style="color: #9ca3af; font-size: 12px;">Engagement Score</div>
+                                    <div class="health-value" id="health-engagement" style="font-size: 24px; font-weight: 600; color: #3b82f6;">-</div>
+                                    <div class="health-desc" style="font-size: 11px; color: #6b7280;">Avg completion rate</div>
+                                </div>
+                                <div class="health-metric">
+                                    <div class="health-label" style="color: #9ca3af; font-size: 12px;">Growth Rate</div>
+                                    <div class="health-value" id="health-growth" style="font-size: 24px; font-weight: 600;">-</div>
+                                    <div class="health-desc" style="font-size: 11px; color: #6b7280;">vs previous period</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Empty state when no library selected -->
+                    <div id="library-empty-state" class="empty-state" style="text-align: center; padding: 60px 20px; color: #9ca3af;">
+                        <div style="font-size: 18px; font-weight: 500; margin-bottom: 10px;">Select a Library</div>
+                        <div>Choose a library from the dropdown above to view detailed analytics</div>
+                    </div>
+                </div>
+
+                <!-- Details Tab Panel (Library Details Manager) -->
+                <div id="library-details-panel" class="sub-tab-panel" role="tabpanel" aria-labelledby="tab-library-details" data-testid="library-details-panel" style="display: none;">
+                    <!-- Container for LibraryDetailsManager - renders library table with drill-down -->
+                    <div id="library-details-container" data-testid="library-details-container">
+                        <!-- LibraryDetailsManager will render here:
+                             - Library table (all libraries list)
+                             - Click row -> slide-in panel with:
+                               - User stats per library
+                               - Media info table
+                               - Watch time stats
+                        -->
+                        <div class="loading-state" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            Loading library details...
+                        </div>
+                    </div>
+                </div>
+            </div>
+

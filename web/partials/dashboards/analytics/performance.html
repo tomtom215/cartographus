@@ -1,0 +1,142 @@
+            <!-- Performance Page -->
+            <div id="analytics-performance" class="analytics-page" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics-performance" tabindex="0">
+                <h2>Technical Performance</h2>
+                <p class="page-description">Bandwidth, streaming quality, and infrastructure metrics</p>
+
+                <div class="chart-grid" role="region" aria-label="Technical performance charts">
+                    <h3 class="section-header">Bandwidth & Infrastructure</h3>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Bandwidth Usage Trends</div>
+                            <button class="chart-export" data-chart="bandwidth-trends">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-bandwidth-trends" tabindex="0" aria-label="Bandwidth Trends interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Bandwidth by Transcode Decision</div>
+                            <button class="chart-export" data-chart="bandwidth-transcode">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-bandwidth-transcode" tabindex="0" aria-label="Bandwidth by Transcode Decision interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Bandwidth by Resolution</div>
+                            <button class="chart-export" data-chart="bandwidth-resolution">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-bandwidth-resolution" tabindex="0" aria-label="Bandwidth by Resolution interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Bandwidth Users</div>
+                            <button class="chart-export" data-chart="bandwidth-users">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-bandwidth-users" tabindex="0" aria-label="Top Bandwidth Users interactive chart"></div>
+                    </div>
+
+                    <h3 class="section-header">Bitrate & Bandwidth Analytics (v1.42)</h3>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Bitrate Distribution</div>
+                            <button class="chart-export" data-chart="bitrate-distribution">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-bitrate-distribution" tabindex="0" role="img" aria-label="Histogram showing bitrate distribution ranges for source and transcode streams"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Bandwidth Utilization Over Time</div>
+                            <button class="chart-export" data-chart="bitrate-utilization">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-bitrate-utilization" tabindex="0" role="img" aria-label="Area chart showing bandwidth utilization trends over 30 days"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Bitrate by Resolution</div>
+                            <button class="chart-export" data-chart="bitrate-resolution">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-bitrate-resolution" tabindex="0" role="img" aria-label="Bar chart comparing average bitrate by video resolution"></div>
+                    </div>
+
+                    <h3 class="section-header">Quality & Technical</h3>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Transcode vs Direct Play</div>
+                            <button class="chart-export" data-chart="transcode">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-transcode" tabindex="0" aria-label="Transcode Decision Distribution interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Video Resolution Distribution</div>
+                            <button class="chart-export" data-chart="resolution">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-resolution" tabindex="0" aria-label="Resolution Distribution interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Resolution Quality Loss Analysis</div>
+                            <button class="chart-export" data-chart="resolution-mismatch">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-resolution-mismatch" tabindex="0" aria-label="Resolution Mismatch Analysis interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">HDR & Dynamic Range Distribution</div>
+                            <button class="chart-export" data-chart="hdr-analytics">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-hdr-analytics" tabindex="0" aria-label="HDR Analytics interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Audio Quality Distribution</div>
+                            <button class="chart-export" data-chart="audio-analytics">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-audio-analytics" tabindex="0" aria-label="Audio Analytics interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Subtitle Usage Analytics</div>
+                            <button class="chart-export" data-chart="subtitle-analytics">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-subtitle-analytics" tabindex="0" aria-label="Subtitle Analytics interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Connection Security Overview</div>
+                            <button class="chart-export" data-chart="connection-security">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-connection-security" tabindex="0" aria-label="Connection Security Analysis interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Concurrent Streams Analytics</div>
+                            <button class="chart-export" data-chart="concurrent-streams">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-concurrent-streams" tabindex="0" aria-label="Concurrent Streams interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Pause Pattern & Engagement Analysis</div>
+                            <button class="chart-export" data-chart="pause-patterns">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-pause-patterns" tabindex="0" aria-label="Pause Patterns interactive chart"></div>
+                    </div>
+                </div>
+            </div>
+

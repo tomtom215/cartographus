@@ -1,0 +1,211 @@
+            <!-- Annual Wrapped Reports (Spotify-style Year-in-Review) -->
+            <div id="analytics-wrapped" class="analytics-page" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics-wrapped" tabindex="0">
+                <h2>Annual Wrapped</h2>
+                <p class="page-description">Your personalized media consumption journey - Spotify Wrapped style</p>
+
+                <!-- Controls -->
+                <div class="wrapped-controls">
+                    <select id="wrapped-year-select" aria-label="Select year">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                    <button id="wrapped-generate-btn" class="btn btn-primary" title="Generate reports (Admin)">Generate Reports</button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="wrapped-loading" class="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Loading your wrapped report...</p>
+                </div>
+
+                <!-- Content Container -->
+                <div id="wrapped-content">
+                    <!-- Server Stats Section -->
+                    <section class="wrapped-section">
+                        <h3>Server Statistics</h3>
+                        <div class="wrapped-stats-grid">
+                            <div class="wrapped-stat-card">
+                                <div class="wrapped-stat-label">Total Users</div>
+                                <div class="wrapped-stat-value" id="wrapped-total-users">-</div>
+                            </div>
+                            <div class="wrapped-stat-card">
+                                <div class="wrapped-stat-label">Total Watch Time</div>
+                                <div class="wrapped-stat-value" id="wrapped-total-watch-time">-</div>
+                            </div>
+                            <div class="wrapped-stat-card">
+                                <div class="wrapped-stat-label">Total Playbacks</div>
+                                <div class="wrapped-stat-value" id="wrapped-total-playbacks">-</div>
+                            </div>
+                            <div class="wrapped-stat-card">
+                                <div class="wrapped-stat-label">Unique Content</div>
+                                <div class="wrapped-stat-value" id="wrapped-unique-content">-</div>
+                            </div>
+                        </div>
+                        <div class="wrapped-highlights">
+                            <div class="wrapped-highlight">
+                                <span class="highlight-label">Top Movie:</span>
+                                <span class="highlight-value" id="wrapped-top-movie">-</span>
+                            </div>
+                            <div class="wrapped-highlight">
+                                <span class="highlight-label">Top Show:</span>
+                                <span class="highlight-value" id="wrapped-top-show">-</span>
+                            </div>
+                            <div class="wrapped-highlight">
+                                <span class="highlight-label">Top Genre:</span>
+                                <span class="highlight-value" id="wrapped-top-genre">-</span>
+                            </div>
+                            <div class="wrapped-highlight">
+                                <span class="highlight-label">Peak Month:</span>
+                                <span class="highlight-value" id="wrapped-peak-month">-</span>
+                            </div>
+                            <div class="wrapped-highlight">
+                                <span class="highlight-label">Avg Completion:</span>
+                                <span class="highlight-value" id="wrapped-avg-completion">-</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Note: Leaderboard removed for user privacy -->
+                    <!-- Individual users only see their own statistics -->
+
+                    <!-- Personal Report Section -->
+                    <section class="wrapped-section" id="wrapped-user-section">
+                        <h3>Your Year in Review</h3>
+                        <div id="wrapped-user-content">
+                            <!-- Core Stats -->
+                            <div class="wrapped-user-stats">
+                                <div class="wrapped-card" data-animate="true">
+                                    <div class="wrapped-card-icon">&#128249;</div>
+                                    <div class="wrapped-card-value" id="wrapped-user-watch-time">-</div>
+                                    <div class="wrapped-card-label">Total Watch Time</div>
+                                </div>
+                                <div class="wrapped-card" data-animate="true">
+                                    <div class="wrapped-card-icon">&#127909;</div>
+                                    <div class="wrapped-card-value" id="wrapped-user-playbacks">-</div>
+                                    <div class="wrapped-card-label">Total Playbacks</div>
+                                </div>
+                                <div class="wrapped-card" data-animate="true">
+                                    <div class="wrapped-card-icon">&#127916;</div>
+                                    <div class="wrapped-card-value" id="wrapped-user-unique-content">-</div>
+                                    <div class="wrapped-card-label">Unique Titles</div>
+                                </div>
+                                <div class="wrapped-card" data-animate="true">
+                                    <div class="wrapped-card-icon">&#9989;</div>
+                                    <div class="wrapped-card-value" id="wrapped-user-completion">-</div>
+                                    <div class="wrapped-card-label">Completion Rate</div>
+                                </div>
+                            </div>
+
+                            <!-- Activity Stats -->
+                            <div class="wrapped-activity-stats">
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">Days Active:</span>
+                                    <span class="mini-value" id="wrapped-user-days-active">-</span>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">Longest Streak:</span>
+                                    <span class="mini-value" id="wrapped-user-streak">-</span>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">Binge Sessions:</span>
+                                    <span class="mini-value" id="wrapped-user-binges">-</span>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">Discovery Rate:</span>
+                                    <span class="mini-value" id="wrapped-user-discovery">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Quality Stats -->
+                            <div class="wrapped-quality-stats">
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">Preferred Platform:</span>
+                                    <span class="mini-value" id="wrapped-user-platform">-</span>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">Direct Play:</span>
+                                    <span class="mini-value" id="wrapped-user-direct-play">-</span>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">4K Viewing:</span>
+                                    <span class="mini-value" id="wrapped-user-4k">-</span>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">HDR Viewing:</span>
+                                    <span class="mini-value" id="wrapped-user-hdr">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Top Content -->
+                            <div class="wrapped-top-content">
+                                <div class="wrapped-content-section">
+                                    <h4>Top Movies</h4>
+                                    <div id="wrapped-top-movies" class="wrapped-content-list"></div>
+                                </div>
+                                <div class="wrapped-content-section">
+                                    <h4>Top Shows</h4>
+                                    <div id="wrapped-top-shows" class="wrapped-content-list"></div>
+                                </div>
+                                <div class="wrapped-content-section">
+                                    <h4>Top Genres</h4>
+                                    <div id="wrapped-top-genres" class="wrapped-genre-list"></div>
+                                </div>
+                            </div>
+
+                            <!-- Viewing Patterns -->
+                            <div class="wrapped-patterns">
+                                <h4>Viewing Patterns</h4>
+                                <div class="wrapped-pattern-stats">
+                                    <div class="wrapped-mini-stat">
+                                        <span class="mini-label">Peak Hour:</span>
+                                        <span class="mini-value" id="wrapped-peak-hour">-</span>
+                                    </div>
+                                    <div class="wrapped-mini-stat">
+                                        <span class="mini-label">Peak Day:</span>
+                                        <span class="mini-value" id="wrapped-peak-day">-</span>
+                                    </div>
+                                    <div class="wrapped-mini-stat">
+                                        <span class="mini-label">Peak Month:</span>
+                                        <span class="mini-value" id="wrapped-user-peak-month">-</span>
+                                    </div>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">First Watch:</span>
+                                    <span class="mini-value" id="wrapped-first-watch">-</span>
+                                </div>
+                                <div class="wrapped-mini-stat">
+                                    <span class="mini-label">Last Watch:</span>
+                                    <span class="mini-value" id="wrapped-last-watch">-</span>
+                                </div>
+                                <div class="wrapped-charts">
+                                    <div id="wrapped-hour-chart" class="wrapped-chart"></div>
+                                    <div id="wrapped-day-chart" class="wrapped-chart"></div>
+                                </div>
+                            </div>
+
+                            <!-- Timeline -->
+                            <div class="wrapped-timeline">
+                                <h4>Monthly Journey</h4>
+                                <div id="wrapped-timeline-content" class="timeline-content"></div>
+                            </div>
+
+                            <!-- Achievements -->
+                            <div class="wrapped-achievements">
+                                <h4>Achievements</h4>
+                                <div id="wrapped-achievements-content" class="achievements-grid"></div>
+                            </div>
+
+                            <!-- Share Card -->
+                            <div class="wrapped-share">
+                                <h4>Share Your Wrapped</h4>
+                                <div id="wrapped-share-card" class="share-card-container"></div>
+                                <div class="share-buttons">
+                                    <button id="wrapped-share-btn" class="btn btn-secondary">Copy Share Link</button>
+                                    <button id="wrapped-export-btn" class="btn btn-secondary">Export Image</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>

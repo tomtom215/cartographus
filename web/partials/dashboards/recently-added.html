@@ -1,0 +1,50 @@
+            <!-- Recently Added Dashboard -->
+            <div id="recently-added-container" class="dashboard-view" style="display: none;" role="tabpanel" aria-labelledby="tab-recently-added" tabindex="-1">
+                <h2>Recently Added Content</h2>
+                <div id="recently-added-filters" class="recently-added-filters">
+                    <select id="recently-added-media-type" aria-label="Media type filter">
+                        <option value="">All Media Types</option>
+                        <option value="movie">Movies</option>
+                        <option value="show">TV Shows</option>
+                        <option value="artist">Music</option>
+                    </select>
+                    <select id="recently-added-library" aria-label="Library filter">
+                        <option value="">All Libraries</option>
+                    </select>
+                    <!-- Enhanced pagination controls -->
+                    <select id="recently-added-count" aria-label="Items per page">
+                        <option value="10">10 items</option>
+                        <option value="25" selected>25 items</option>
+                        <option value="50">50 items</option>
+                        <option value="100">100 items</option>
+                        <option value="250">250 items</option>
+                        <option value="0">Load All</option>
+                    </select>
+                </div>
+                <div id="recently-added-grid" class="recently-added-grid">
+                    <div id="recently-added-loading" class="loading-state">Loading recently added content...</div>
+                </div>
+                <!-- Enhanced pagination with page jump -->
+                <div id="recently-added-pagination" class="pagination enhanced-pagination">
+                    <button id="recently-added-first" class="pagination-btn" aria-label="Go to first page" title="First page">
+                        <span aria-hidden="true">««</span>
+                    </button>
+                    <button id="recently-added-prev" class="pagination-btn" aria-label="Go to previous page" title="Previous page" disabled>
+                        <span aria-hidden="true">←</span> Prev
+                    </button>
+                    <div class="pagination-jump">
+                        <label for="recently-added-page-input" class="visually-hidden">Go to page</label>
+                        <input type="number" id="recently-added-page-input" min="1" value="1" aria-label="Page number">
+                        <span id="recently-added-page-total">/ 1</span>
+                        <button id="recently-added-go" class="pagination-btn pagination-go" aria-label="Go to page">Go</button>
+                    </div>
+                    <button id="recently-added-next" class="pagination-btn" aria-label="Go to next page" title="Next page">
+                        Next <span aria-hidden="true">→</span>
+                    </button>
+                    <button id="recently-added-last" class="pagination-btn" aria-label="Go to last page" title="Last page">
+                        <span aria-hidden="true">»»</span>
+                    </button>
+                    <span id="recently-added-page-info" class="pagination-info" aria-live="polite"></span>
+                </div>
+            </div>
+

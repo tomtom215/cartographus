@@ -1,0 +1,117 @@
+            <!-- Content Analytics Page -->
+            <div id="analytics-content" class="analytics-page" style="display: none;" role="tabpanel" aria-labelledby="tab-analytics-content" tabindex="0">
+                <h2>Content Analytics</h2>
+                <p class="page-description">Library statistics and popular content insights</p>
+
+                <!-- Content Sub-Tabs (Collections & Playlists) -->
+                <nav class="sub-tabs" role="tablist" aria-label="Content view options" data-testid="content-sub-tabs">
+                    <button class="sub-tab active" data-sub-tab="content-analytics" role="tab" aria-selected="true" aria-controls="content-analytics-panel" id="tab-content-analytics">
+                        Analytics
+                    </button>
+                    <button class="sub-tab" data-sub-tab="content-collections" role="tab" aria-selected="false" aria-controls="content-collections-panel" id="tab-content-collections">
+                        Collections
+                    </button>
+                    <button class="sub-tab" data-sub-tab="content-playlists" role="tab" aria-selected="false" aria-controls="content-playlists-panel" id="tab-content-playlists">
+                        Playlists
+                    </button>
+                </nav>
+
+                <!-- Analytics Tab Panel (existing content) -->
+                <div id="content-analytics-panel" class="sub-tab-panel active" role="tabpanel" aria-labelledby="tab-content-analytics" data-testid="content-analytics-panel">
+                    <div class="chart-grid" role="region" aria-label="Content analytics charts">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Library Distribution</div>
+                            <button class="chart-export" data-chart="libraries">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-libraries" tabindex="0" aria-label="Library Distribution interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Content Rating Distribution</div>
+                            <button class="chart-export" data-chart="ratings">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-ratings" tabindex="0" aria-label="Content Rating Distribution interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Duration Statistics by Media Type</div>
+                            <button class="chart-export" data-chart="duration">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-duration" tabindex="0" aria-label="Duration Statistics by Media Type interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Release Years</div>
+                            <button class="chart-export" data-chart="years">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-years" tabindex="0" aria-label="Top Release Years interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <div class="chart-title">Codec Combination Distribution</div>
+                            <button class="chart-export" data-chart="codec">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-codec" tabindex="0" aria-label="Codec Combination Distribution interactive chart"></div>
+                    </div>
+
+                    <h3 class="section-header">Popular Content</h3>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top Movies</div>
+                            <button class="chart-export" data-chart="popular-movies">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-popular-movies" tabindex="0" aria-label="Top Movies interactive chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Top TV Shows</div>
+                            <button class="chart-export" data-chart="popular-shows">Export PNG</button>
+                        </div>
+                        <div class="chart-content" id="chart-popular-shows" tabindex="0" aria-label="Top TV Shows interactive chart"></div>
+                    </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Top Episodes</div>
+                                <button class="chart-export" data-chart="popular-episodes">Export PNG</button>
+                            </div>
+                            <div class="chart-content" id="chart-popular-episodes" tabindex="0" aria-label="Top Episodes interactive chart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collections Tab Panel (Collections Browser) -->
+                <div id="content-collections-panel" class="sub-tab-panel" role="tabpanel" aria-labelledby="tab-content-collections" data-testid="content-collections-panel" style="display: none;">
+                    <!-- Library filter for collections (optional - collections can be per-library) -->
+                    <div class="library-filter-container" style="margin-bottom: 20px; padding: 15px; background: #1e1e2e; border-radius: 8px;">
+                        <label for="collections-library-filter" style="margin-right: 10px; font-weight: 500;">Filter by Library:</label>
+                        <select id="collections-library-filter" aria-label="Filter collections by library" style="background: #2a2a3e; color: #e0e0e0; border: 1px solid #3a3a4e; padding: 8px 15px; border-radius: 4px; min-width: 200px;">
+                            <option value="">All Libraries</option>
+                        </select>
+                    </div>
+                    <!-- Container for LibraryContentManager (collections mode) -->
+                    <div id="collections-container" data-testid="collections-container">
+                        <div class="loading-state" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            Loading collections...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Playlists Tab Panel (Playlists Browser) -->
+                <div id="content-playlists-panel" class="sub-tab-panel" role="tabpanel" aria-labelledby="tab-content-playlists" data-testid="content-playlists-panel" style="display: none;">
+                    <!-- Container for LibraryContentManager (playlists mode) -->
+                    <div id="playlists-container" data-testid="playlists-container">
+                        <div class="loading-state" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            Loading playlists...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
