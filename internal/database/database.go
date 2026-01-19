@@ -78,17 +78,13 @@ func New(cfg *config.DatabaseConfig, serverLat, serverLon float64) (*DB, error) 
 		}
 	}
 
-	// CRITICAL: Preload extensions BEFORE opening the main database.
-	// When DuckDB opens a database file, it immediately replays the WAL (Write-Ahead Log).
-	// If the WAL contains ALTER TABLE statements that use extension functions (e.g.,
-	// TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP from the ICU extension), WAL replay will fail
-	// with "GetDefaultDatabase with no default database set" if extensions aren't loaded.
-	//
-	// By loading extensions in an in-memory database first, DuckDB caches them per-process,
-	// making them available when we open the main database file for WAL replay.
-	if err := preloadExtensions(); err != nil {
-		logging.Warn().Err(err).Msg("Failed to preload extensions, WAL replay may fail if database has pending changes")
-	}
+	// NOTE: Extension preloading is no longer needed.
+	// We now use autoload_known_extensions=true in the connection string, which
+	// automatically loads pre-installed extensions during WAL replay. This is more
+	// reliable than the previous approach of loading extensions in an in-memory
+	// database first (which didn't actually help because DuckDB doesn't cache
+	// loaded extensions across connections in a way that helps WAL replay).
+	// See: https://duckdb.org/docs/stable/dev/internal_errors for WAL replay errors
 
 	// Build connection string with tuning options
 	// preserve_insertion_order=false reduces memory usage but may change result order
@@ -97,9 +93,13 @@ func New(cfg *config.DatabaseConfig, serverLat, serverLon float64) (*DB, error) 
 		preserveOrder = "false"
 	}
 
-	// Disable auto-install/auto-load to prevent hangs in restricted network environments
-	// Extensions are explicitly loaded by installExtensions() with proper timeout handling
-	connStr := fmt.Sprintf("%s?access_mode=read_write&threads=%d&max_memory=%s&preserve_insertion_order=%s&autoinstall_known_extensions=false&autoload_known_extensions=false",
+	// Disable auto-install to prevent network downloads in restricted environments.
+	// Enable auto-load so locally pre-installed extensions are loaded during WAL replay.
+	// This is CRITICAL: Without autoload, WAL replay fails with "GetDefaultDatabase with
+	// no default database set" when the WAL contains ALTER TABLE statements that use
+	// extension functions (e.g., ICU's CURRENT_TIMESTAMP for TIMESTAMPTZ defaults).
+	// Extensions are pre-installed in Docker images and via setup-duckdb-extensions.sh.
+	connStr := fmt.Sprintf("%s?access_mode=read_write&threads=%d&max_memory=%s&preserve_insertion_order=%s&autoinstall_known_extensions=false&autoload_known_extensions=true",
 		cfg.Path, numThreads, cfg.MaxMemory, preserveOrder)
 
 	conn, err := sql.Open("duckdb", connStr)
@@ -197,68 +197,6 @@ func (db *DB) Conn() *sql.DB {
 	return db.conn
 }
 
-// preloadExtensions loads DuckDB extensions in an in-memory database before opening
-// the main database file. This ensures extensions are available during WAL replay.
-//
-// DuckDB caches loaded extensions per-process, so once loaded in any database
-// connection (even in-memory), they become available for all subsequent connections.
-// This prevents "GetDefaultDatabase with no default database set" errors during
-// WAL replay when the WAL contains ALTER TABLE statements with extension functions.
-//
-// This function is skipped in CI/test environments where extensions may not be
-// installed and tests use DUCKDB_SPATIAL_OPTIONAL=true anyway.
-func preloadExtensions() error {
-	// Skip in CI environments - tests use DUCKDB_SPATIAL_OPTIONAL=true and
-	// don't need extension preloading. This also prevents potential resource
-	// contention issues when running many parallel tests.
-	if os.Getenv("CI") != "" || os.Getenv("GITHUB_ACTIONS") != "" {
-		logging.Debug().Msg("Skipping extension preload in CI environment")
-		return nil
-	}
-
-	logging.Debug().Msg("Preloading DuckDB extensions for WAL replay compatibility")
-
-	// Open an in-memory database with autoload disabled (we'll load explicitly)
-	conn, err := sql.Open("duckdb", ":memory:?autoinstall_known_extensions=false&autoload_known_extensions=false")
-	if err != nil {
-		return fmt.Errorf("failed to open in-memory database for extension preload: %w", err)
-	}
-
-	// Ensure proper cleanup: disable connection pooling before close
-	// This prevents resource leaks that could affect the main database connection
-	defer func() {
-		conn.SetConnMaxLifetime(0)
-		conn.SetMaxIdleConns(0)
-		conn.SetMaxOpenConns(0)
-		closeQuietly(conn)
-	}()
-
-	// List of core extensions that might be used in table defaults
-	// ICU is critical - it provides TIMESTAMPTZ and timezone functions
-	extensions := []string{"icu", "json", "inet", "spatial"}
-
-	for _, ext := range extensions {
-		// Check if extension is installed locally
-		if !isExtensionInstalledLocally(ext) {
-			logging.Debug().Str("extension", ext).Msg("Extension not installed locally, skipping preload")
-			continue
-		}
-
-		// Load the extension
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		_, err := conn.ExecContext(ctx, fmt.Sprintf("LOAD %s;", ext))
-		cancel()
-
-		if err != nil {
-			logging.Debug().Str("extension", ext).Err(err).Msg("Failed to preload extension")
-			// Continue with other extensions - non-fatal
-		} else {
-			logging.Debug().Str("extension", ext).Msg("Extension preloaded successfully")
-		}
-	}
-
-	return nil
-}
 
 // Close closes the database connection and all prepared statements.
 // It performs a CHECKPOINT before closing to flush the WAL to the main database file.
