@@ -27,16 +27,23 @@ import { BaseChartRenderer } from './BaseChartRenderer';
 import { CHART_COLORS, STYLE_CONSTANTS } from '../config/colors';
 import type { EChartsCallbackDataParams } from '../types';
 
-// Extend window interface for temporal data storage
-declare global {
-  interface Window {
-    temporalHeatmapData?: TemporalHeatmapResponse;
-  }
-}
-
 export class AdvancedChartRenderer extends BaseChartRenderer {
+  /**
+   * FIX: Store temporal data as instance property instead of polluting window global.
+   * Used for animation control in temporal heatmap.
+   */
+  private temporalData: TemporalHeatmapResponse | null = null;
+
   render(_data: any): void {
     // Base render method - unused in this renderer
+  }
+
+  /**
+   * Get stored temporal heatmap data for animation control.
+   * Returns null if no data has been loaded.
+   */
+  getTemporalData(): TemporalHeatmapResponse | null {
+    return this.temporalData;
   }
 
   renderTemporalHeatmap(data: TemporalHeatmapResponse): void {
@@ -52,8 +59,8 @@ export class AdvancedChartRenderer extends BaseChartRenderer {
       container.textContent = `${data.buckets.length} time periods (${data.interval})`;
     }
 
-    // Store temporal data for animation control
-    window.temporalHeatmapData = data;
+    // Store temporal data for animation control (uses instance property, not window global)
+    this.temporalData = data;
   }
 
   renderResolutionMismatch(data: ResolutionMismatchAnalytics): void {

@@ -21,6 +21,8 @@ import type {
     PlexCapabilities,
     PlexBandwidthStatistics,
     PlexMediaContainer,
+    PlexIdentityResponse,
+    PlexCapabilitiesResponse,
     PlexFriendsListResponse,
     PlexInviteFriendRequest,
     PlexSharedServersListResponse,
@@ -39,8 +41,9 @@ import { BaseAPIClient } from './client';
  */
 export class PlexAPI extends BaseAPIClient {
     async getPlexIdentity(): Promise<PlexServerIdentity> {
-        const response = await this.fetch<PlexMediaContainer<PlexServerIdentity>>('/plex/identity');
-        return response.data.MediaContainer as unknown as PlexServerIdentity;
+        // FIX: Use proper PlexIdentityResponse type instead of unsafe assertion
+        const response = await this.fetch<PlexIdentityResponse>('/plex/identity');
+        return response.data.MediaContainer;
     }
 
     async getPlexLibrarySections(): Promise<PlexLibrarySection[]> {
@@ -109,8 +112,9 @@ export class PlexAPI extends BaseAPIClient {
     }
 
     async getPlexCapabilities(): Promise<PlexCapabilities> {
-        const response = await this.fetch<PlexMediaContainer<PlexCapabilities>>('/plex/capabilities');
-        return response.data.MediaContainer as unknown as PlexCapabilities;
+        // FIX: Use proper PlexCapabilitiesResponse type instead of unsafe assertion
+        const response = await this.fetch<PlexCapabilitiesResponse>('/plex/capabilities');
+        return response.data.MediaContainer;
     }
 
     async getPlexBandwidthStatistics(): Promise<PlexBandwidthStatistics[]> {

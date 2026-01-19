@@ -25,16 +25,23 @@ export class ChartManager {
   private resizeDebounceTimer: number | null = null;
   /** Debounce delay in milliseconds (200ms is optimal for resize) */
   private static readonly RESIZE_DEBOUNCE_DELAY = 200;
+  /** Bound resize handler reference for proper cleanup */
+  private boundResizeHandler: () => void;
+  /** Keyboard event listeners by container ID for cleanup on theme change */
+  private keyboardListeners: Map<string, { keydown: (e: KeyboardEvent) => void; blur: () => void }> = new Map();
 
   constructor(private api: API) {
     // Detect device capabilities for optimal renderer selection
     this.isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     this.isLowMemory = this.detectLowMemory();
 
+    // Store bound resize handler reference for proper cleanup in destroy()
+    this.boundResizeHandler = () => this.debouncedResizeCharts();
+
     this.setupLazyLoading();
     this.setupExportButtons();
     // Use debounced resize handler to prevent excessive redraws during window resize
-    window.addEventListener('resize', () => this.debouncedResizeCharts());
+    window.addEventListener('resize', this.boundResizeHandler);
   }
 
   // Detect low memory devices
@@ -98,14 +105,20 @@ export class ChartManager {
    * - Arrow Left/Right: Navigate between data points
    * - Home/End: Jump to first/last data point
    * - Enter: Announce current data point details
+   *
+   * FIX: Stores listener references to prevent accumulation on theme changes.
+   * Old listeners are removed before adding new ones.
    */
   private setupKeyboardNavigation(chartId: string): void {
     const container = document.getElementById(chartId);
     if (!container) return;
 
+    // Remove existing listeners for this container to prevent accumulation
+    this.removeKeyboardListeners(chartId);
+
     let currentDataIndex = -1; // -1 = no selection
 
-    container.addEventListener('keydown', (e: KeyboardEvent) => {
+    const keydownHandler = (e: KeyboardEvent) => {
       const chart = this.charts.get(chartId);
       if (!chart) return;
 
@@ -171,10 +184,10 @@ export class ChartManager {
         // Announce to screen reader
         this.announceToScreenReader(announcement);
       }
-    });
+    };
 
     // Clear highlight when focus leaves chart
-    container.addEventListener('blur', () => {
+    const blurHandler = () => {
       const chart = this.charts.get(chartId);
       if (chart) {
         chart.dispatchAction({
@@ -183,7 +196,45 @@ export class ChartManager {
         });
       }
       currentDataIndex = -1;
+    };
+
+    // Store references for cleanup
+    this.keyboardListeners.set(chartId, { keydown: keydownHandler, blur: blurHandler });
+
+    // Add the event listeners
+    container.addEventListener('keydown', keydownHandler);
+    container.addEventListener('blur', blurHandler);
+  }
+
+  /**
+   * Remove keyboard listeners for a specific chart container.
+   * Called before adding new listeners to prevent accumulation.
+   */
+  private removeKeyboardListeners(chartId: string): void {
+    const listeners = this.keyboardListeners.get(chartId);
+    if (!listeners) return;
+
+    const container = document.getElementById(chartId);
+    if (container) {
+      container.removeEventListener('keydown', listeners.keydown);
+      container.removeEventListener('blur', listeners.blur);
+    }
+    this.keyboardListeners.delete(chartId);
+  }
+
+  /**
+   * Remove all keyboard listeners for all chart containers.
+   * Called during destroy() for complete cleanup.
+   */
+  private removeAllKeyboardListeners(): void {
+    this.keyboardListeners.forEach((listeners, chartId) => {
+      const container = document.getElementById(chartId);
+      if (container) {
+        container.removeEventListener('keydown', listeners.keydown);
+        container.removeEventListener('blur', listeners.blur);
+      }
     });
+    this.keyboardListeners.clear();
   }
 
   /**
@@ -835,6 +886,18 @@ export class ChartManager {
   }
 
   destroy(): void {
+    // Remove window resize listener to prevent memory leak
+    window.removeEventListener('resize', this.boundResizeHandler);
+
+    // Clear any pending resize debounce timer
+    if (this.resizeDebounceTimer !== null) {
+      window.clearTimeout(this.resizeDebounceTimer);
+      this.resizeDebounceTimer = null;
+    }
+
+    // Remove all keyboard listeners to prevent memory leak
+    this.removeAllKeyboardListeners();
+
     if (this.observer) {
       this.observer.disconnect();
       this.observer = null;

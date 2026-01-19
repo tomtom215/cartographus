@@ -290,4 +290,16 @@ export function getAPICacheManager(): APICacheManager {
   return globalCacheInstance;
 }
 
+/**
+ * FIX: Destroy the global cache manager instance.
+ * Should be called during app teardown/logout to stop cleanup timer and free resources.
+ * A new instance will be created on next getAPICacheManager() call.
+ */
+export function destroyCacheManager(): void {
+  if (globalCacheInstance) {
+    globalCacheInstance.destroy();
+    globalCacheInstance = null;
+  }
+}
+
 export default APICacheManager;

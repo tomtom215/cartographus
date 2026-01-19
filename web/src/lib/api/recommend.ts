@@ -16,6 +16,7 @@ import type {
     TrainingStatus,
     RecommendConfig,
     RecommendMetrics,
+    RecommendStatusResponse,
     UserPreference,
     WhatsNextRequest,
     WhatsNextResponse,
@@ -89,8 +90,9 @@ export class RecommendAPI extends BaseAPIClient {
      * @returns Training status including progress and last trained time
      */
     async getTrainingStatus(): Promise<TrainingStatus> {
-        const response = await this.fetch<TrainingStatus>('/recommendations/status');
-        return response.data;
+        // FIX: Backend returns combined {training, metrics} - extract training part
+        const response = await this.fetch<RecommendStatusResponse>('/recommendations/status');
+        return response.data.training;
     }
 
     /**
@@ -122,8 +124,9 @@ export class RecommendAPI extends BaseAPIClient {
      * @returns Engine performance metrics
      */
     async getMetrics(): Promise<RecommendMetrics> {
-        const response = await this.fetch<RecommendMetrics>('/recommendations/status');
-        return response.data;
+        // FIX: Backend returns combined {training, metrics} - extract metrics part
+        const response = await this.fetch<RecommendStatusResponse>('/recommendations/status');
+        return response.data.metrics;
     }
 
     /**
