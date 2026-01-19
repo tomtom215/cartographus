@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // https://github.com/tomtom215/cartographus
 import { API, LocationFilter, PlaybackEvent } from './lib/api';
+import { destroyCacheManager } from './lib/api-cache';
 import { createLogger } from './lib/logger';
 import { MapManager } from './lib/map';
 import { getRoleGuard } from './lib/auth/RoleGuard';
@@ -1766,6 +1767,9 @@ class App {
         // Special cleanup methods
         this.wsManager?.disconnect();
         this.toastManager?.dismissAll();
+
+        // FIX: Clean up API cache manager to stop cleanup timer
+        destroyCacheManager();
 
         // Stop all intervals/timers to prevent memory leaks
         this.stopAutoRefresh();

@@ -469,3 +469,23 @@ export interface PlexMediaContainer<T> {
         StatisticsBandwidth?: T[];
     };
 }
+
+/**
+ * FIX: Specific response type for /plex/identity endpoint.
+ * The identity data is directly on MediaContainer, not in an array.
+ */
+export interface PlexIdentityResponse {
+    MediaContainer: PlexServerIdentity & {
+        size?: number;
+    };
+}
+
+/**
+ * FIX: Specific response type for /plex/capabilities endpoint.
+ * The capabilities data is directly on MediaContainer, not in an array.
+ */
+export interface PlexCapabilitiesResponse {
+    MediaContainer: PlexCapabilities & {
+        size?: number;
+    };
+}
