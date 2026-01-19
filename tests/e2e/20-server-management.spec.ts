@@ -587,8 +587,8 @@ test.describe('Server Management UI', () => {
         if (btn) btn.click();
       });
 
-      // Wait for reload
-      await page.waitForTimeout(500);
+      // DETERMINISTIC: Wait for server list to be updated (network + DOM update)
+      await page.waitForLoadState('networkidle', { timeout: TIMEOUTS.MEDIUM }).catch(() => {});
 
       // Should still have servers
       const finalCards = await page.locator('.server-card').count();
@@ -615,10 +615,8 @@ test.describe('Server Management UI', () => {
 
       // Switch to mobile viewport
       await page.setViewportSize({ width: 375, height: 667 });
-      await page.waitForTimeout(TIMEOUTS.ANIMATION);
-
-      // Server list should still be visible
-      await expect(page.locator('[data-testid="server-list"]')).toBeVisible();
+      // DETERMINISTIC: Wait for server list to be visible (layout stabilized)
+      await expect(page.locator('[data-testid="server-list"]')).toBeVisible({ timeout: TIMEOUTS.ANIMATION });
 
       // Cards should stack (check that container is narrower)
       const serverList = page.locator('[data-testid="server-list"]');
@@ -633,10 +631,8 @@ test.describe('Server Management UI', () => {
 
       // Switch to mobile viewport
       await page.setViewportSize({ width: 375, height: 667 });
-      await page.waitForTimeout(TIMEOUTS.ANIMATION);
-
-      // Header should still be visible
-      await expect(page.locator('.multi-server-header')).toBeVisible();
+      // DETERMINISTIC: Wait for header to be visible (layout stabilized)
+      await expect(page.locator('.multi-server-header')).toBeVisible({ timeout: TIMEOUTS.ANIMATION });
     });
   });
 

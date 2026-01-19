@@ -392,8 +392,8 @@ test.describe('Server Management UI', () => {
         return container && getComputedStyle(container).display !== 'none';
       }, { timeout: TIMEOUTS.RENDER });
 
-      // Wait for initial data load to complete
-      await page.waitForTimeout(500);
+      // DETERMINISTIC: Wait for initial data load (network idle or visible elements)
+      await page.waitForLoadState('networkidle', { timeout: TIMEOUTS.MEDIUM }).catch(() => {});
 
       // DETERMINISTIC: Use waitForResponse to verify API call is made
       // This is more reliable than manual request counting
