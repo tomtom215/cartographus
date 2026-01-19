@@ -121,36 +121,36 @@ func (db *DB) getFieldQualityMetrics(ctx context.Context, whereClause string, ar
 		SELECT
 			COUNT(*) AS total_records,
 
-			-- Identity fields
-			SUM(CASE WHEN user_id IS NULL THEN 1 ELSE 0 END) AS null_user_id,
-			SUM(CASE WHEN username IS NULL OR username = '' THEN 1 ELSE 0 END) AS null_username,
-			SUM(CASE WHEN session_key IS NULL OR session_key = '' THEN 1 ELSE 0 END) AS null_session_key,
+			-- Identity fields (COALESCE to handle empty tables)
+			COALESCE(SUM(CASE WHEN user_id IS NULL THEN 1 ELSE 0 END), 0) AS null_user_id,
+			COALESCE(SUM(CASE WHEN username IS NULL OR username = '' THEN 1 ELSE 0 END), 0) AS null_username,
+			COALESCE(SUM(CASE WHEN session_key IS NULL OR session_key = '' THEN 1 ELSE 0 END), 0) AS null_session_key,
 
 			-- Network fields
-			SUM(CASE WHEN ip_address IS NULL OR ip_address = '' THEN 1 ELSE 0 END) AS null_ip_address,
+			COALESCE(SUM(CASE WHEN ip_address IS NULL OR ip_address = '' THEN 1 ELSE 0 END), 0) AS null_ip_address,
 
 			-- Temporal fields
-			SUM(CASE WHEN started_at IS NULL THEN 1 ELSE 0 END) AS null_started_at,
-			SUM(CASE WHEN started_at > CURRENT_TIMESTAMP THEN 1 ELSE 0 END) AS future_started_at,
+			COALESCE(SUM(CASE WHEN started_at IS NULL THEN 1 ELSE 0 END), 0) AS null_started_at,
+			COALESCE(SUM(CASE WHEN started_at > CURRENT_TIMESTAMP THEN 1 ELSE 0 END), 0) AS future_started_at,
 
 			-- Content fields
-			SUM(CASE WHEN media_type IS NULL OR media_type = '' THEN 1 ELSE 0 END) AS null_media_type,
-			SUM(CASE WHEN title IS NULL OR title = '' THEN 1 ELSE 0 END) AS null_title,
-			SUM(CASE WHEN media_type NOT IN ('movie', 'episode', 'track', 'photo', 'clip') THEN 1 ELSE 0 END) AS invalid_media_type,
+			COALESCE(SUM(CASE WHEN media_type IS NULL OR media_type = '' THEN 1 ELSE 0 END), 0) AS null_media_type,
+			COALESCE(SUM(CASE WHEN title IS NULL OR title = '' THEN 1 ELSE 0 END), 0) AS null_title,
+			COALESCE(SUM(CASE WHEN media_type NOT IN ('movie', 'episode', 'track', 'photo', 'clip') THEN 1 ELSE 0 END), 0) AS invalid_media_type,
 
 			-- Device fields
-			SUM(CASE WHEN platform IS NULL OR platform = '' THEN 1 ELSE 0 END) AS null_platform,
-			SUM(CASE WHEN player IS NULL OR player = '' THEN 1 ELSE 0 END) AS null_player,
+			COALESCE(SUM(CASE WHEN platform IS NULL OR platform = '' THEN 1 ELSE 0 END), 0) AS null_platform,
+			COALESCE(SUM(CASE WHEN player IS NULL OR player = '' THEN 1 ELSE 0 END), 0) AS null_player,
 
 			-- Quality fields
-			SUM(CASE WHEN transcode_decision IS NULL OR transcode_decision = '' THEN 1 ELSE 0 END) AS null_transcode,
-			SUM(CASE WHEN video_resolution IS NULL OR video_resolution = '' THEN 1 ELSE 0 END) AS null_resolution,
+			COALESCE(SUM(CASE WHEN transcode_decision IS NULL OR transcode_decision = '' THEN 1 ELSE 0 END), 0) AS null_transcode,
+			COALESCE(SUM(CASE WHEN video_resolution IS NULL OR video_resolution = '' THEN 1 ELSE 0 END), 0) AS null_resolution,
 
 			-- Engagement fields
-			SUM(CASE WHEN percent_complete IS NULL THEN 1 ELSE 0 END) AS null_percent_complete,
-			SUM(CASE WHEN percent_complete < 0 OR percent_complete > 100 THEN 1 ELSE 0 END) AS invalid_percent_complete,
-			SUM(CASE WHEN play_duration IS NULL THEN 1 ELSE 0 END) AS null_play_duration,
-			SUM(CASE WHEN play_duration < 0 THEN 1 ELSE 0 END) AS invalid_play_duration,
+			COALESCE(SUM(CASE WHEN percent_complete IS NULL THEN 1 ELSE 0 END), 0) AS null_percent_complete,
+			COALESCE(SUM(CASE WHEN percent_complete < 0 OR percent_complete > 100 THEN 1 ELSE 0 END), 0) AS invalid_percent_complete,
+			COALESCE(SUM(CASE WHEN play_duration IS NULL THEN 1 ELSE 0 END), 0) AS null_play_duration,
+			COALESCE(SUM(CASE WHEN play_duration < 0 THEN 1 ELSE 0 END), 0) AS invalid_play_duration,
 
 			-- Unique counts for cardinality
 			COUNT(DISTINCT user_id) AS unique_users,
