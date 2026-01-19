@@ -8,7 +8,7 @@
  * HTML Composition Script
  * =============================================================================
  * Combines partial HTML files into a single index.html using {{include "path"}}
- * markers. This allows the 4,111-line index.html to be split into maintainable
+ * markers. This allows the 4,109-line index.html to be split into maintainable
  * partial files that fit within AI context windows.
  *
  * Usage:
@@ -37,7 +37,7 @@ const path = require('path');
 const PARTIALS_DIR = path.join(__dirname, '../partials');
 const OUTPUT_FILE = path.join(__dirname, '../public/index.html');
 const MAX_INCLUDE_DEPTH = 10;
-const EXPECTED_LINE_COUNT = 4111;
+const EXPECTED_LINE_COUNT = 4109;
 
 // Include pattern: {{include "path/to/file.html"}}
 const INCLUDE_PATTERN = /\{\{include\s+"([^"]+)"\}\}/g;
@@ -154,7 +154,10 @@ function compose() {
 
     // Calculate metrics
     const duration = Date.now() - startTime;
-    const lineCount = composedContent.split('\n').length;
+    // Count lines like wc -l (count newlines, not segments)
+    const lineCount = composedContent.endsWith('\n')
+        ? composedContent.split('\n').length - 1
+        : composedContent.split('\n').length;
     const partialCount = countPartials(PARTIALS_DIR);
     const sizeKB = (Buffer.byteLength(composedContent, 'utf8') / 1024).toFixed(1);
 
