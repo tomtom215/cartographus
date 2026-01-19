@@ -8,7 +8,7 @@ require (
 	github.com/ThreeDotsLabs/watermill-nats/v2 v2.1.3
 	github.com/duckdb/duckdb-go/v2 v2.5.4
 	// ADR-0016: Chi router for route grouping and middleware composition
-	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-chi/chi/v5 v5.2.4
 	// High-performance JSON library (drop-in replacement for encoding/json)
 	github.com/goccy/go-json v0.10.5
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -20,7 +20,7 @@ require (
 	github.com/sony/gobreaker/v2 v2.4.0
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.6
-	golang.org/x/crypto v0.46.0
+	golang.org/x/crypto v0.47.0
 	golang.org/x/time v0.14.0
 )
 
