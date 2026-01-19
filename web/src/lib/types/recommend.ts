@@ -236,6 +236,17 @@ export interface AlgorithmInfo {
 }
 
 /**
+ * Combined status response from /recommendations/status endpoint.
+ * The backend returns both training status and metrics in a single response.
+ */
+export interface RecommendStatusResponse {
+    /** Current training status */
+    training: TrainingStatus;
+    /** Engine performance metrics */
+    metrics: RecommendMetrics;
+}
+
+/**
  * Request for "What's Next" predictions (Markov chain).
  */
 export interface WhatsNextRequest {

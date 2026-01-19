@@ -156,10 +156,11 @@ export class API {
     }
 
     setCacheStatusCallback(callback: CacheStatusCallback): void {
+        // FIX: Added this.recommend which was missing from the module list
         const modules = [this.auth, this.core, this.locations, this.analytics, this.spatial,
             this.tautulli, this.backup, this.plex, this.detection, this.dedupe,
-            this.audit, this.dlq, this.wal, this.crossPlatform, this.wrapped, this.newsletter,
-            this.server, this.sync];
+            this.audit, this.dlq, this.wal, this.crossPlatform, this.recommend, this.wrapped,
+            this.newsletter, this.server, this.sync];
         modules.forEach(m => m.setCacheStatusCallback(callback));
     }
 
@@ -246,10 +247,11 @@ export class API {
     }
 
     private syncTokenToModules(token: string | null): void {
+        // FIX: Added this.recommend which was missing from the module list
         const modules = [this.core, this.locations, this.analytics, this.spatial,
             this.tautulli, this.backup, this.plex, this.detection, this.dedupe,
-            this.audit, this.dlq, this.wal, this.crossPlatform, this.wrapped, this.newsletter,
-            this.server, this.sync];
+            this.audit, this.dlq, this.wal, this.crossPlatform, this.recommend, this.wrapped,
+            this.newsletter, this.server, this.sync];
         modules.forEach(m => m.setToken(token));
     }
 

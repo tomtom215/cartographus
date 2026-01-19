@@ -330,8 +330,11 @@ export class BaseAPIClient {
                 // Only auto-logout for 401s on authenticated endpoints, not login attempts
                 if (response.status === 401 && !endpoint.includes('/auth/login')) {
                     this.token = null;
+                    // FIX: Clear ALL auth storage keys (was missing auth_user_id and auth_role)
                     SafeStorage.removeItem('auth_token');
                     SafeStorage.removeItem('auth_username');
+                    SafeStorage.removeItem('auth_user_id');
+                    SafeStorage.removeItem('auth_role');
                     SafeStorage.removeItem('auth_expires_at');
                     window.location.reload();
                     throw new Error('Session expired. Please login again.');
