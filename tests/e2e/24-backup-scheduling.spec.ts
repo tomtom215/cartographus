@@ -87,8 +87,18 @@ async function waitForBackupDataLoaded(page: import('@playwright/test').Page): P
         { timeout: TIMEOUTS.MEDIUM }
     );
 
-    // Wait for updateScheduleFieldsState() to complete after display update
-    await page.waitForTimeout(100);
+    // DETERMINISTIC: Wait for schedule fields to be enabled (updateScheduleFieldsState completed)
+    await page.waitForFunction(
+        () => {
+            const interval = document.getElementById('schedule-interval') as HTMLSelectElement;
+            // If toggle is checked, fields should be enabled
+            const toggle = document.getElementById('schedule-enabled') as HTMLInputElement;
+            if (!toggle || !interval) return false;
+            // Fields are enabled when toggle is checked
+            return toggle.checked ? !interval.disabled : interval.disabled;
+        },
+        { timeout: TIMEOUTS.SHORT }
+    ).catch(() => {});
 }
 
 test.describe('Backup Scheduling', () => {
@@ -226,9 +236,7 @@ test.describe('Backup Scheduling', () => {
             await toggleSwitch.uncheck();
             await expect(toggleSwitch).not.toBeChecked();
 
-            // Wait for updateScheduleFieldsState() to run
-            await page.waitForTimeout(50);
-
+            // DETERMINISTIC: Wait for interval to become disabled (updateScheduleFieldsState ran)
             await expect(intervalSelect).toBeDisabled({ timeout: TIMEOUTS.RENDER });
             await expect(hourSelect).toBeDisabled();
             await expect(typeSelect).toBeDisabled();
@@ -238,9 +246,7 @@ test.describe('Backup Scheduling', () => {
             await toggleSwitch.check();
             await expect(toggleSwitch).toBeChecked();
 
-            // Wait for updateScheduleFieldsState() to run
-            await page.waitForTimeout(50);
-
+            // DETERMINISTIC: Wait for interval to become enabled (updateScheduleFieldsState ran)
             await expect(intervalSelect).toBeEnabled({ timeout: TIMEOUTS.RENDER });
             await expect(hourSelect).toBeEnabled();
             await expect(typeSelect).toBeEnabled();
@@ -298,8 +304,14 @@ test.describe('Backup Scheduling', () => {
             const isChecked = await toggleSwitch.isChecked();
             if (!isChecked) {
                 await toggleSwitch.check();
-                // Wait for next backup calculation
-                await page.waitForTimeout(200);
+                // DETERMINISTIC: Wait for next backup value to update (not "Disabled")
+                await page.waitForFunction(
+                    () => {
+                        const el = document.getElementById('schedule-next-value');
+                        return el && el.textContent && el.textContent !== 'Disabled' && el.textContent !== '--';
+                    },
+                    { timeout: TIMEOUTS.SHORT }
+                ).catch(() => {});
             }
 
             // When enabled, should show a time estimate (not disabled states)

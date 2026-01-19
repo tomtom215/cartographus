@@ -67,10 +67,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Root Node.js (E2E test dependencies)
+node_modules/
+
 # Playwright test artifacts
 web/test-results/
 web/playwright-report/
 web/playwright/.cache/
+test-results/
+playwright-report/
+playwright/.auth/
 
 # DuckDB extensions (downloaded at runtime)
 *.duckdb_extension

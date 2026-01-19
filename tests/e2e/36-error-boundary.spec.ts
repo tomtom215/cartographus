@@ -74,7 +74,14 @@ test.describe('Error Boundary/Recovery UI', () => {
       // Stats should show placeholder/default state since API returns 500 errors
       // Page-level error routes have priority over context-level success routes
       const statsPlaybacks = page.locator('#stat-playbacks');
-      await page.waitForTimeout(500); // Allow time for API calls to fail and UI to update
+      // DETERMINISTIC: Wait for stats to be rendered (content present)
+      await page.waitForFunction(
+        () => {
+          const el = document.getElementById('stat-playbacks');
+          return el && el.textContent !== null;
+        },
+        { timeout: TIMEOUTS.SHORT }
+      ).catch(() => {}); // Continue even if timeout
       const playbacksText = await statsPlaybacks.textContent();
       // With error mocking active, stats should show placeholder '-' or '0' (not real data)
       expect(playbacksText === '-' || playbacksText === '0' || playbacksText === '').toBeTruthy();
@@ -130,7 +137,14 @@ test.describe('Error Boundary/Recovery UI', () => {
       // Initial load with error mocking - stats should show placeholder state
       // Page-level error routes intercept before context-level success routes
       const statsPlaybacks = page.locator('#stat-playbacks');
-      await page.waitForTimeout(500); // Allow time for API calls to fail
+      // DETERMINISTIC: Wait for stats element to have content
+      await page.waitForFunction(
+        () => {
+          const el = document.getElementById('stat-playbacks');
+          return el && el.textContent !== null;
+        },
+        { timeout: TIMEOUTS.SHORT }
+      ).catch(() => {});
       const initialText = await statsPlaybacks.textContent();
       // With errors, stats show placeholder '-' or '0' (not real data)
       expect(initialText === '-' || initialText === '0' || initialText === '').toBeTruthy();
@@ -175,8 +189,8 @@ test.describe('Error Boundary/Recovery UI', () => {
       await page.goto('/', { waitUntil: 'networkidle' });
       await expect(page.locator('#app')).toBeVisible({ timeout: TIMEOUTS.DEFAULT });
 
-      // Wait for any async error logging
-      await page.waitForTimeout(1000);
+      // DETERMINISTIC: Wait for network to settle (all API calls completed/failed)
+      await page.waitForLoadState('networkidle', { timeout: TIMEOUTS.DATA_LOAD }).catch(() => {});
 
       // Errors should be logged for debugging (implementation-dependent)
       // At minimum, app should remain functional even if no errors logged
@@ -602,7 +616,8 @@ test.describe('Error Boundary/Recovery UI', () => {
 
       // Press Escape key - should not crash or break the app
       await page.keyboard.press('Escape');
-      await page.waitForTimeout(200);
+      // DETERMINISTIC: Verify app is still responsive after keypress
+      // Instead of waiting, we directly check app visibility (Playwright auto-waits)
 
       // App should still be functional
       await expect(page.locator('#app')).toBeVisible();
@@ -797,8 +812,8 @@ test.describe('Error Boundary/Recovery UI', () => {
       await page.goto('/', { waitUntil: 'networkidle' });
       await expect(page.locator('#app')).toBeVisible({ timeout: TIMEOUTS.DEFAULT });
 
-      // Wait for async operations to complete
-      await page.waitForTimeout(1000);
+      // DETERMINISTIC: Wait for network to settle (all API calls completed/failed)
+      await page.waitForLoadState('networkidle', { timeout: TIMEOUTS.DATA_LOAD }).catch(() => {});
 
       // App should remain functional even with API errors
       await expect(page.locator('#app')).toBeVisible();
@@ -838,7 +853,14 @@ test.describe('Error Boundary State Persistence', () => {
 
     // Stats should show error/placeholder state
     const statsPlaybacks = page.locator('#stat-playbacks');
-    await page.waitForTimeout(500); // Allow error responses to be processed
+    // DETERMINISTIC: Wait for stats element to have content
+    await page.waitForFunction(
+      () => {
+        const el = document.getElementById('stat-playbacks');
+        return el && el.textContent !== null;
+      },
+      { timeout: TIMEOUTS.SHORT }
+    ).catch(() => {});
     const initialText = await statsPlaybacks.textContent();
     // With error mocking, stats show placeholder '-' or '0'
     expect(initialText === '-' || initialText === '0' || initialText === '').toBeTruthy();

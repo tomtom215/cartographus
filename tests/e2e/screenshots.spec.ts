@@ -347,8 +347,24 @@ test.describe('UI Screenshots @screenshot', () => {
         }
       }
 
-      // Additional wait for rendering
-      await page.waitForTimeout(TIMEOUTS.WEBGL_INIT);
+      // DETERMINISTIC: Wait for rendering to complete (canvas/WebGL ready or app stable)
+      // WHY: Using waitForFunction with condition instead of arbitrary timeout
+      await page.waitForFunction(
+        () => {
+          // Check if any canvas has been rendered (WebGL views)
+          const canvases = document.querySelectorAll('canvas');
+          for (const canvas of canvases) {
+            if (canvas.width > 0 && canvas.height > 0) return true;
+          }
+          // Check if app is in stable state (no loading indicators)
+          const loading = document.querySelector('.loading:visible, [data-loading="true"]');
+          return !loading;
+        },
+        { timeout: TIMEOUTS.WEBGL_INIT }
+      ).catch(() => {
+        // Timeout is acceptable - continue with screenshot
+        console.log('[E2E] screenshots: Render wait timed out, proceeding with screenshot');
+      });
 
       // Take full-page screenshot
       await page.screenshot({
@@ -401,7 +417,8 @@ test.describe('UI Component Screenshots @screenshot', () => {
       const btn = document.querySelector('button[data-view="analytics"], .nav-tab[data-view="analytics"]') as HTMLElement;
       if (btn) btn.click();
     });
-    await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
+    // DETERMINISTIC: Wait for analytics container to be visible instead of arbitrary timeout
+    await expect(page.locator('#analytics-container')).toBeVisible({ timeout: TIMEOUTS.DATA_LOAD });
 
     // Define charts by analytics page for comprehensive capture
     const chartsByPage: Record<string, string[]> = {
@@ -451,7 +468,8 @@ test.describe('UI Component Screenshots @screenshot', () => {
       const pageTab = page.locator(`.analytics-tab[data-analytics-page="${pageName}"]`);
       if (await pageTab.isVisible({ timeout: TIMEOUTS.WEBGL_INIT }).catch(() => false)) {
         await pageTab.click();
-        await page.waitForTimeout(TIMEOUTS.DATA_LOAD + 500);
+        // DETERMINISTIC: Wait for analytics page to be visible instead of arbitrary timeout
+        await expect(page.locator(`#analytics-${pageName}`)).toBeVisible({ timeout: TIMEOUTS.DATA_LOAD + 500 });
 
         // Wait for charts to render
         try {
@@ -470,7 +488,8 @@ test.describe('UI Component Screenshots @screenshot', () => {
             // ROOT CAUSE FIX: Accept both 'canvas' and 'svg' renderers - ChartManager uses SVG for small datasets
             const canvas = chart.locator('canvas, svg');
             if (await canvas.count() > 0) {
-              await page.waitForTimeout(TIMEOUTS.ANIMATION);
+              // DETERMINISTIC: Wait for chart element to be stable (rendered)
+              await expect(canvas.first()).toBeVisible({ timeout: TIMEOUTS.ANIMATION });
             }
 
             await chart.screenshot({
@@ -584,7 +603,8 @@ test.describe('UI State Screenshots @screenshot', () => {
     });
     // Reload to apply the cleared state
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(TIMEOUTS.RENDER);
+    // DETERMINISTIC: Wait for login form to be visible instead of arbitrary timeout
+    await expect(page.locator('#login-container')).toBeVisible({ timeout: TIMEOUTS.RENDER });
 
     // Capture login page state
     await page.screenshot({
@@ -621,7 +641,14 @@ test.describe('UI State Screenshots @screenshot', () => {
       await expect(page.locator(SELECTORS.APP_VISIBLE)).toBeVisible({ timeout: TIMEOUTS.DEFAULT });
       await waitForNavReady(page); // Wait for NavigationManager to initialize before clicking nav buttons
 
-      await page.waitForTimeout(TIMEOUTS.WEBGL_INIT);
+      // DETERMINISTIC: Wait for app to be stable (no loading indicators)
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('.loading:visible, [data-loading="true"]');
+          return !loading;
+        },
+        { timeout: TIMEOUTS.WEBGL_INIT }
+      ).catch(() => {});
 
       await page.screenshot({
         path: 'web/screenshots/empty-state.png',
@@ -658,7 +685,14 @@ test.describe('UI State Screenshots @screenshot', () => {
       await expect(page.locator(SELECTORS.APP_VISIBLE)).toBeVisible({ timeout: TIMEOUTS.DEFAULT });
       await waitForNavReady(page); // Wait for NavigationManager to initialize before clicking nav buttons
 
-      await page.waitForTimeout(TIMEOUTS.WEBGL_INIT);
+      // DETERMINISTIC: Wait for app to be stable (error state loaded)
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('.loading:visible, [data-loading="true"]');
+          return !loading;
+        },
+        { timeout: TIMEOUTS.WEBGL_INIT }
+      ).catch(() => {});
 
       await page.screenshot({
         path: 'web/screenshots/error-state.png',
@@ -696,14 +730,25 @@ async function performAction(page: Page, action: string): Promise<void> {
           }
         });
       });
-      await page.waitForTimeout(TIMEOUTS.ANIMATION / 3);
+      // DETERMINISTIC: Wait for WebGL cleanup to complete (contexts released)
+      await page.waitForFunction(
+        () => {
+          const canvases = document.querySelectorAll('canvas');
+          // No active WebGL contexts should remain
+          return canvases.length === 0 || Array.from(canvases).every(c => {
+            const gl = c.getContext('webgl') || c.getContext('webgl2');
+            return !gl || gl.isContextLost();
+          });
+        },
+        { timeout: TIMEOUTS.ANIMATION }
+      ).catch(() => {});
 
       const globeToggle = page.locator(SELECTORS.VIEW_MODE_3D);
       await expect(globeToggle).toBeVisible({ timeout: shortTimeout });
       await globeToggle.click();
-      // Wait for WebGL globe to initialize
-      await page.waitForTimeout(TIMEOUTS.WEBGL_INIT + 1000);
+      // DETERMINISTIC: Wait for globe container and canvas to be visible
       await expect(page.locator(SELECTORS.GLOBE)).toBeVisible({ timeout: mediumTimeout });
+      await expect(page.locator(SELECTORS.GLOBE_CANVAS)).toBeVisible({ timeout: TIMEOUTS.WEBGL_INIT });
       break;
     }
 
@@ -712,7 +757,7 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
+      // DETERMINISTIC: Wait for analytics container to be visible
       await expect(page.locator('#analytics-container')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -729,13 +774,23 @@ async function performAction(page: Page, action: string): Promise<void> {
           }
         });
       });
-      await page.waitForTimeout(TIMEOUTS.ANIMATION / 3); // Brief pause for cleanup
+      // DETERMINISTIC: Wait for cleanup by checking contexts are released
+      await page.waitForFunction(
+        () => {
+          const canvases = document.querySelectorAll('canvas');
+          return canvases.length === 0 || Array.from(canvases).every(c => {
+            const gl = c.getContext('webgl') || c.getContext('webgl2');
+            return !gl || gl.isContextLost();
+          });
+        },
+        { timeout: TIMEOUTS.ANIMATION }
+      ).catch(() => {});
 
       // Use button[data-view="..."] selector - consistent with 08-live-activity.spec.ts
       const activityTab = page.locator('button[data-view="activity"], .nav-tab[data-view="activity"]').first();
       await expect(activityTab).toBeVisible({ timeout: shortTimeout });
       await activityTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
+      // DETERMINISTIC: Wait for activity container to be visible
       await expect(page.locator('#activity-container')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -745,7 +800,7 @@ async function performAction(page: Page, action: string): Promise<void> {
       const recentTab = page.locator('button[data-view="recently-added"], .nav-tab[data-view="recently-added"]').first();
       await expect(recentTab).toBeVisible({ timeout: shortTimeout });
       await recentTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
+      // DETERMINISTIC: Wait for recently-added container to be visible
       await expect(page.locator('#recently-added-container')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -755,7 +810,7 @@ async function performAction(page: Page, action: string): Promise<void> {
       const serverTab = page.locator('button[data-view="server"], .nav-tab[data-view="server"]').first();
       await expect(serverTab).toBeVisible({ timeout: shortTimeout });
       await serverTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
+      // DETERMINISTIC: Wait for server container to be visible
       await expect(page.locator('#server-container')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -772,14 +827,24 @@ async function performAction(page: Page, action: string): Promise<void> {
           }
         });
       });
-      await page.waitForTimeout(TIMEOUTS.ANIMATION / 3);
+      // DETERMINISTIC: Wait for cleanup by checking contexts are released
+      await page.waitForFunction(
+        () => {
+          const canvases = document.querySelectorAll('canvas');
+          return canvases.length === 0 || Array.from(canvases).every(c => {
+            const gl = c.getContext('webgl') || c.getContext('webgl2');
+            return !gl || gl.isContextLost();
+          });
+        },
+        { timeout: TIMEOUTS.ANIMATION }
+      ).catch(() => {});
 
       const globeBtn = page.locator(SELECTORS.VIEW_MODE_3D);
       await expect(globeBtn).toBeVisible({ timeout: shortTimeout });
       await globeBtn.click();
-      // Wait for globe to fully initialize with controls
-      await page.waitForTimeout(TIMEOUTS.WEBGL_INIT + 1000);
-      await expect(page.locator('#globe-controls')).toBeVisible({ timeout: mediumTimeout });
+      // DETERMINISTIC: Wait for globe controls to be visible (globe fully initialized)
+      await expect(page.locator(SELECTORS.GLOBE)).toBeVisible({ timeout: mediumTimeout });
+      await expect(page.locator('#globe-controls')).toBeVisible({ timeout: TIMEOUTS.WEBGL_INIT });
       break;
     }
 
@@ -789,12 +854,13 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      // DETERMINISTIC: Wait for analytics container before clicking sub-tab
+      await expect(page.locator('#analytics-container')).toBeVisible({ timeout: shortTimeout });
       // Then click Content sub-tab
       const contentTab = page.locator('.analytics-tab[data-analytics-page="content"]');
       await expect(contentTab).toBeVisible({ timeout: shortTimeout });
       await contentTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
+      // DETERMINISTIC: Wait for content page to be visible
       await expect(page.locator('#analytics-content')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -803,11 +869,10 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      await expect(page.locator('#analytics-container')).toBeVisible({ timeout: shortTimeout });
       const usersTab = page.locator('.analytics-tab[data-analytics-page="users"]');
       await expect(usersTab).toBeVisible({ timeout: shortTimeout });
       await usersTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
       await expect(page.locator('#analytics-users')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -816,11 +881,10 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      await expect(page.locator('#analytics-container')).toBeVisible({ timeout: shortTimeout });
       const perfTab = page.locator('.analytics-tab[data-analytics-page="performance"]');
       await expect(perfTab).toBeVisible({ timeout: shortTimeout });
       await perfTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
       await expect(page.locator('#analytics-performance')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -829,11 +893,10 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      await expect(page.locator('#analytics-container')).toBeVisible({ timeout: shortTimeout });
       const geoTab = page.locator('.analytics-tab[data-analytics-page="geographic"]');
       await expect(geoTab).toBeVisible({ timeout: shortTimeout });
       await geoTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
       await expect(page.locator('#analytics-geographic')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -842,11 +905,10 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      await expect(page.locator('#analytics-container')).toBeVisible({ timeout: shortTimeout });
       const advancedTab = page.locator('.analytics-tab[data-analytics-page="advanced"]');
       await expect(advancedTab).toBeVisible({ timeout: shortTimeout });
       await advancedTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
       await expect(page.locator('#analytics-advanced')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -855,11 +917,10 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      await expect(page.locator('#analytics-container')).toBeVisible({ timeout: shortTimeout });
       const libraryTab = page.locator('.analytics-tab[data-analytics-page="library"]');
       await expect(libraryTab).toBeVisible({ timeout: shortTimeout });
       await libraryTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
       await expect(page.locator('#analytics-library')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -868,11 +929,10 @@ async function performAction(page: Page, action: string): Promise<void> {
       const analyticsTab = page.locator('button[data-view="analytics"], .nav-tab[data-view="analytics"]').first();
       await expect(analyticsTab).toBeVisible({ timeout: shortTimeout });
       await analyticsTab.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      await expect(page.locator('#analytics-container')).toBeVisible({ timeout: shortTimeout });
       const usersProfileTab = page.locator('.analytics-tab[data-analytics-page="users-profile"]');
       await expect(usersProfileTab).toBeVisible({ timeout: shortTimeout });
       await usersProfileTab.click();
-      await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
       await expect(page.locator('#analytics-users-profile')).toBeVisible({ timeout: mediumTimeout });
       break;
     }
@@ -881,7 +941,7 @@ async function performAction(page: Page, action: string): Promise<void> {
       const settingsBtn = page.locator('#settings-button');
       await expect(settingsBtn).toBeVisible({ timeout: shortTimeout });
       await settingsBtn.click();
-      await page.waitForTimeout(TIMEOUTS.RENDER);
+      // DETERMINISTIC: Wait for settings panel to be visible
       await expect(page.locator('#settings-panel')).toBeVisible({ timeout: mediumTimeout });
       break;
     }

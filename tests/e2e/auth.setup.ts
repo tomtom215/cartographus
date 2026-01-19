@@ -167,8 +167,8 @@ setup('authenticate', async ({ browser }) => {
     console.warn(`[AUTH] WARNING: Token expires in ${validForMinutes} minutes - tests may fail`);
   }
 
-  // Wait a bit for any remaining initialization before saving state
-  await page.waitForTimeout(TIMEOUTS.DATA_LOAD);
+  // DETERMINISTIC: Wait for network to settle (all initialization requests complete)
+  await page.waitForLoadState('networkidle', { timeout: TIMEOUTS.DATA_LOAD }).catch(() => {});
 
   console.log('[AUTH] Authentication successful - saving state');
 
