@@ -414,7 +414,8 @@ export class InsightsManager {
 
     /**
      * Render a single insight item
-     * Defense in depth: escape content even though it's internally generated
+     * Note: Icon is not escaped since it's an emoji from internal source (not user input).
+     * Other text content is escaped for defense in depth.
      */
     private renderInsight(insight: Insight): string {
         const trendClass = insight.trend === 'up' ? 'trend-up' : insight.trend === 'down' ? 'trend-down' : '';
@@ -425,7 +426,7 @@ export class InsightsManager {
                  data-testid="insight-item"
                  data-insight-id="${escapeHtml(insight.id)}"
                  role="listitem">
-                <div class="insight-icon" aria-hidden="true">${escapeHtml(insight.icon)}</div>
+                <div class="insight-icon" aria-hidden="true">${insight.icon}</div>
                 <div class="insight-content">
                     <div class="insight-title">${escapeHtml(insight.title)}</div>
                     <div class="insight-description">${escapeHtml(insight.description)}</div>
