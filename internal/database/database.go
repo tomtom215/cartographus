@@ -145,6 +145,19 @@ func New(cfg *config.DatabaseConfig, serverLat, serverLon float64) (*DB, error) 
 		logging.Warn().Err(err).Msg("Spatial optimizations initialization had issues")
 	}
 
+	// CRITICAL: Checkpoint after spatial optimizations to prevent WAL replay issues.
+	// The checkpoint in initialize() happens BEFORE initializeSpatialOptimizations(),
+	// so ALTER TABLE statements from spatial optimization would be in the WAL.
+	// If a crash occurs before this checkpoint, WAL replay will fail with
+	// "GetDefaultDatabase with no default database set" when DuckDB tries to
+	// re-validate column defaults that use extension functions (TIMESTAMPTZ).
+	// See: https://github.com/duckdb/duckdb/pull/16398 (partial fix for Copy, not AddColumn)
+	checkpointCtx, checkpointCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	if err := db.Checkpoint(checkpointCtx); err != nil {
+		logging.Warn().Err(err).Msg("Failed to checkpoint after spatial optimizations")
+	}
+	checkpointCancel()
+
 	return db, nil
 }
 
