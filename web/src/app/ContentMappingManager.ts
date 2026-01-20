@@ -626,13 +626,20 @@ export class ContentMappingManager {
    * Extract form values for creating a mapping
    */
   private extractMappingFormValues(form: HTMLFormElement) {
+    const titleEl = form.querySelector('#mapping-title') as HTMLInputElement | null;
+    const mediaTypeEl = form.querySelector('#mapping-media-type') as HTMLSelectElement | null;
+    const yearEl = form.querySelector('#mapping-year') as HTMLInputElement | null;
+    const imdbEl = form.querySelector('#mapping-imdb') as HTMLInputElement | null;
+    const tmdbEl = form.querySelector('#mapping-tmdb') as HTMLInputElement | null;
+    const tvdbEl = form.querySelector('#mapping-tvdb') as HTMLInputElement | null;
+
     return {
-      title: (form.querySelector('#mapping-title') as HTMLInputElement).value.trim(),
-      mediaType: (form.querySelector('#mapping-media-type') as HTMLSelectElement).value as 'movie' | 'show' | 'episode',
-      year: parseInt((form.querySelector('#mapping-year') as HTMLInputElement).value, 10),
-      imdbId: (form.querySelector('#mapping-imdb') as HTMLInputElement).value.trim(),
-      tmdbId: parseInt((form.querySelector('#mapping-tmdb') as HTMLInputElement).value, 10),
-      tvdbId: parseInt((form.querySelector('#mapping-tvdb') as HTMLInputElement).value, 10)
+      title: titleEl?.value.trim() ?? '',
+      mediaType: (mediaTypeEl?.value ?? 'movie') as 'movie' | 'show' | 'episode',
+      year: parseInt(yearEl?.value ?? '', 10),
+      imdbId: imdbEl?.value.trim() ?? '',
+      tmdbId: parseInt(tmdbEl?.value ?? '', 10),
+      tvdbId: parseInt(tvdbEl?.value ?? '', 10)
     };
   }
 
@@ -861,7 +868,8 @@ export class ContentMappingManager {
    * Handle linking a platform
    */
   private async handleLinkPlatform(mappingId: number, platform: Platform, form: HTMLFormElement): Promise<void> {
-    const platformId = (form.querySelector('#platform-id') as HTMLInputElement).value.trim();
+    const platformIdEl = form.querySelector('#platform-id') as HTMLInputElement | null;
+    const platformId = platformIdEl?.value.trim() ?? '';
     const operations = this.getPlatformOperations(platform);
 
     if (!operations) {
