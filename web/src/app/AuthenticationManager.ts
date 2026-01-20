@@ -230,9 +230,18 @@ export class AuthenticationManager {
             }
         }
 
-        const username = (document.getElementById('username') as HTMLInputElement).value.trim();
-        const password = (document.getElementById('password') as HTMLInputElement).value;
-        const rememberMe = (document.getElementById('remember-me') as HTMLInputElement)?.checked ?? false;
+        const usernameEl = document.getElementById('username') as HTMLInputElement | null;
+        const passwordEl = document.getElementById('password') as HTMLInputElement | null;
+        const rememberMeEl = document.getElementById('remember-me') as HTMLInputElement | null;
+
+        if (!usernameEl || !passwordEl) {
+            this.showLoginError('Login form elements not found');
+            return;
+        }
+
+        const username = usernameEl.value.trim();
+        const password = passwordEl.value;
+        const rememberMe = rememberMeEl?.checked ?? false;
 
         this.showLoginError('');
         this.loginButton.disabled = true;
