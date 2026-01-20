@@ -28,6 +28,7 @@ export class SidebarManager {
   private collapseIcon: HTMLElement | null;
   private filtersPanel: HTMLElement | null;
   private filtersCollapseBtn: HTMLElement | null;
+  private filtersCollapseIcon: HTMLElement | null;
   private isMobile: boolean;
   private isOpen: boolean;
   private isCollapsed: boolean;
@@ -51,6 +52,7 @@ export class SidebarManager {
     this.collapseIcon = document.getElementById('collapse-icon');
     this.filtersPanel = document.getElementById('filters');
     this.filtersCollapseBtn = document.getElementById('filters-collapse-btn');
+    this.filtersCollapseIcon = this.filtersCollapseBtn?.querySelector('.filters-collapse-icon') ?? null;
     this.isMobile = window.innerWidth <= 768;
     this.isOpen = false;
     this.isCollapsed = false;
@@ -382,11 +384,17 @@ export class SidebarManager {
       this.filtersCollapseBtn.setAttribute('aria-expanded', 'false');
       this.filtersCollapseBtn.setAttribute('aria-label', 'Expand filters panel');
       this.filtersCollapseBtn.setAttribute('title', 'Expand filters');
+      if (this.filtersCollapseIcon) {
+        this.filtersCollapseIcon.textContent = '\u25BC'; // Down arrow (expand)
+      }
     } else {
       this.filtersPanel.classList.remove('collapsed');
       this.filtersCollapseBtn.setAttribute('aria-expanded', 'true');
       this.filtersCollapseBtn.setAttribute('aria-label', 'Collapse filters panel');
       this.filtersCollapseBtn.setAttribute('title', 'Collapse filters');
+      if (this.filtersCollapseIcon) {
+        this.filtersCollapseIcon.textContent = '\u25B2'; // Up arrow (collapse)
+      }
     }
   }
 

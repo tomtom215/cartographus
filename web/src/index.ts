@@ -495,9 +495,6 @@ class App {
                 this.setupTautulliSubTabs();
                 this.setupIPHistoryModal();
 
-                // Initialize onboarding
-                this.initializeOnboarding();
-
                 // Load heavy dependencies in parallel
                 await this.loadLazyModules();
 
@@ -521,8 +518,19 @@ class App {
                     this.filterHistoryManager.recordState(this.filterManager!.buildFilter());
                 }
 
-                this.loadData();
-                this.startAutoRefresh();
+                // CRITICAL: Initialize onboarding/setup wizard BEFORE loading data
+                // On first run, the wizard guides users through setup - loading data before
+                // configuration is complete just causes errors and a broken experience.
+                // Only load data after wizard completes (or if not shown).
+                const wizardShown = await this.initializeOnboardingAsync();
+
+                if (!wizardShown) {
+                    // No wizard shown - user has already completed setup or skipped
+                    // Safe to load data now
+                    this.loadData();
+                    this.startAutoRefresh();
+                }
+                // If wizard was shown, loadData() will be called via onComplete callback
             } catch (error) {
                 // Log the error but don't crash the app
                 logger.error('[App] Initialization error:', error);
@@ -1045,45 +1053,19 @@ class App {
     }
 
     /**
-     * Initialize onboarding experience
+     * Initialize onboarding experience asynchronously
+     * Returns true if setup wizard was shown (first-run experience)
+     * Returns false if wizard was skipped (returning user)
+     *
+     * CRITICAL: This must complete BEFORE loadData() is called
+     * On first run, attempting to load data before setup causes errors and broken UI
      */
-    private initializeOnboarding(): void {
+    private async initializeOnboardingAsync(): Promise<boolean> {
         // Initialize setup wizard manager (first-time setup experience)
         this.setupWizardManager = new SetupWizardManager();
         this.onboardingManager = new OnboardingManager();
 
-        // Initialize setup wizard and onboarding after a small delay to ensure UI is ready
-        setTimeout(async () => {
-            if (this.setupWizardManager) {
-                this.setupWizardManager.init({
-                    onComplete: () => {
-                        this.onboardingManager?.init();
-                    },
-                    onStartTour: () => {
-                        this.onboardingManager?.init();
-                        this.onboardingManager?.startTour();
-                    },
-                    onTriggerSync: async () => {
-                        try {
-                            await this.api.triggerSync();
-                            this.toastManager?.success('Data sync started successfully', 'Sync Initiated');
-                        } catch (error) {
-                            logger.error('[SetupWizard] Failed to trigger sync:', error);
-                            this.toastManager?.error('Failed to start data sync. Please try again.', 'Sync Error');
-                        }
-                    }
-                });
-
-                const wasShown = await this.setupWizardManager.show();
-                if (!wasShown) {
-                    this.onboardingManager?.init();
-                }
-            } else {
-                this.onboardingManager?.init();
-            }
-        }, 500);
-
-        // Setup help tour button
+        // Setup help tour button (can do this immediately)
         document.getElementById('help-tour-btn')?.addEventListener('click', () => {
             this.onboardingManager?.restartTour();
         });
@@ -1093,6 +1075,47 @@ class App {
         setTimeout(() => {
             this.progressiveOnboardingManager?.init();
         }, 1500);
+
+        // Initialize the setup wizard with callbacks
+        this.setupWizardManager.init({
+            onComplete: () => {
+                // Wizard completed - user has configured data sources
+                // NOW it's safe to load data
+                this.onboardingManager?.init();
+                this.loadData();
+                this.startAutoRefresh();
+            },
+            onSkip: () => {
+                // User skipped the wizard - still need to load data
+                // They may want to explore the UI even without data sources configured
+                this.onboardingManager?.init();
+                this.loadData();
+                this.startAutoRefresh();
+            },
+            onStartTour: () => {
+                this.onboardingManager?.init();
+                this.onboardingManager?.startTour();
+            },
+            onTriggerSync: async () => {
+                try {
+                    await this.api.triggerSync();
+                    this.toastManager?.success('Data sync started successfully', 'Sync Initiated');
+                } catch (error) {
+                    logger.error('[SetupWizard] Failed to trigger sync:', error);
+                    this.toastManager?.error('Failed to start data sync. Please try again.', 'Sync Error');
+                }
+            }
+        });
+
+        // Check if wizard should show and show it
+        const wasShown = await this.setupWizardManager.show();
+
+        if (!wasShown) {
+            // Wizard was skipped (returning user) - initialize onboarding manager
+            this.onboardingManager?.init();
+        }
+
+        return wasShown;
     }
 
     /**

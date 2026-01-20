@@ -442,8 +442,10 @@ export class ErrorBoundaryManager {
      * Create error context from an Error object
      */
     static createContext(error: Error | unknown, component?: string): ErrorContext {
-        // Data-load errors are critical (main data loading failure)
-        const isCritical = component === 'data-load';
+        // Data-load errors use standard threshold (not critical)
+        // This allows graceful degradation on first failure, showing error overlay
+        // only after multiple consecutive failures (default: 3)
+        const isCritical = false;
 
         // Network errors
         if (error instanceof TypeError && error.message.includes('fetch')) {
