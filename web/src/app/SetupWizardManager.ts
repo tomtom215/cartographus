@@ -91,6 +91,7 @@ interface WizardStep {
  */
 export interface SetupWizardCallbacks {
   onComplete: () => void;
+  onSkip: () => void;
   onStartTour: () => void;
   onTriggerSync: () => void;
 }
@@ -568,6 +569,14 @@ export class SetupWizardManager {
   private skip(): void {
     SafeStorage.setItem('setup_wizard_skipped', 'true');
     this.hideModal();
+
+    // Safely invoke onSkip callback with error handling
+    // This allows the app to proceed with data loading after user skips setup
+    try {
+      this.callbacks?.onSkip();
+    } catch (error) {
+      logger.error('Error in onSkip callback', { error });
+    }
   }
 
   /**
