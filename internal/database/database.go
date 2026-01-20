@@ -210,7 +210,6 @@ func (db *DB) Conn() *sql.DB {
 	return db.conn
 }
 
-
 // Close closes the database connection and all prepared statements.
 // It performs a CHECKPOINT before closing to flush the WAL to the main database file.
 // This prevents WAL replay issues on next startup caused by a DuckDB bug where
